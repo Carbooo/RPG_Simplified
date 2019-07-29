@@ -9,7 +9,7 @@ from sources.root.fight.action.Actions import Actions
 ################### MELEE ATTACK CHAR CLASS #################
 #############################################################
 class MeleeAttackChar:
-    'Class to melee attack a character'
+    """Class to melee attack a character"""
     
     #[Description, command, melee power coef, melee handiness coef, risk coef, stamina coef, time coef]
     NormalBlow = {
@@ -21,48 +21,7 @@ class MeleeAttackChar:
         'stamina': 1.0,
         'time': 1.0
     }
-    QuickBlow = {
-        'description': "Quick blow",
-        'command': "QCB",
-        'power': 0.7,
-        'handiness': 0.85,
-        'risk': 0.85,
-        'stamina': 0.7,
-        'time': 0.7
-    }
-    PreciseBlow = {
-        'description': "Precise blow",
-        'command': "PRE",
-        'power': 0.65,
-        'handiness': 1.5,
-        'risk': 1.25,
-        'stamina': 0.9,
-        'time': 1.15
-    }
-    PowerfulBlow = {
-        'description': "Powerful blow",
-        'command': "POW",
-        'power': 1.85,
-        'handiness': 0.65,
-        'risk': 1.5,
-        'stamina': 1.5,
-        'time': 1.5
-    }
-    AttackType = []
-    AttackType.append(NormalBlow)
-    AttackType.append(QuickBlow)
-    AttackType.append(PreciseBlow)
-    AttackType.append(PowerfulBlow)
-    
-    #[Description, command, att coef, risk coef, stamina coef, post description]
-    LowRisk = {
-        'description': "Low risks with a small attack",
-        'command': "LOW", 
-        'attack': 0.5, 
-        'risk': 0.5, 
-        'stamina': 0.5, 
-        'post_description': "Low risk attack"
-    }
+
     NormalRisk = {
         'description': "Medium risks with a normal attack",
         'command': "MED", 
@@ -71,27 +30,7 @@ class MeleeAttackChar:
         'stamina': 1.0, 
         'post_description': "Medium risk attack"
     }
-    HighRisk = {
-        'description': "High risks with a strong attack",
-        'command': "HIG", 
-        'attack': 1.5, 
-        'risk': 2.0, 
-        'stamina': 1.5, 
-        'post_description': "High risk attack"
-    }
-    AttackRisk = []
-    AttackRisk.append(LowRisk)
-    AttackRisk.append(NormalRisk)
-    AttackRisk.append(HighRisk)
-    
-    #[Description, command, stamina coef, defense coef, post description]
-    NoDefense = {
-        'description': "Do not defend",
-        'command': "DND", 
-        'stamina': 0.0, 
-        'defense': 0.0, 
-        'post_description': "Not defending"
-    }
+
     Defense = {
         'description': "Defend with all your means",
         'command': "DFE", 
@@ -99,54 +38,22 @@ class MeleeAttackChar:
         'defense': 1.0, 
         'post_description': "Fully defending"
     }
-    Dodge = {
-        'description': "Only dodge",
-        'command': "DOG", 
-        'stamina': 1.0, 
-        'defense': 1.0, 
-        'post_description': "Only dodging"
-    }
-    CounterAttack = {
-        'description': "Counter attack while defending",
-        'command': "CAT", 
-        'stamina': 1.0, 
-        'defense': 1.0, 
-        'post_description': "Counter attacking"
-    }
-    DefenseType = []
-    DefenseType.append(NoDefense)
-    DefenseType.append(Defense)
-    DefenseType.append(Dodge)
-    DefenseType.append(CounterAttack)
-    
-    #[Description, command, def coef, stamina coef, post description]
+
     LowInvolvement = {
-        'description': "Barely defend, but keep free time for other fights", 
+        'description': "Not defending",
         'command': "BAR",
-        'defense': 0.5, 
-        'stamina': 0.5, 
-        'post_description': "Low defense involvement"
-    }
-    MediumInvolvement = {
-        'description': "Defend lightly and keep some free time for other fights", 
-        'command': "LIG",
-        'defense': 0.75, 
-        'stamina': 0.75, 
-        'post_description': "Medium defense involvement"
+        'defense': 0.0,
+        'stamina': 0.0,
+        'post_description': "Not defending for various reasons"
     }
     HighInvolvement = {
-        'description': "Fully defend, but spend all your time in this fight", 
+        'description': "Fully defend, but spend all your time in this fight",
         'command': "FUL",
-        'defense': 1.0, 
-        'stamina': 1.0, 
+        'defense': 1.0,
+        'stamina': 1.0,
         'post_description': "High defense involvement"
     }
-    DefenseInvolvement = []
-    DefenseInvolvement.append(LowInvolvement)
-    DefenseInvolvement.append(MediumInvolvement)
-    DefenseInvolvement.append(HighInvolvement)
-    
-    
+
     actual_defense = ["Full dodge", "Dodge", "Defense"]
     attack_effect = [0, 25, 50, 75] #["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]
     time_ratio = 0.85 #Ratio when the hit will occur
@@ -157,14 +64,13 @@ class MeleeAttackChar:
     def __init__(self, fight, character, target):
         Actions.__init__(self, fight)
         self.attacker = character
-        self.attack_type = "None"
-        self.attack_risk = "None"
+        self.attack_type = NormalBlow
+        self.attack_risk = NormalRisk
         self.attack_handicap = 0.0
         self.attack_unconsciousness_period = []
-        self.is_a_counter_attack = False
         self.defender = target
-        self.defense_type = MeleeAttackChar.NoDefense
-        self.defense_involvement = MeleeAttackChar.LowInvolvement
+        self.defense_type = MeleeAttackChar.Defense
+        self.defense_involvement = MeleeAttackChar.HighInvolvement
         self.defense_handicap = 0.0
         self.defense_unconsciousness_period = []
         self.actual_defense = "None"
@@ -180,43 +86,9 @@ class MeleeAttackChar:
             print("You do not have enough stamina (", \
                 self.attacker.body.get_current_stamina(), ") for a melee attack")
             return False
-        elif self.defender != NoneCharacter:
-            self.is_a_counter_attack = True
         elif not self.choose_target():
             return False
-        
-        print("What type of attack should it be?")
-        txt = "--> (" 
-        for attack_type in MeleeAttackChar.AttackType:
-            print("\t-", attack_type['description'], "(", attack_type['command'], ")")
-            txt += attack_type['command'] + "/"
-        txt += "): "
-        while 1:
-            read = input(txt)
-            for attack_type in MeleeAttackChar.AttackType:
-                if read == attack_type['command']:
-                    self.attack_type = attack_type
-                    break
-            if self.attack_type != "None":
-                break
-            print("The input", read, "is not recognized")
-        
-        print("How risky the attack should be?")
-        txt = "--> ("
-        for attack_risk in MeleeAttackChar.AttackRisk:
-            print("\t-", attack_risk['description'], "(", attack_risk['command'], ")")
-            txt += attack_risk['command'] + "/"
-        txt += "): "
-        while 1:
-            read = input(txt)
-            for attack_risk in MeleeAttackChar.AttackRisk:
-                if read == attack_risk['command']:
-                    self.attack_risk = attack_risk
-                    break
-            if self.attack_risk != "None":
-                break
-            print("The input", read, "is not recognized")               
-        
+
         self.attacker.last_direction = self.attacker.char_to_point_angle( \
             self.defender.abscissa, self.defender.ordinate)
         self.defense_handicap += 1 - self.defender.get_readiness()
@@ -285,8 +157,6 @@ class MeleeAttackChar:
         print("")
         print("--------- self.attacker -----------")
         self.attacker.print_attack_state()
-        print("Attack type:", self.attack_type['description'])
-        print("Attack risk:", self.attack_risk['post_description'])
         print("--------- self.defender -----------")
         self.defender.print_defense_state()
         print("Planned fighting ratio:", round(self.get_planned_fighting_ratio(self.defender),2))
@@ -299,90 +169,9 @@ class MeleeAttackChar:
             print(") is unconscious and cannot defend")
             print("The result of the attack will be displayed in a few time")
             time.sleep(3)
-            return None
-        
-        print("Choose one of the following defense:")
-        for defense in MeleeAttackChar.DefenseType:
-            print("\t-", defense['description'], " (", defense['command'], ")")
-        
-        while 1:
-            read = input('-->: ')
-            
-            if read == MeleeAttackChar.NoDefense['command']:
-                print("You have chosen not to defend")               
-                self.defense_type = MeleeAttackChar.NoDefense
-                break
-            
-            elif read == MeleeAttackChar.Defense['command']:
-                if not self.check_stamina_defense_requirement(MeleeAttackChar.Defense):
-                    continue
-                print("You have chosen to fully defend yourselves")             
-                self.defense_type = MeleeAttackChar.Defense
-                self.set_defend_action()
-                break
-                       
-            elif read == MeleeAttackChar.Dodge['command']:
-                if not self.check_stamina_defense_requirement(MeleeAttackChar.Dodge):
-                    continue
-                print("You have chosen to only dodge, preserving your equipped weapons")             
-                self.defense_type = MeleeAttackChar.Dodge
-                self.set_defend_action()
-                break
-            
-            elif read == MeleeAttackChar.CounterAttack['command']:
-                if not self.check_stamina_defense_requirement(MeleeAttackChar.CounterAttack):
-                    continue
-                if self.is_a_counter_attack or self.defender.is_a_melee_attacker():
-                    print("You are already throwing a blow, you cannot counter attack")
-                    continue
-                print("You have chosen to defend and attack at the same time")             
-                self.defense_type = MeleeAttackChar.CounterAttack
-                
-                if not (self.defender.is_waiting() or self.defender.is_melee_fighting()):
-                    self.fight.stop_action(self.defender) #If not yet fighting, stop other actions
-                if self.defender.is_waiting() or self.defender.timeline < self.attack_end_time:
-                    self.defender.timeline = self.attack_end_time
-                break
-            
-            else:
-                print("Defense:", read, "is not recognized")
-    
-        if self.defense_type == MeleeAttackChar.NoDefense:
             self.defense_involvement = MeleeAttackChar.LowInvolvement
-        else:
-            print("How hard do you want to defend?")
-            for involvement in MeleeAttackChar.DefenseInvolvement:
-                print("\t-", involvement['description'], " (", involvement['command'], ")")
-                    
-            while 1:
-                read = input('-->: ')
-                if read == MeleeAttackChar.LowInvolvement['command']:
-                    print("You have chosen to barely defend")               
-                    self.defense_involvement = MeleeAttackChar.LowInvolvement
-                    break
-                
-                elif read == MeleeAttackChar.MediumInvolvement['command']:
-                    print("You have chosen to defend lightly")               
-                    self.defense_involvement = MeleeAttackChar.MediumInvolvement
-                    break
-                           
-                elif read == MeleeAttackChar.HighInvolvement['command']:
-                    self.defense_involvement = MeleeAttackChar.HighInvolvement
-                    print("You have chosen to fully defend")
-                    break              
-                
-                else:
-                    print("Involvement:", read, "is not recognized")
-            
-            print("The result of the attack will be displayed in a few time")
-            time.sleep(3)
-        
-        if self.defense_type == MeleeAttackChar.CounterAttack:
-            if not self.fight.melee_attack_action(self.defender, self.attacker):
-                print("Your counter attack is converted to a full defense")
-                self.defense_type = MeleeAttackChar.Defense
-            
-        
+
+
     def check_stamina_defense_requirement(self, def_type):
         if not self.defender.check_stamina(def_type['stamina']):
             print("Character (")
@@ -432,10 +221,8 @@ class MeleeAttackChar:
         print("is trying to melee attack (", end=' ')
         self.defender.print_basic()
         print(")")
-        print("Attack type:", self.attack_type['description'], "--- Attack risk:", self.attack_risk['post_description'], "--- Attack ratio:", \
-            round(self.get_fighting_ratio(self.attacker),2))
-        print("Defense type:", self.defense_type['post_description'], "--- Defense involvement:", self.defense_involvement['post_description'], "--- Defense ratio:", \
-            round(self.get_fighting_ratio(self.defender),2))
+        print("--- Attack ratio:", round(self.get_fighting_ratio(self.attacker),2))
+        print("--- Defense ratio:", round(self.get_fighting_ratio(self.defender),2))
         print("*******************************************************************************************************************")
         print("")
         time.sleep(5)
