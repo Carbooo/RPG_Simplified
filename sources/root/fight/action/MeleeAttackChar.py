@@ -474,4 +474,3 @@ class MeleeAttackChar:
             if self.attacker.can_melee_attack(char):
                 return True
         return False
-    
