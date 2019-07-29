@@ -1,0 +1,5 @@
+Name;Load;Bulk;Resistance;Hand;Defense;Damage;Penetration Rate;Resistance Diminution Rate;Melee Handiness;Melee range
+Small wooden shield;8;1.5;3;1;12.5;1;2;0.25;9;7
+Large wooden shield;12;2.5;3;1;20;1.5;2;0.25;8.5;8
+Small steel shield;12;1.5;10;1;12.5;2;5;2;8.5;7
+Large steel shield;18;2.5;10;1;20;3;5;2;8;8

@@ -1,0 +1,9 @@
+Name;Load;Bulk;Resistance;Hand;Defense;Damage;Penetration Rate;Resistance Diminution Rate;Melee Handiness;Melee range
+Dagger;5;1;7;1;10;7.5;10;15;13;9
+Light sword;10;2;8;1;12.5;15;10;15;12;10
+Heavy sword;15;3;8;2;12.5;20;10;15;11;11
+Light axe;10;2;9;1;6.5;15;25;35;10;9
+Heavy axe;15;3;9;2;6.5;20;25;35;9;10
+Light mace;13.5;2;10;1;5;10;65;25;9.5;8.5
+Heavy mace;20;3;10;2;5;15;65;25;8.5;9.5
+Spear;15;4;9;2;9;15;20;15;7;13

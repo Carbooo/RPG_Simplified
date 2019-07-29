@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" style="width: 1273px; height: 320px; ">
+
+<head>
+	<title>WebSocket demo</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="./packages/bootstrap.min.css">
+	<script src="./packages/jquery-3.1.1.js"></script>
+	<script src="./packages/bootstrap.min.js"></script>
+</head>
+
+<body style="height: 260px; ">
+	<div class="container">
+		<h2>Button Tags</h2>
+		<a href="javascript:webSocketTest()" class="btn btn-info" role="button">Link Button</a>
+	</div>
+	<br>
+	<div class="container">
+		<form onSubmit="return false;">
+			<h2>Form Tags</h2>
+		    <div class="form-group">
+		      <label for="usr">Name:</label>
+		      <input type="text" class="form-control" id="usr">
+		    </div>
+		    <input type='button' class="btn btn-info" value="Submit 1" onClick="webSocketSendInput()">
+		    <button type='button' class="btn btn-info" onClick="webSocketSendInput()">Submit 2</button>
+		    <input type="submit" class="btn btn-info" onClick="webSocketSendInput()" value="Submit 3">
+	    </form>
+	</div>
+	<br>
+	<div class="container">
+		<p id="srv"></p>
+	</div>
+	
+	<script>
+		var ws = new WebSocket("ws://127.0.0.1:5678/");	
+		
+		ws.onmessage = function (event) {
+            message = document.createElement('li');
+            content = document.createTextNode(event.data);
+        	message.appendChild(content);
+        	messages.appendChild(message);
+        	$("#srv").text(event.data)
+    	};
+    	
+		function webSocketTest() {
+			ws.send("test");
+	    };
+	    
+	    function webSocketSendInput() {
+			ws.send($("#usr").val());
+	    };
+	    
+		var messages = document.createElement('ul');
+    	document.body.appendChild(messages);
+    	
+
+    </script>	
+</body>
+</html>

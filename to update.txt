@@ -1,0 +1,32 @@
+
+- moins d'espace dispo aux alentours, moins dodge efficace
+- dodge move et melee fight déplace les char
+- Le readiness dépend aussi de la proximité de la fin d'action (si quasiment fini, quasiment pas de malus readiness)
+- Dur de toucher la partie du corps couvert pas le bouclier (en particulier avec flèche)
+- perte/récupération d'arme et flèche
+- revoir angle ratio
+
+- Plus de décomposition dans l'attaque :
+	- Attaque décomposé en série de coup :
+		- chaque coup est décrit avec précision (emplacement, armure ou pas, main utilisé, moyen de défense, type)
+			- prendre en compte gaucher / droitier
+			- chaque fois, un des char a l'initiative de coup (selon différente caractéristique) jusqu'à écoulement du tour d'attaque
+				- calcul initiative : bonus si choisi d'attaquer, malus si déjà en train de se battre, malus si handicap, malus si vient de donner un coup, 
+				bonus global ratio, bonus volonté/moral, bonus taille arme, malus mauvaise position corps...
+				- possibilité d'attaque réciproque
+				- calcul succès : handiness, malus si déjà en train de se battre ou si handicap, bonus global fight ratio, malus mauvaise position corps
+				- en fonction du succès, plus ou moins de précision dans le coup ou de puissance dans l'attaque/décalage 
+		- avec un certain résultat :
+			- contré, bloqué, esquivé, déplacement, augmentation/diminution handicap, touché (partie du corps, de l'armure, puissance, ...))
+			perte arme/flèche, assomé, blessé, dégât réciproque, arme coincé, désarmement, ...
+			- peut être contré par une arme, mais être touché quand même (arme détruite / percée). Dépend de dégat armure / pénétration par rapport à resistance
+			le contre peut éventuellement détruire/abimer l'arme qui attaque (dépend de la puissance de l'attaque, du niveau de défense et des résistances réciproques)
+
+
+------- WEB ------
+- gérer le temps de réflexion
+- protection archers (et surtout arbalette) en tirant
+- tir en hauteur pour éviter obstacle
+
+
+
