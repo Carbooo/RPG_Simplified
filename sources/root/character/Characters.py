@@ -14,24 +14,24 @@ from sources.root.character.BodyMembers import BodyMembers
 class Characters:
     'Common base class for all characters'
     
-    #Characters constants
+    # Characters constants
     list = []
     instances_count = 0
-    max_position_area = 6 #Max range for characters positions
-    variance = 0.1 #Gauss variance
-    max_bonus = 1.35 #Max load bonus
-    load_mean = 50.0 #Load reference for characters characteristics
-    bulk_mean = 6.0 #Bulk reference for characters characteristics
-    use_load_mean = 15.0 #Weapons use load reference for characters
-    use_bulk_mean = 3.5 #Weapons use bulk reference for characters
-    min_speed = 1.0 / 6.0 #Minimum speed for char (necessary for hurt char)
-    accuracy_mean = 100.0 #Accuracy reference for characters
-    chances_to_miss_ranged_target = 0.01 #Chance to miss easy target
-    chances_per_wrong_melee_target = 0.2 #Default chance to hit another melee target
-    min_speed_run_level = 0.75 #Minimum speedrunlevel (use for starting move)
+    max_position_area = 6 # Max range for characters positions
+    variance = 0.1 # Gauss variance
+    max_bonus = 1.35 # Max load bonus
+    load_mean = 50.0 # Load reference for characters characteristics
+    bulk_mean = 6.0 # Bulk reference for characters characteristics
+    use_load_mean = 15.0 # Weapons use load reference for characters
+    use_bulk_mean = 3.5 # Weapons use bulk reference for characters
+    min_speed = 1.0 / 6.0 # Minimum speed for char (necessary for hurt char)
+    accuracy_mean = 100.0 # Accuracy reference for characters
+    chances_to_miss_ranged_target = 0.01 # Chance to miss easy target
+    chances_per_wrong_melee_target = 0.2 # Default chance to hit another melee target
+    min_speed_run_level = 0.75 # Minimum speedrunlevel (use for starting move)
     
-    #A turn is around 6 seconds
-    #[Action choices, action command, time spend, stamina spend, action description]
+    # A turn is around 6 seconds
+    # [Action choices, action command, time spend, stamina spend, action description]
     NoAction = ["No current action", "NOA", 0.0, 0.0, "No action"]
     Pass = ["Wait a little", "PAS", 0.1, 0.0, "Passing time"]
     Rest = ["Rest a little", "RES", 1.0, 0.0, "Resting"]
@@ -41,15 +41,12 @@ class Characters:
     RangedAttack = ["Ranged attack an enemy character", "RAT", 0.35, 0.5, "Ranged attacking"]
     Reload = ["Reload your ranged weapon", "REL", 1.0, 0.1, "Reloading"]
     
-    #Between each case, there are approximatively 2 meters
-    #Normal run is around 2.7 meters --> around 1 case per second
-    #Time of reflexion and other handicaps increase time per cases
+    # Between each case, there are approximatively 2 meters
+    # Normal run is around 2.7 meters --> around 1 case per second
+    # Time of reflexion and other handicaps increase time per cases
     Move = ["Move to an adjacent case", "MOV", 0.15, 0.1, "Moving"]
     DodgeMove = ["Move and dodge projectiles at the same time", "MDO", 0.2, 0.3, "Dodge moving"]
     DefMove = ["Move and defend at the same time", "MDE", 0.225, 0.1, "Def moving"]
-    EquipSpecMove = ["Move and equip specific weapons at the same time", "MEQ", 1.0, 1.5, "Equip moving"] #[Time to equip, Handicap move]
-    UnequipSpecMove = ["Move and unequip specific weapons at the same time", "MUQ"] + EquipSpecMove[2:4] + ["Unequip moving"] #[Time to equip, Handicap move]
-    ReloadMove = ["Move and reload at the same time", "MRE", 1.5] + EquipSpecMove[3:4] + ["Reload moving"] #[Time to reload, Handicap move]
 
     EquipSpec = ["Equip specific weapons", "EQS", 0.5, 0.0, "Equiping"]
     EquipAll = ["Equip all your weapons", "EQA"] + EquipSpec[2:4] + ["Equiping"]
@@ -70,9 +67,6 @@ class Characters:
     Actions.append(Move)
     Actions.append(DodgeMove)
     Actions.append(DefMove)
-    Actions.append(ReloadMove)
-    Actions.append(EquipSpecMove)
-    Actions.append(UnequipSpecMove)
     Actions.append(EquipSpec)
     Actions.append(EquipAll)
     Actions.append(UnequipSpec)
@@ -217,8 +211,7 @@ class Characters:
             return 0.7
         elif ca == Characters.Move:
             return 0.65
-        elif ca == Characters.DodgeMove or ca == Characters.EquipSpecMove or \
-        ca == Characters.UnequipSpecMove or ca == Characters.ReloadMove:
+        elif ca == Characters.DodgeMove:
             return 0.6
         else:
             print("(Characters) Error in get_readiness. Action:", ca, "not recognized")
@@ -265,21 +258,12 @@ class Characters:
         self.current_action == Characters.UnequipSpecMove:
             return True
         return False
-    
-    
-    def is_action_moving(self):
-        if self.is_equip_moving() or self.current_action == Characters.ReloadMove:
-            return True
-        return False
         
     
     def is_moving(self):
         if self.current_action == Characters.Move or \
         self.current_action == Characters.DodgeMove or \
-        self.current_action == Characters.DefMove or \
-        self.current_action == Characters.ReloadMove or \
-        self.current_action == Characters.EquipSpecMove or \
-        self.current_action == Characters.UnequipSpecMove:
+        self.current_action == Characters.DefMove:
             return True
         return False
     
@@ -1022,7 +1006,7 @@ class Characters:
     
     def ranged_weapon_has_ammo(self, ranged_weapon):  
         for ammo in self.ammo:
-            if ranged_weapon.__class__ == ammo.ranged_weaponType:
+            if ranged_weapon.__class__ == ammo.ranged_weapon_type:
                 return True
         return False        
 

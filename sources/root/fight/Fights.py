@@ -414,18 +414,6 @@ class Fights:
                 self.scheduler.remove(character.action_in_progress)
             except:
                 pass #Action already removed
-                        
-        elif character.current_action == Characters.ReloadMove:
-            print("The attack has stopped up the reload of (", end=' ')
-            character.print_basic()
-            print(") and the ammo being reloaded has been lost")
-            time.sleep(2)
-            self.stop_reloading(character, character.action_in_progress.linked_action)
-            print("The attack has shaken up the movement of (", end=' ')
-            character.print_basic()
-            print(")")
-            time.sleep(2)
-            self.stop_moving(character, character.action_in_progress)
                    
         elif character.current_action == Characters.Reload:
             print("The attack has stopped the reload of (", end=' ')
@@ -619,18 +607,6 @@ class Fights:
             elif read == Characters.DefMove[1]:
                 if self.def_move_action(character):
                     break
-                
-            elif read == Characters.ReloadMove[1]:
-                if self.reload_move_action(character):
-                    break
-                
-            elif read == Characters.EquipSpecMove[1]:
-                if self.equip_spec_move_action(character):
-                    break
-            
-            elif read == Characters.UnequipSpecMove[1]:
-                if self.unequip_spec_move_action(character):
-                    break
             
             elif read == Characters.EquipAll[1]:
                 if self.equip_all_action(character):
@@ -747,30 +723,6 @@ class Fights:
             print("You will have less defense handicap")
             time.sleep(3)
             return True
-        return False
-    
-    
-    def reload_move_action(self, character):
-        character.current_action = Characters.ReloadMove
-        move_action = MoveChar(self, character)
-        if move_action.is_a_success:
-            return True
-        return False        
-    
-    
-    def equip_spec_move_action(self, character):       
-        character.current_action = Characters.EquipSpecMove
-        move_action = MoveChar(self, character)
-        if move_action.is_a_success:
-            return True
-        return False
-
-
-    def unequip_spec_move_action(self, character):     
-        character.current_action = Characters.UnequipSpecMove
-        move_action = MoveChar(self, character)
-        if move_action.is_a_success:
-            return True                
         return False
 
 

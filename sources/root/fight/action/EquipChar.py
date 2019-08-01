@@ -9,25 +9,23 @@ from sources.root.fight.action.Actions import Actions
 ###################### EQUIP CHAR CLASS #####################
 #############################################################
 class EquipChar:
-    'Class to equip a character'
+    """Class to equip a character"""
     
     def __init__(self, fight, character):
         Actions.__init__(self, fight)
         self.character = character
         self.next_equipment = []
         self.next_unequipment = []
-        self.end_time = character.timeline
         self.equip_time = 0.0
         self.equip_handicap = 0.0
         self.after_equip_handicap = 0.0
         self.is_a_success = self.start()
-        
-        
+
     def start(self):
         Actions.start(self)
         if not self.character.check_stamina(self.character.current_action[3]):
-            print("You do not have enough stamina (", \
-                self.attacker.body.get_current_stamina(), ") to modify your equipment")
+            print("You do not have enough stamina (",
+                  self.character.body.get_current_stamina(), ") to modify your equipment")
             return False
         
         if self.character.current_action == Characters.UnequipAll:
@@ -85,7 +83,6 @@ class EquipChar:
             print("(equip_weapons) mode:", self.character.current_action, "unknown, action cancelled!")
             return False
     
-    
     def unequip_weapons_list(self, weapons_list):
         if not weapons_list:
             print("(EquipChar) Cannot unequip because weapon_list is empty")
@@ -99,12 +96,10 @@ class EquipChar:
         
         self.next_unequipment = weapons_list
         self.calculate_timelines(weapons_list)
-        return True
-
+        return self.result()
 
     def unequip_all_weapons(self):
         return self.unequip_weapons_list(copy.copy(self.character.weapons_use))
-        
 
     def unequip_spec_weapons(self):    
         equipped_list = copy.copy(self.character.weapons_use)
@@ -144,10 +139,9 @@ class EquipChar:
                 print("The input is not an available ID")
                 print("")
                 
-            elif equipped_list == []:
+            elif not equipped_list:
                 return self.unequip_weapons_list(equipment_to_remove)
-        
-        
+
     def equip_weapons_list(self, weapons_list):
         if not weapons_list:
             print("(EquipChar) Cannot equip because weapon_list is empty")
@@ -161,24 +155,22 @@ class EquipChar:
         self.next_equipment = weapons_list
         self.calculate_timelines(weapons_list)
         time.sleep(3)
-        return True
-                
+        return self.result()
 
     def equip_all_weapons(self):
-        notequipped_list = []
+        not_equipped_list = []
         for weapon in self.character.weapons_stored:
-            if weapon not in weapons_use:
-                notequipped_list.append(weapon)
-        return self.equip_weapons_list(notequipped_list)
-        
+            if weapon not in self.character.weapons_use:
+                not_equipped_list.append(weapon)
+        return self.equip_weapons_list(not_equipped_list)
 
     def equip_spec_weapons(self):
         equipped_list = copy.copy(self.character.weapons_use)
-        notequipped_list = []
+        not_equipped_list = []
         new_equipment = []
         for weapon in self.character.weapons_stored:
-            if weapon not in weapons_use:
-                notequipped_list.append(weapon)
+            if weapon not in self.character.weapons_use:
+                not_equipped_list.append(weapon)
                 
         while 1:
             print("Current weapons:")
@@ -187,7 +179,7 @@ class EquipChar:
             print("")
             
             print("Choose a weapon to be equipped:")
-            for equip in notequipped_list:
+            for equip in not_equipped_list:
                 equip.print_obj()
             
             try:
@@ -205,12 +197,12 @@ class EquipChar:
                 print("You have stopped to equip")
                 return self.equip_weapons_list(new_equipment)
             
-            #Cannot cancel equip move
+            # Cannot cancel equip move
             elif self.fight.cancel_action(read):
                 return False 
 
             available_equipment = False
-            for equip in notequipped_list:
+            for equip in not_equipped_list:
                 if read == equip.get_id():
                     available_equipment = True
                     weapon = equip
@@ -221,53 +213,44 @@ class EquipChar:
                 print("")
                 continue
             
-            NbOfHandsUse = 0
+            nb_of_hands_use = 0
             for equip in equipped_list:
-                NbOfHandsUse += equip.hand
-            if NbOfHandsUse + weapon.hand <= 2:
+                nb_of_hands_use += equip.hand
+            if nb_of_hands_use + weapon.hand <= 2:
                 equipped_list.append(weapon)
-                notequipped_list.remove(weapon)
+                not_equipped_list.remove(weapon)
                 new_equipment.append(weapon)
             else:
                 print("You do not have enough free hands to equip:")
                 weapon.print_obj()
                 print("")
             
-            if NbOfHandsUse + weapon.hand == 2:
+            if nb_of_hands_use + weapon.hand == 2:
                 return self.equip_weapons_list(new_equipment)
             
-        
-    def result(self):
-        
+    def result(self):        
         success = False
         if self.next_equipment:
             for weapon in self.next_equipment:
-                success = self.character.add_weapon_in_use(weapon)  
+                success = self.character.add_weapon_in_use(weapon)
+                if not success:
+                    return False
         elif self.next_unequipment:
             for weapon in self.next_unequipment:
                 success = self.character.remove_weapon_in_use(weapon)
+                if not success:
+                    return False
         else:
             print("(EquipChar) Cannot equip, because equip & unequip lists are empty")
             return False
         
         self.character.spend_stamina(self.equip_time * self.character.current_action[3])
         self.character.calculate_characteristic()
-        
         return success
     
-    
-    def calculate_timelines(self, weapon):
-        self.equip_time = self.character.current_action[2] * self.character.speed_ratio \
-            * math.sqrt(weapon.bulk / Characters.use_bulk_mean)
-        if self.is_dropping:
-            self.equip_time /= 10
-        self.begin_time = self.end_time  # Need to reset time for second equipment
-        self.timeline = self.begin_time + EquipChar.time_ratio * self.equip_time / self.character.speed_ratio
-        self.end_time = self.begin_time + self.equip_time / self.character.speed_ratio
-        self.fight.scheduler.append(self)
-        
-        if not self.character.is_equip_moving(): # No additional time for equip move
-            self.character.spend_time(self.equip_time)
-            
-            
-    
+    def calculate_timelines(self, weapons):
+        self.equip_time = 0
+        for weapon in weapons:
+            self.equip_time += self.character.current_action[2] * self.character.speed_ratio \
+                * math.sqrt(weapon.bulk / Characters.use_bulk_mean)
+        self.character.spend_time(self.equip_time)
