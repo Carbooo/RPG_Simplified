@@ -11,26 +11,21 @@ from sources.root.fight.action.Actions import Actions
 class EquipChar:
     'Class to equip a character'
     
-    time_ratio = 0.5 #Ratio when the equip / unequp will occur
-
     def __init__(self, fight, character):
         Actions.__init__(self, fight)
         self.character = character
         self.next_equipment = []
         self.next_unequipment = []
-        self.begin_time = character.timeline
         self.end_time = character.timeline
         self.equip_time = 0.0
         self.equip_handicap = 0.0
         self.after_equip_handicap = 0.0
-        self.is_dropping = False
         self.is_a_success = self.start()
         
         
     def start(self):
         Actions.start(self)
-        if not self.character.is_equip_moving() and \
-        not self.character.check_stamina(self.character.current_action[3]):
+        if not self.character.check_stamina(self.character.current_action[3]):
             print("You do not have enough stamina (", \
                 self.attacker.body.get_current_stamina(), ") to modify your equipment")
             return False
@@ -43,8 +38,7 @@ class EquipChar:
                 return True
             return False
         
-        if self.character.current_action == Characters.UnequipSpec or \
-        self.character.current_action == Characters.UnequipSpecMove:
+        if self.character.current_action == Characters.UnequipSpec:
             if not self.character.weapons_use:
                 print("You have already unequipped all your weapons, action cancelled!")
                 return False
@@ -72,8 +66,7 @@ class EquipChar:
                 return True
             return False
         
-        if self.character.current_action == Characters.EquipSpec \
-        or self.character.current_action == Characters.EquipSpecMove:
+        if self.character.current_action == Characters.EquipSpec:
             if not self.character.weapons_stored:
                 print("You have no weapon to equip, action cancelled!")
                 return False
@@ -105,21 +98,7 @@ class EquipChar:
         time.sleep(3)
         
         self.next_unequipment = weapons_list
-        self.character.action_in_progress = self
-        print("")
-        print("Do you want to put the items away (PAW) or to quickly drop them (DRP) :")
-        while 1: 
-            read = input('--> (PAW / DRP): ')
-            if read == "PAW":
-                break
-            elif read == "DRP":
-                self.is_dropping = True
-                break
-            else:
-                print("Your input is not recognized!")
-        
-        self.calculate_timelines(weapons_list[0])
-        time.sleep(3)
+        self.calculate_timelines(weapons_list)
         return True
 
 
@@ -180,22 +159,16 @@ class EquipChar:
             weapon.print_obj()
         
         self.next_equipment = weapons_list
-        self.calculate_timelines(weapons_list[0])
-        self.character.action_in_progress = self
+        self.calculate_timelines(weapons_list)
         time.sleep(3)
         return True
                 
 
     def equip_all_weapons(self):
         notequipped_list = []
-        for weapon_s in self.character.weapons_stored:
-            exist = False
-            for weapon_u in self.character.weapons_use:
-                if weapon_s == weapon_u:
-                    exist = True
-                    break
-            if not exist:
-                notequipped_list.append(weapon_s)
+        for weapon in self.character.weapons_stored:
+            if weapon not in weapons_use:
+                notequipped_list.append(weapon)
         return self.equip_weapons_list(notequipped_list)
         
 
@@ -203,15 +176,10 @@ class EquipChar:
         equipped_list = copy.copy(self.character.weapons_use)
         notequipped_list = []
         new_equipment = []
-        for weapon_s in self.character.weapons_stored:
-            exist = False
-            for weapon_u in self.character.weapons_use:
-                if weapon_s == weapon_u:
-                    exist = True
-                    break
-            if exist is False:
-                notequipped_list.append(weapon_s)
-        
+        for weapon in self.character.weapons_stored:
+            if weapon not in weapons_use:
+                notequipped_list.append(weapon)
+                
         while 1:
             print("Current weapons:")
             for equip in equipped_list:
@@ -270,28 +238,21 @@ class EquipChar:
             
         
     def result(self):
-        Actions.result(self)
         
         success = False
         if self.next_equipment:
-            success = self.character.add_weapon_in_use(self.next_equipment.pop(0))  
+            for weapon in self.next_equipment:
+                success = self.character.add_weapon_in_use(weapon)  
         elif self.next_unequipment:
-            if self.is_dropping:
-                success = self.character.remove_weapon_in_use(self.next_unequipment.pop(0), True)
-            else:
-                success = self.character.remove_weapon_in_use(self.next_unequipment.pop(0))
+            for weapon in self.next_unequipment:
+                success = self.character.remove_weapon_in_use(weapon)
         else:
             print("(EquipChar) Cannot equip, because equip & unequip lists are empty")
             return False
         
-        if not self.character.is_equip_moving(): #No additional cost for equip/unequip move
-            self.character.spend_stamina(self.equip_time * self.character.current_action[3])
+        self.character.spend_stamina(self.equip_time * self.character.current_action[3])
         self.character.calculate_characteristic()
         
-        if len(self.next_equipment) > 0:
-            self.calculate_timelines(self.next_equipment[0])
-        elif len(self.next_unequipment) > 0:
-            self.calculate_timelines(self.next_unequipment[0])
         return success
     
     

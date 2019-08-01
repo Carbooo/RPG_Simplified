@@ -95,10 +95,7 @@ class MeleeAttackChar:
                         
         time_spent = Characters.MeleeAttack[2] * self.attack_type['time'] * random.gauss(1, MeleeAttackChar.variance)
         self.attack_end_time = self.fight.current_timeline + time_spent
-        self.timeline = self.fight.current_timeline + time_spent * MeleeAttackChar.time_ratio
-        if self.attacker.is_waiting() or self.attacker.timeline < self.attack_end_time: #Waiting may occur during a counter attack
-            self.attacker.timeline = self.attack_end_time
-        
+
         self.choose_defense_type()
         
         self.attacker.action_in_progress = self
