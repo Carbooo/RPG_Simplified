@@ -327,17 +327,12 @@ class Characters:
         return False
     
     
-    def spend_time(self, time_spent, kind="normal"):
-        self.spend_absolute_time(time_spent / self.speed_ratio, kind)
+    def spend_time(self, time_spent):
+        self.spend_absolute_time(time_spent / self.speed_ratio)
     
     
-    def spend_absolute_time(self, time_spent, kind="normal"):
-        if kind == "suffer":
-            self.unconsciousness += time_spent
-            if not self.is_melee_fighting():
-                self.timeline += time_spent
-        else:
-            self.timeline += time_spent
+    def spend_absolute_time(self, time_spent):
+        self.timeline += time_spent
         
     
     def check_stamina(self, coefficient):
@@ -866,7 +861,7 @@ class Characters:
                 life_ratio = math.pow(2 - life_ratio, 2) - 1
                 print("The shock of the attack delays the player of", round(life_ratio,2), "turn(s)")
                 time.sleep(3)
-                self.spend_time(life_ratio, "suffer")
+                self.spend_time(life_ratio)
                 self.spend_stamina(life_ratio)
         
     

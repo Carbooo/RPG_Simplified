@@ -649,7 +649,7 @@ class Bodies:
     def melee_choose_member(self, coefficient):
         # Coefficient must be an integer between 0 and 5 (6 members)
         # The higher is the coefficient, the better target it will be
-        coefficient = int(min(5, max(0, math.floor( \
+        coefficient = int(min(5, max(0, math.floor(
             coefficient * len(self.body_members) * random.random()))))
 
         members_list = self.list_all_members_resistance()

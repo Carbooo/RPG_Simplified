@@ -4,7 +4,7 @@
 ######################## ACTIONS CLASS ######################
 #############################################################
 class Actions:
-    'Super class for all fight actions'
+    """Super class for all fight actions"""
 
     def __init__(self, fight):
         self.fight = fight
@@ -12,5 +12,3 @@ class Actions:
         
     def start(self):
         return False
-        
-    
