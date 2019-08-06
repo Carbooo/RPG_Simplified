@@ -11,17 +11,15 @@ from sources.root.fight.action.ReloadChar import ReloadChar
 #############################################################
 class MoveChar:
     'Class to move a self.character'
-    
-    time_ratio = 0.5 #Ratio when the move will occur
+ 
     nb_of_move_before_recalculating_path = 2 #Ratio when the path will be recalculated
     
     
     def __init__(self, fight, character):
         Actions.__init__(self, fight)
         self.character = character
-        self.linked_action = False
-        self.old_abs = -1
-        self.old_ord = -1
+        self.old_abs = self.character.abscissa
+        self.old_ord = self.character.ordinate
         self.target_abs = -1
         self.target_ord = -1
         self.quick_turn_asked = False
@@ -32,22 +30,10 @@ class MoveChar:
 ####################### MOVE ACTIONS ########################  
     def start(self):
         Actions.start(self)
-        self.old_abs = self.character.abscissa
-        self.old_ord = self.character.ordinate
         
         if not self.initial_move_check():
             return False
-        
-        if self.character.current_action == Characters.ReloadMove and \
-        self.character.is_using_a_crossbow():
-            print("You cannot move and reload if you are using a crossbow!")
-            return False
-        
-        if self.character.speed_run_level == 0: #Was previously not running
-            self.character.speed_run_level = Characters.min_speed_run_level
-        elif self.character.current_action != Characters.Move:
-            self.character.speed_run_level = 1
-                
+             
         print("Choose your destination:")
         while 1:
             abscissa = -1
@@ -93,26 +79,9 @@ class MoveChar:
             self.character.current_path = path
             self.target_abs = coord[0]
             self.target_ord = coord[1]
-            if self.move_character():
-                if (self.character.current_action == Characters.UnequipSpecMove \
-                or self.character.current_action == Characters.EquipSpecMove) \
-                and self.linked_action is False:
-                    self.linked_action = EquipChar(self.fight, self.character)
-                    if not self.linked_action.is_a_success:
-                        self.fight.stop_moving(self.character, self)
-                        return False
-                elif self.character.current_action == Characters.ReloadMove \
-                and self.linked_action is False:
-                    self.linked_action = ReloadChar(self.fight, self.character)
-                    if not self.linked_action.is_a_success:
-                        self.fight.stop_moving(self.character, self)
-                        return False
-                self.character.action_in_progress = self
-                return True
-            else:
-                self.character.move_direction = old_move_direction
-                self.character.current_path = []
-                return False
+            self.character.move_direction = old_move_direction
+            self.character.current_path = []
+            return False
 
                 
     def move_character(self):
@@ -124,55 +93,13 @@ class MoveChar:
         if not self.check_move_stamina():
             return False
         
-        self.timeline = self.character.timeline
         self.character.spend_time(self.get_time_coef())
-        self.timeline += (self.character.timeline - self.timeline) * MoveChar.time_ratio
-        self.fight.scheduler.append(self)
-        
-        self.manage_quick_run()
             
         print("You are moving to", self.target_abs, "x", self.target_ord)
         time.sleep(2)
         print("You are following the path:", self.character.current_path)
-        time.sleep(2)
-        print("The actual move will occur in a few time")
         time.sleep(3)
         return True
-        
-    
-    def manage_quick_run(self):
-        if self.character.speed_run_level < 1: #First move is slower than the other
-            self.character.speed_run_level = 1
-        
-        elif self.character.speed_run_level > 1:
-            if self.fight.automatic_mode:
-                self.character.speed_run_level += 1
-            else:
-                while 1:
-                    read = input('--> Still use quick run for next turn? (Y/N): ')
-                    if read == "Y":
-                        self.character.speed_run_level += 1
-                        break
-                    elif read == "N":
-                        self.character.speed_run_level = 1
-                        break
-                    else:
-                        print("Answer:", read, "is not recognized")
-            
-        elif self.character.current_action == Characters.Move and \
-        (not self.character.is_using_a_bow() or not self.character.has_reloaded()): #Only run when moving and not with an arrow ready to be launched           
-            if not self.fight.automatic_mode or not self.quick_turn_asked:
-                self.quick_turn_asked = True
-                while 1:
-                    read = input('--> Use quick run for next turn? (Y/N): ')
-                    if read == "Y":
-                        self.character.speed_run_level += 1
-                        break
-                    elif read == "N":
-                        break
-                    else:
-                        print("Answer:", read, "is not recognized")
-    
     
     def get_move_coef(self):
         if abs(self.target_abs - self.old_abs) + abs(self.target_ord - self.old_ord) == 2:
@@ -186,21 +113,13 @@ class MoveChar:
                 
     
     def get_time_coef(self):
-        time_coef = self.character.speed_run_ratio() * self.character.movement_handicap_ratio()
-        if self.character.is_action_moving():
-            return self.get_move_coef() / time_coef * Characters.Move[2] * self.character.current_action[3] 
-        else:
-            return self.get_move_coef() / time_coef * self.character.current_action[2]
-                    
+        return self.get_move_coef() / self.character.speed_run_ratio() / self.character.movement_handicap_ratio() \
+            * Characters.Move[2]
     
     def get_stamina_coef(self):
         stamina_coef = 1 + (self.character.speed_run_ratio() - 1) * 2 #Between 1 and 3
         stamina_coef /= self.character.movement_handicap_ratio()
-        if self.character.is_action_moving():
-            return self.get_move_coef() * stamina_coef * Characters.Move[3] * self.character.current_action[3]
-        else:
-            return self.get_move_coef() * stamina_coef * self.character.current_action[3]
-        
+        return self.get_move_coef() * stamina_coef * Characters.Move[3]
     
     def result(self):
         Actions.result(self)
@@ -386,39 +305,6 @@ class MoveChar:
             return True
         return False
 
-    
-    def finish_linked_action(self, coef):
-        self.character.speed_run_level = 0
-        self.character.action_in_progress = self.linked_action
-        if self.linked_action.timeline > self.character.timeline:
-            self.linked_action.timeline -= (self.linked_action.timeline - self.character.timeline) * (1 - coef)
-        if self.linked_action.end_time > self.character.timeline:
-            self.linked_action.end_time -= (self.linked_action.end_time - self.character.timeline) * (1 - coef)
-            self.character.spend_absolute_time(self.linked_action.end_time - self.character.timeline)
-        
-    
-    def printfinish_modifying_equipment(self):
-        print("")
-        print("*********************************************************************")
-        self.character.print_basic()
-        print("has finished moving")
-        print("He will now finish modifying his equipment")
-        print("*********************************************************************")
-        print("")
-        time.sleep(5)
-        
-    
-    def printfinish_reloading(self):
-        print("")
-        print("*********************************************************************")
-        self.character.print_basic()
-        print("has finished moving")
-        print("He will now finish reloading his equipment")
-        print("*********************************************************************")
-        print("")
-        time.sleep(5)        
-        
-        
     def initial_move_check(self):
         if self.fight.field.can_move(self.character) is False:
             print("No free case available for move action")

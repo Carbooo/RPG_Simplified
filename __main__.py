@@ -42,4 +42,5 @@ ImportData("ObstaclesField", "data\\LongObstacles.csv")
 # Fields.list[0].print_obj()
 
 print("")
-Fights(Fields.list[3], Teams.list[0], Teams.list[1])
+# Fights(Fields.list[3], Teams.list[0], Teams.list[1])
+Fights(Fields.list[0], Teams.list[9], Teams.list[10])

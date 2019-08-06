@@ -19,3 +19,5 @@ r0;10;10;10;10;10;10;10;right_handed;--noneArmor--;Breast mail;Arms mail;--noneA
 r1;10;10;10;10;10;10;10;right_handed;--noneArmor--;Breast mail;Arms mail;--noneArmor--;Long bow;--noneWeapon--;--noneWeapon--;--noneWeapon--;Broadhead arrow;20;--noneAmmo--;0;5;3
 r2;10;10;10;10;10;10;10;right_handed;--noneArmor--;--noneArmor--;--noneArmor--;--noneArmor--;Strong crossbow;--noneWeapon--;--noneWeapon--;--noneWeapon--;Bodkin bolt;20;--noneAmmo--;0;5;2
 r3;10;10;10;10;10;10;10;right_handed;Mail coif;Breast mail;Arms mail;Legs mail;Short bow;Dagger;--noneWeapon--;--noneWeapon--;Bodkin arrow;20;--noneAmmo--;0;5;3
+t0;10;10;10;10;10;10;10;right_handed;Full helmet;Breast plate;Arms plate;Legs plate;Light sword;Large steel shield;--noneWeapon--;--noneWeapon--;--noneAmmo--;0;--noneAmmo--;0;2;2
+t1;10;10;10;10;10;10;10;right_handed;Mail coif;Breast mail;Arms mail;Legs mail;Heavy axe;--noneWeapon--;--noneWeapon--;--noneWeapon--;--noneAmmo--;0;--noneAmmo--;0;3;2
