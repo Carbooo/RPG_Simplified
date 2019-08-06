@@ -10,11 +10,10 @@ from sources.root.fight.action.ReloadChar import ReloadChar
 ######################## MOVE CHAR CLASS ####################
 #############################################################
 class MoveChar:
-    'Class to move a self.character'
+    """Class to move a self.character"""
  
     nb_of_move_before_recalculating_path = 2 #Ratio when the path will be recalculated
-    
-    
+
     def __init__(self, fight, character):
         Actions.__init__(self, fight)
         self.character = character
@@ -149,37 +148,9 @@ class MoveChar:
         
 ######################## BROWSE PATH ##########################
     def browse_current_path(self):
-        #Finish equiping when moving is finished
+        #Finish moving
         if not self.character.current_path:
-            self.character.action_in_progress = False
-            if self.character.current_action == Characters.EquipSpecMove:
-                self.character.current_action = Characters.EquipSpec
-                self.finish_linked_action(Characters.EquipSpec[2] / Characters.EquipSpecMove[2])
-                self.printfinish_modifying_equipment()
-                return True
-            elif self.character.current_action == Characters.UnequipSpecMove:
-                self.character.current_action = Characters.UnequipSpec
-                self.finish_linked_action(Characters.UnequipSpec[2] / Characters.UnequipSpecMove[2])
-                self.printfinish_modifying_equipment()
-                return True
-            elif self.character.current_action == Characters.ReloadMove:
-                self.character.current_action = Characters.Reload
-                self.finish_linked_action(Characters.Reload[2] / Characters.ReloadMove[2])
-                self.printfinish_reloading()
-                return True
-            else:
-                self.fight.choose_actions(self.character)
-                if not self.character.is_moving():
-                    self.character.speed_run_level = 0
-                return True
-        
-        #Normal move when linked action is finished  
-        if (self.character.current_action == Characters.EquipSpecMove \
-        or self.character.current_action == Characters.UnequipSpecMove \
-        or self.character.current_action == Characters.ReloadMove) \
-        and self.linked_action.end_time < self.character.timeline:
-            self.character.current_action = Characters.Move
-            self.linked_action = False
+            self.fight.choose_actions(self.character)
         
         #Update path
         if self.nb_of_move_left <= 0:
@@ -190,44 +161,11 @@ class MoveChar:
             self.nb_of_move_left = MoveChar.nb_of_move_before_recalculating_path
         else:
             self.nb_of_move_left -= 1 
-        
-        #Choose the next move
-        print("")
-        print("You are currently moving through the following path ", \
-            "(mode used:", self.character.current_action[1], "):", self.character.current_path)
-        can_browse_path = True
-        while 1:
-            print("")
-            if can_browse_path and self.fight.automatic_mode:
-                if self.continue_browse_path():
-                    return True
-                can_browse_path = False
-                continue
-                
-            print("Do you want to keep going through this path?")
-            if can_browse_path:
-                read = input('--> Yes (Y), No (N), Modify move (M): ')
-            else:
-                read = input('--> No (N), Modify move (M): ')
-                
-            if can_browse_path and read == "Y":
-                if self.continue_browse_path():
-                    return True
-                can_browse_path = False
-                continue
-            
-            if read == "N":
-                if self.stop_browse_path():
-                    return True
-                return False
-            
-            if read == "M":
-                if self.modify_browse_path():
-                    return True
-                continue
 
-            print("Answer:", read, "is not recognized")                   
-
+        if self.continue_browse_path():
+            return True
+        else:
+            return self.stop_browse_path()
 
     def continue_browse_path(self):
         coord = self.character.current_path.pop(0)
@@ -243,66 +181,13 @@ class MoveChar:
         time.sleep(3)
         return False
 
-
-    def modify_browse_path(self):
-        print("")
-        if not self.character.is_equip_moving():
-            print("Which move mode do you want to use?")
-            print("Current mode:", self.character.current_action[1])
-            while 1:
-                read = input(\
-                    '--> Standard Move (' + Characters.Move[1] + \
-                    '), Dodge Move (' + Characters.DodgeMove[1] + \
-                    '), Defense Move (' + Characters.DefMove[1] + '): ')
-                
-                if read == Characters.Move[1]:
-                    self.character.current_action = Characters.Move
-                elif read == Characters.DodgeMove[1]:
-                    self.character.current_action = Characters.DodgeMove
-                elif read == Characters.DefMove[1]:
-                    self.character.current_action = Characters.DefMove
-                else:
-                    print("Answer:", read, "is not recognized")
-                    continue
-                break
-            
-        if self.start():
-            return True
-        else:
-            print("Modifying move failed!")
-            time.sleep(3)
-            return False
-            
-
     def stop_browse_path(self):
         print("")
         print("Movement is stopped!")
         self.character.current_path = []
         self.character.action_in_progress = False
-        if self.character.current_action == Characters.EquipSpecMove:
-            print("Character will now finish equiping")
-            time.sleep(3)
-            self.character.current_action = Characters.EquipSpec
-            self.finish_linked_action(Characters.EquipSpec[2] / Characters.EquipSpecMove[2])
-            return True
-        elif self.character.current_action == Characters.UnequipSpecMove:
-            print("Character will now finish unequiping")
-            time.sleep(3)
-            self.character.current_action = Characters.UnequipSpec
-            self.finish_linked_action(Characters.UnequipSpec[2] / Characters.UnequipSpecMove[2])
-            return True
-        elif self.character.current_action == Characters.ReloadMove:
-            print("Character will now finish reloading")
-            time.sleep(3)
-            self.character.current_action = Characters.Reload
-            self.finish_linked_action(Characters.Reload[2] / Characters.ReloadMove[2])
-            return True
-        else:
-            time.sleep(3)
-            self.fight.choose_actions(self.character)
-            if not self.character.is_moving():
-                self.character.speed_run_level = 0
-            return True
+        time.sleep(3)
+        self.fight.choose_actions(self.character)
         return False
 
     def initial_move_check(self):
@@ -318,7 +203,6 @@ class MoveChar:
             return False
         
         return True
-    
     
     def check_move_stamina(self):
         if not self.character.check_stamina(self.get_stamina_coef()):
