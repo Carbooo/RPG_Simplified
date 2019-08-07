@@ -11,7 +11,7 @@ from sources.root.fight.action.Actions import Actions
 ################### RANGED ATTACK CHAR CLASS ################
 #############################################################
 class RangedAttackChar:
-    'Class to ranged attack a character'
+    """Class to ranged attack a character"""
     
     attack_effect = [25, 50] #[Blocked", "Hit", "Hit & stopped"]
     medium = 1.0  # Gauss expected value
@@ -29,7 +29,7 @@ class RangedAttackChar:
     def start(self): #Choose ranged target and shoot mode
         Actions.start(self)
         if self.attacker.check_stamina(Characters.RangedAttack[3]) is False:
-            print("You do not have enough stamina (", \
+            print("You do not have enough stamina (",
                 self.attacker.body.get_current_stamina(), ") for a ranged attack")
             return False
         elif self.attacker.is_using_a_ranged_weapon() is False:
@@ -70,14 +70,8 @@ class RangedAttackChar:
                     hit_chance = hit_chance_list_bis[j]
                     hit_number = j
             self.defender = enemy_list_bis.pop(hit_number)
-            print("----- HIT CHANCE:", \
-                round(hit_chance_list_bis.pop(hit_number),2), \
-                "-----  ----- MELEE FIGHT DISTURBTION:", \
-                round(self.attacker.chances_to_hit_wrong_melee_target(self.defender, self.fight.current_timeline),2), \
-                "-----")
+            print("----- HIT CHANCE:", round(hit_chance_list_bis.pop(hit_number),2), "-----")
             self.defender.print_state()
-            print("Current ranged defense availability:", \
-                round(self.get_ranged_availability(),2))
         
         while 1:
             try:
@@ -102,8 +96,8 @@ class RangedAttackChar:
     
     def shoot_speed(self, hit_chance):
         #Harder is the target to hit, longer it takes to aim and shoot (between 1 to 4.5)
-        ratio = math.sqrt(hit_chance * (1 - \
-            self.attacker.calculate_point_distance(self.defender.abscissa, \
+        ratio = math.sqrt(hit_chance * (1 -
+            self.attacker.calculate_point_distance(self.defender.abscissa,
             self.defender.ordinate) / self.attacker.has_range()))
         return 1 + 3.5 * (1 - ratio)
         
@@ -179,7 +173,6 @@ class RangedAttackChar:
             member = self.defender.body.ranged_choose_member(hit_chance, shoot_type)
             self.defender.ranged_attack_received(self.attacker, attack_result, 1, member, self.ammo_used)
 
-
     def shoot_hit_chance(self):
         #Distance = -a*(x-1) + b --> distance min = 1.0, distance max = 0.0
         h_dist = max(0, (self.attacker.calculate_point_distance(self.defender.abscissa, \
@@ -199,11 +192,8 @@ class RangedAttackChar:
             h_act = 1
         
         #Concatenate and include melee fight disturbtion
-        return min(1, self.attacker.accuracy_ratio("Ranged") \
-            * (1 - self.defender.chances_to_be_ranged_missed(self.fight.current_timeline)) \
-            * h_dist * h_obs * h_act)
-    
-    
+        return min(1, self.attacker.accuracy_ratio("Ranged") * h_dist * h_obs * h_act)
+
     def move_and_shoot_angle_ratio(self):
         angle = self.move_and_shoot_angle()
         return 0.95 - angle / (math.pi / 2) * 0.75 #0,25 min --> 0.95 max
@@ -231,8 +221,7 @@ class RangedAttackChar:
             return min(coef1, coef2)
         else:
             return max(coef1, coef2)
-        
-        
+
     def can_ranged_attack(self):
         if self.attacker.has_ammo() is False:
             print("No ammo for a ranged attack")
@@ -251,5 +240,3 @@ class RangedAttackChar:
             if self.fight.field.is_target_reachable(self.attacker, char):
                 return True
         return False
-        
-        
