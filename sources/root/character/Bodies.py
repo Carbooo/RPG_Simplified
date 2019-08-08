@@ -13,7 +13,6 @@ from sources.root.character.Equipments import Equipments, Shields, \
 class Bodies:
     """Common base class for all body of characters"""
     life_distribution = [20.0, 40.0, 80.0, 80.0, 80.0, 80.0]
-    ranged_shoot_type = [["Assured shoot", "AS"], ["Specific shoot", "SS"], ["Rapid shoot", "RS"]]
 
     # For ranged shoot probability
     member_size = [0.08, 0.4, 0.11, 0.11, 0.15, 0.15]  # Normal ratio for non-specific target
@@ -702,21 +701,10 @@ class Bodies:
 
         return ordered_list
 
-    def ranged_choose_member(self, coefficient, shoot_type):
+    def ranged_choose_member(self, coefficient):
         # Coefficient = HitRatio
-        if shoot_type == Bodies.ranged_shoot_type[1]:
-            # Specific shoot, aim the weakest part of the body
-            members_list = self.list_all_members_resistance()
-            ordered_list = self.list_all_members_resistance_ordered(members_list)
-            member = ordered_list[len(ordered_list) - 1][0]
-            for i in range(len(BodyMembers.types)):
-                if member == BodyMembers.types[i]:
-                    coefficient /= self.weakest_member_size_ratio()  # Reestablish old hit ratio
-                    member_ratio_list = self.member_size_adjusted(coefficient, i)
-                    break
-        else:
-            # Other shoots, aim the center of the body (i.e. the chest)
-            member_ratio_list = self.member_size_adjusted(coefficient, 1)  # 1 for chest
+        # Aim at the center of the body (i.e. the chest)
+        member_ratio_list = self.member_size_adjusted(coefficient, 1)  # 1 for chest
 
         # Calculate member hit
         ratio = random.random()
@@ -735,13 +723,6 @@ class Bodies:
                                Bodies.member_size_high_per_member[member][i]) * \
                               (1 - coefficient)
         return members_list
-
-    def weakest_member_size_ratio(self):
-        members_list = self.list_all_members_resistance()
-        ordered_list = self.list_all_members_resistance_ordered(members_list)
-        for i in range(len(members_list)):
-            if members_list[i][0] == ordered_list[len(ordered_list) - 1][0]:
-                return (1.0 + Bodies.member_size[i] / max(Bodies.member_size)) / 2
 
     ########################## PRINTING FUNCTIONS #########################
     def print_life(self):
