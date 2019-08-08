@@ -21,7 +21,6 @@ class MoveChar:
         self.old_ord = self.character.ordinate
         self.target_abs = -1
         self.target_ord = -1
-        self.quick_turn_asked = False
         self.nb_of_move_left = MoveChar.nb_of_move_before_recalculating_path
         self.is_a_success = self.start()
     

@@ -82,7 +82,7 @@ class MeleeAttackChar:
         print("attack_result:", attack_result)
         self.melee_attack_type(attack_result)
 
-        # Stamina spent
+        self.attacker.spend_time(Characters.MeleeAttack[2])
         self.attacker.spend_melee_attack_stamina(Characters.MeleeAttack[3])
 
         if self.actual_defense == "Dodge":
