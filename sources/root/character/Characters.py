@@ -43,8 +43,6 @@ class Characters:
     # Normal run is around 2.7 meters --> around 1 case per second
     # Time of reflexion and other handicaps increase time per cases
     Move = ["Move to an adjacent case", "MOV", 0.15, 0.1, "Moving"]
-    DodgeMove = ["Move and dodge projectiles at the same time", "MDO", 0.2, 0.3, "Dodge moving"]
-    DefMove = ["Move and defend at the same time", "MDE", 0.225, 0.1, "Def moving"]
 
     EquipSpec = ["Equip specific weapons", "EQS", 0.5, 0.0, "Equiping"]
     EquipAll = ["Equip all your weapons", "EQA"] + EquipSpec[2:4] + ["Equiping"]
@@ -54,7 +52,6 @@ class Characters:
     Information = ["Information on a character state", "INF", 0.0, 0.0, "Information"]
     Save = ["Save the current game state", "SAV", 0.0, 0.0, "Saving"]
     Load = ["Load a previous game state", "LOA", 0.0, 0.0, "Loading"]
-    SwitchAutomaticMode = ["Set on or off the automatic mode", "AUT", 0.0, 0.0, "Automatic"]
     
     Actions = []
     Actions.append(Pass)
@@ -63,8 +60,6 @@ class Characters:
     Actions.append(RangedAttack)
     Actions.append(Reload)
     Actions.append(Move)
-    Actions.append(DodgeMove)
-    Actions.append(DefMove)
     Actions.append(EquipSpec)
     Actions.append(EquipAll)
     Actions.append(UnequipSpec)
@@ -72,8 +67,6 @@ class Characters:
     Actions.append(Information)
     Actions.append(Save)
     Actions.append(Load)
-    Actions.append(SwitchAutomaticMode)
-    
     
     def __init__(self, name, constitution, force, agility, dexterity, reflex, \
     willpower, spirit, prefered_hand, head_armor, chest_armor, arms_armor, legs_armor, \
@@ -259,9 +252,7 @@ class Characters:
         
     
     def is_moving(self):
-        if self.current_action == Characters.Move or \
-        self.current_action == Characters.DodgeMove or \
-        self.current_action == Characters.DefMove:
+        if self.current_action == Characters.Move:
             return True
         return False
     

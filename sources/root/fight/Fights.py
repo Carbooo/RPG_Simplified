@@ -599,14 +599,6 @@ class Fights:
             elif read == Characters.Move[1]:
                 if self.move_action(character):
                     break
-
-            elif read == Characters.DodgeMove[1]:
-                if self.dodge_move_action(character):
-                    break
-            
-            elif read == Characters.DefMove[1]:
-                if self.def_move_action(character):
-                    break
             
             elif read == Characters.EquipAll[1]:
                 if self.equip_all_action(character):
@@ -632,9 +624,6 @@ class Fights:
             
             elif read == Characters.Load[1]:
                 self.load_action(character)
-                        
-            elif read == Characters.SwitchAutomaticMode[1]:
-                self.switch_automatic_mode(character)
                 
             else:
                 print("Action:", read, "is not recognized")
