@@ -174,9 +174,7 @@ class RangedAttackChar:
             print("The attack has been fully blocked by the defender")
             time.sleep(5)
         else:
-            if attack_result > RangedAttackChar.attack_effect[1]:
-                self.fight.stop_action(self.defender)
-            member = self.defender.body.ranged_choose_member(hit_chance, shoot_type)
+            member = self.defender.body.ranged_choose_member(hit_chance)
             self.defender.ranged_attack_received(self.attacker, attack_result, 1, member, self.ammo_used)
 
 
@@ -187,18 +185,11 @@ class RangedAttackChar:
         
         h_obs = self.fight.field.calculate_ranged_obstacle_ratio(self.attacker, self.defender)
         
-        if not self.defender.is_active():
-            h_act = 1
-        elif self.defender.current_action == Characters.DodgeMove:
-            coef = self.dodge_and_shoot_angle_ratio()
-            h_act = self.dodge_speed_ratio(coef)
-        elif self.defender.is_moving():
+        h_act = 1
+        if self.defender.is_moving():
             coef = self.move_and_shoot_angle_ratio()
             h_act = self.move_speed_ratio(coef)
-        else:
-            h_act = 1
         
-        #Concatenate and include melee fight disturbtion
         return min(1, self.attacker.accuracy_ratio("Ranged") \
             * (1 - self.defender.chances_to_be_ranged_missed(self.fight.current_timeline)) \
             * h_dist * h_obs * h_act)
