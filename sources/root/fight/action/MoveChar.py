@@ -2,8 +2,6 @@ import math as math
 import time as time
 from sources.root.character.Characters import Characters
 from sources.root.fight.action.Actions import Actions
-from sources.root.fight.action.EquipChar import EquipChar
-from sources.root.fight.action.ReloadChar import ReloadChar
 
 
 #############################################################

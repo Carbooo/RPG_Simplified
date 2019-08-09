@@ -809,12 +809,15 @@ class Characters:
         penetration_rate = enemy.penetration_rate
         self.attack_received(enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate)
     
-    
     def ranged_attack_received(self, enemy, attack_value, attack_coef, member, ammo_used):
         resistance_dim_rate = enemy.resistance_dim_rate * ammo_used.resistance_dim_rate
         penetration_rate = enemy.penetration_rate * ammo_used.penetration_rate
         self.attack_received(enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate)
-        
+    
+    def magic_attack_received(self, enemy, attack_value, attack_coef, member):
+        resistance_dim_rate = enemy.resistance_dim_rate
+        penetration_rate = enemy.penetration_rate
+        self.attack_received(enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate)
         
     def attack_received(self, enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate):
         a = enemy.attack_characteristics(self, attack_coef, member)
