@@ -1,5 +1,5 @@
 import copy as copy
-from sources.root.character.Characters import Characters
+from sources.character.Characters import Characters
 
 
 #############################################################

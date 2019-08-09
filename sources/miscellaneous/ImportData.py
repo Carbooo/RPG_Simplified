@@ -1,10 +1,10 @@
 import csv as csv
 import numpy as np
-from sources.root.character.Equipments import Equipments, Armors, Shields, MeleeWeapons, RangedWeapons, Bows, Crossbows, \
+from sources.character.Equipments import Equipments, Armors, Shields, MeleeWeapons, RangedWeapons, Bows, Crossbows, \
     Ammo
-from sources.root.character.Characters import Characters
-from sources.root.fight.Teams import Teams
-from sources.root.fight.Fields import Fields
+from sources.character.Characters import Characters
+from sources.fight.Teams import Teams
+from sources.fight.Fields import Fields
 
 
 ###########################################################

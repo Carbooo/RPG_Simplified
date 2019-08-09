@@ -1,5 +1,5 @@
 import math as math
-from sources.root.character.Equipments import Equipments, NoneArmor, NoneWeapon, Armors
+from sources.character.Equipments import Equipments, NoneArmor, NoneWeapon, Armors
 
 #############################################################
 ################### BODY MEMBERS CLASS ######################

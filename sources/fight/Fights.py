@@ -1,15 +1,15 @@
 import copy as copy
 import random as random
 import time as time
-from sources.root.character.Characters import Characters, NoneCharacter
-from sources.root.fight.action.GetCharInformation import GetCharInformation
-from sources.root.fight.action.EquipChar import EquipChar
-from sources.root.fight.action.MeleeAttackChar import MeleeAttackChar
-from sources.root.fight.action.MoveChar import MoveChar
-from sources.root.fight.action.RangedAttackChar import RangedAttackChar
-from sources.root.fight.action.ReloadChar import ReloadChar
-from sources.root.fight.action.RestChar import RestChar
-from sources.root.fight.action.SaveAndLoad import Save, Load
+from sources.character.Characters import Characters, NoneCharacter
+from sources.action.GetCharInformation import GetCharInformation
+from sources.action.EquipChar import EquipChar
+from sources.action.MeleeAttackChar import MeleeAttackChar
+from sources.action.MoveChar import MoveChar
+from sources.action.RangedAttackChar import RangedAttackChar
+from sources.action.ReloadChar import ReloadChar
+from sources.action.RestChar import RestChar
+from sources.action.SaveAndLoad import Save, Load
 
 
 #############################################################

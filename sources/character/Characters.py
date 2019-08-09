@@ -2,10 +2,10 @@ import copy as copy
 import math as math
 import random as random
 import time as time
-from sources.root.character.Equipments import Equipments, Weapons, Shields, AttackWeapons, \
+from sources.character.Equipments import Equipments, Weapons, Shields, AttackWeapons, \
     MeleeWeapons, RangedWeapons, Bows, Crossbows, Ammo, NoneWeapon, NoneAmmo
-from sources.root.character.Bodies import Bodies
-from sources.root.character.BodyMembers import BodyMembers
+from sources.character.Bodies import Bodies
+from sources.character.BodyMembers import BodyMembers
 
 
 #############################################################
@@ -95,7 +95,9 @@ class Characters:
         self.dexterity = float(dexterity)
         self.reflex = float(reflex)
         self.willpower = float(willpower)
+        self.willpower_ratio = float(willpower) / 10
         self.spirit = float(spirit)
+        self.spirit_ratio = float(spirit) / 10
         self.set_initial_position(abscissa, ordinate)
         life = max(1, float(self.constitution * 10))
         mana = max(1, float(self.spirit * 10))
@@ -803,9 +805,7 @@ class Characters:
         penetration_rate = enemy.penetration_rate * ammo_used.penetration_rate
         self.attack_received(enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate)
     
-    def magic_attack_received(self, enemy, attack_value, attack_coef, member):
-        resistance_dim_rate = enemy.resistance_dim_rate
-        penetration_rate = enemy.penetration_rate
+    def magic_attack_received(self, enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate):
         self.attack_received(enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate)
         
     def attack_received(self, enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate):

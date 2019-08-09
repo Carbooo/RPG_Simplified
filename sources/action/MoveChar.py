@@ -1,7 +1,7 @@
 import math as math
 import time as time
-from sources.root.character.Characters import Characters
-from sources.root.fight.action.Actions import Actions
+from sources.character.Characters import Characters
+from sources.action.Actions import Actions
 
 
 #############################################################

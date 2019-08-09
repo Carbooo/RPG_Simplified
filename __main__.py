@@ -1,7 +1,7 @@
 from sources.miscellaneous.ImportData import ImportData
-from sources.root.fight.Fields import Fields
-from sources.root.fight.Teams import Teams
-from sources.root.fight.Fights import Fights
+from sources.fight.Fields import Fields
+from sources.fight.Teams import Teams
+from sources.fight.Fights import Fights
 
 ImportData("Armors", "data/Armors.csv")
 # PrintData("Armors")

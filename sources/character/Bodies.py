@@ -2,8 +2,8 @@ import copy as copy
 import math as math
 import random as random
 import time as time
-from sources.root.character.BodyMembers import BodyMembers
-from sources.root.character.Equipments import Equipments, Shields, \
+from sources.character.BodyMembers import BodyMembers
+from sources.character.Equipments import Equipments, Shields, \
     Bows, MeleeWeapons, Crossbows
 
 

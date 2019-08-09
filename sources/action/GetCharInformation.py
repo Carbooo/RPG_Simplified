@@ -1,4 +1,4 @@
-from sources.root.fight.action.Actions import Actions
+from sources.action.Actions import Actions
 
 #############################################################
 ################## GET CHAR INFORMATION CLASS ###############

@@ -1,6 +1,5 @@
 import time as time
-from sources.root.fight.action.Actions import Actions
-from sources.root.character.Characters import Characters
+from sources.action.Actions import Actions
 
 
 #############################################################

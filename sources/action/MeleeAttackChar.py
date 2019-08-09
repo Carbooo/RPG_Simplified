@@ -1,8 +1,8 @@
 import math as math
 import random as random
 import time as time
-from sources.root.character.Characters import Characters, NoneCharacter
-from sources.root.fight.action.Actions import Actions
+from sources.character.Characters import Characters
+from sources.action.Actions import Actions
 
 
 #############################################################

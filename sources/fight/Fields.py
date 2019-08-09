@@ -2,7 +2,7 @@ import copy as copy
 import math as math
 import numpy as np
 import random as random
-from sources.root.character.Characters import Characters, NoneCharacter
+from sources.character.Characters import Characters, NoneCharacter
 
 
 #############################################################

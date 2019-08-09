@@ -1,5 +1,4 @@
-from sources.root.fight.action.spell.Spells import Spells
-
+from sources.spell.Spells import Spells
 
 #############################################################
 ####################### WRATH SPELL CLASS ###################
@@ -22,7 +21,5 @@ class WrathSpells:
         return True
         
     def fireball(self):
-        self.target.
+        self.target.test = 3
         return True
-        
-        

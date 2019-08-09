@@ -1,7 +1,7 @@
 import time as time
-from sources.root.character.Equipments import RangedWeapons, Crossbows
-from sources.root.character.Characters import Characters
-from sources.root.fight.action.Actions import Actions
+from sources.character.Equipments import RangedWeapons, Crossbows
+from sources.character.Characters import Characters
+from sources.action.Actions import Actions
 
 
 #############################################################
