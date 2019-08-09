@@ -151,22 +151,12 @@ class Fields:
 
         return path_ratio
 
-    def shoot_has_hit_another_target(self, attacker, defender, hit_chance, current_timeline):
+    def shoot_has_hit_another_target(self, attacker, defender, hit_chance):
         # Test if it has missed the target
         rd = random.random()
         if rd <= hit_chance:
             # Not missed
             return True
-
-        # Test if it has directly hit a wrong melee fighter
-        if rd - hit_chance <= attacker.chances_to_hit_wrong_melee_target(defender, current_timeline):
-            char_list = []
-            for att in defender.current_melee_attacks:
-                if att.defender != attacker and att.defender != defender:
-                    char_list.append(att.defender)
-                if att.attacker != attacker and att.attacker != defender:
-                    char_list.append(att.attacker)
-            return random.choice(char_list)
 
         # Test wrong direction of the arrow
         # Calculate defender position at +/- variation angle
@@ -213,7 +203,6 @@ class Fields:
                 if not self.is_case_character_free(c_abs, c_ord) \
                         and random.random() < 0.35:
                     return self.characters_array[c_abs, c_ord]
-
         return False
 
     ###################### SET AND MOVE FUNCTIONS #####################

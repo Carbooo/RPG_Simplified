@@ -26,8 +26,6 @@ class Characters:
     use_bulk_mean = 3.5 # Weapons use bulk reference for characters
     min_speed = 1.0 / 6.0 # Minimum speed for char (necessary for hurt char)
     accuracy_mean = 100.0 # Accuracy reference for characters
-    chances_to_miss_ranged_target = 0.01 # Chance to miss easy target
-    chances_per_wrong_melee_target = 0.2 # Default chance to hit another melee target
     min_speed_run_level = 0.75 # Minimum speedrunlevel (use for starting move)
     
     # A turn is around 6 seconds
@@ -45,8 +43,6 @@ class Characters:
     # Normal run is around 2.7 meters --> around 1 case per second
     # Time of reflexion and other handicaps increase time per cases
     Move = ["Move to an adjacent case", "MOV", 0.15, 0.1, "Moving"]
-    DodgeMove = ["Move and dodge projectiles at the same time", "MDO", 0.2, 0.3, "Dodge moving"]
-    DefMove = ["Move and defend at the same time", "MDE", 0.225, 0.1, "Def moving"]
 
     EquipSpec = ["Equip specific weapons", "EQS", 0.5, 0.0, "Equiping"]
     EquipAll = ["Equip all your weapons", "EQA"] + EquipSpec[2:4] + ["Equiping"]
@@ -56,7 +52,6 @@ class Characters:
     Information = ["Information on a character state", "INF", 0.0, 0.0, "Information"]
     Save = ["Save the current game state", "SAV", 0.0, 0.0, "Saving"]
     Load = ["Load a previous game state", "LOA", 0.0, 0.0, "Loading"]
-    SwitchAutomaticMode = ["Set on or off the automatic mode", "AUT", 0.0, 0.0, "Automatic"]
     
     Actions = []
     Actions.append(Pass)
@@ -65,8 +60,6 @@ class Characters:
     Actions.append(RangedAttack)
     Actions.append(Reload)
     Actions.append(Move)
-    Actions.append(DodgeMove)
-    Actions.append(DefMove)
     Actions.append(EquipSpec)
     Actions.append(EquipAll)
     Actions.append(UnequipSpec)
@@ -74,8 +67,6 @@ class Characters:
     Actions.append(Information)
     Actions.append(Save)
     Actions.append(Load)
-    Actions.append(SwitchAutomaticMode)
-    
     
     def __init__(self, name, constitution, force, agility, dexterity, reflex, \
     willpower, spirit, prefered_hand, head_armor, chest_armor, arms_armor, legs_armor, \
@@ -261,9 +252,7 @@ class Characters:
         
     
     def is_moving(self):
-        if self.current_action == Characters.Move or \
-        self.current_action == Characters.DodgeMove or \
-        self.current_action == Characters.DefMove:
+        if self.current_action == Characters.Move:
             return True
         return False
     
@@ -869,30 +858,6 @@ class Characters:
         
     
 ###################### RANGED FUNCTIONS ########################
-    def chances_to_be_ranged_missed(self, current_timeline):
-        #All attacks diminish the chances to hit the right target
-        return Characters.chances_to_miss_ranged_target + \
-            self.chances_to_ranged_hit_melee_attack_list(self.current_melee_attacks, current_timeline)
-    
-    
-    def chances_to_hit_wrong_melee_target(self, target, current_timeline):
-        #If target attack the shooter, need to remove this attack
-        melee_attack_list = []
-        for att in target.current_melee_attacks:
-            if att.defender != self or att.attacker != target:
-                melee_attack_list.append(att)
-        return self.chances_to_ranged_hit_melee_attack_list(melee_attack_list, current_timeline)
-
-        
-    def chances_to_ranged_hit_melee_attack_list(self, melee_attack_list, current_timeline): 
-        ratio = 0
-        for att in melee_attack_list:
-            if att.attack_end_time > current_timeline:
-                ratio += 1
-        ratio *= Characters.chances_per_wrong_melee_target
-        return ratio
-        
-
     def calculate_point_distance(self, abscissa, ordinate):
         return math.sqrt( \
             math.pow(self.abscissa - abscissa, 2) + \
