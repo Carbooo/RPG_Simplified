@@ -10,7 +10,7 @@ class RestChar:
 
     rest_config = ["Normal rest", 1, 1, 5]  # [Type, Rest coef, min_turn, max_turn]
 
-    def __init__(self, fight, character, default_type="None", automatic=False, nb_of_turn=0):
+    def __init__(self, fight, character, nb_of_turn):
         Actions.__init__(self, fight)
         self.character = character
         self.nb_of_turn = nb_of_turn

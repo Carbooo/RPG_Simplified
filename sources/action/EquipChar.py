@@ -17,8 +17,6 @@ class EquipChar:
         self.next_equipment = []
         self.next_unequipment = []
         self.equip_time = 0.0
-        self.equip_handicap = 0.0
-        self.after_equip_handicap = 0.0
         self.is_a_success = self.start()
 
     def start(self):

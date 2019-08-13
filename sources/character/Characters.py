@@ -109,17 +109,8 @@ class Characters:
         self.body = Bodies(life, stamina, mana, prefered_hand, self.force_ratio)
         
         #Set characters parameters
-        self.current_path = []
-        self.next_equipment = []
-        self.next_unequipment = []
-        self.current_action = Characters.NoAction
-        self.current_melee_attacks = []
-        self.action_in_progress = False
-        self.last_direction = 0.0
-        self.move_direction = 0.0
-        self.speed_run_level = 0
         self.timeline = 0.0
-        self.unconsciousness = 0.0
+        self.last_action = Characters.NoAction
         
         #Set weapons
         self.weapons_stored = []
@@ -190,68 +181,13 @@ class Characters:
      
         
 ################### RESET & STATE FUNCTIONS ######################
-    def get_readiness(self):
-        ca = self.current_action
-        if ca == Characters.NoAction or ca == Characters.Pass or ca == Characters.Defending or \
-        ca == Characters.MeleeAttack:
-            return 1
-        elif ca == Characters.DefMove:
-            return 0.9
-        elif ca == Characters.Rest or ca == Characters.Reload or ca == Characters.EquipSpec or \
-        ca == Characters.EquipAll or ca == Characters.UnequipSpec or ca == Characters.UnequipAll:
-            return 0.75
-        elif ca == Characters.RangedAttack:
-            return 0.7
-        elif ca == Characters.Move:
-            return 0.65
-        elif ca == Characters.DodgeMove:
-            return 0.6
-        else:
-            print("(Characters) Error in get_readiness. Action:", ca, "not recognized")
-            return 1
-    
-
-    def reset_current_melee_attacks(self, current_timeline):
-        current_attack_list = copy.copy(self.current_melee_attacks)
-        for att in current_attack_list:
-            if att.timeline + Characters.MeleeAttack[2] <= current_timeline:
-                self.current_melee_attacks.remove(att)
-    
-    
-    def is_a_melee_attacker(self):
-        for att in self.current_melee_attacks:
-            if att.attacker == self:
-                if att.timeline > att.fight.current_timeline:
-                    return True
-        return False 
-    
-    
-    def get_last_possible_timeline(self):
-        current_timeline = self.timeline
-        for att in self.current_melee_attacks:
-            if att.attacker.is_alive() and att.defender.is_alive() and \
-            att.get_char_end_of_timeline(self) > current_timeline:
-                current_timeline = att.attack_end_time
-        return current_timeline
-        
-    
     def is_modifying_equipment(self):
         if self.current_action == Characters.UnequipAll or \
         self.current_action == Characters.UnequipSpec or \
-        self.current_action == Characters.UnequipSpecMove or \
         self.current_action == Characters.EquipAll or \
-        self.current_action == Characters.EquipSpec or \
-        self.current_action == Characters.EquipSpecMove:        
+        self.current_action == Characters.EquipSpec:        
             return True
         return False
-    
-    
-    def is_equip_moving(self):
-        if self.current_action == Characters.EquipSpecMove or \
-        self.current_action == Characters.UnequipSpecMove:
-            return True
-        return False
-        
     
     def is_moving(self):
         if self.current_action == Characters.Move:
@@ -260,8 +196,7 @@ class Characters:
     
     
     def is_melee_fighting(self):
-        if self.current_action == Characters.MeleeAttack or \
-        self.current_action == Characters.Defending:
+        if self.current_action == Characters.MeleeAttack:
             return True
         return False
     
@@ -272,13 +207,6 @@ class Characters:
             return True
         return False
     
-    
-    def speed_run_ratio(self):
-        if self.speed_run_level <= 1:
-            return self.speed_run_level
-        return max(1, min(2, self.speed_run_level - 0.5)) #between min_speed_run_level and 2
-    
-
     def calculate_state(self):
         old_state = self.body.state
         self.body.calculate_states()
@@ -706,9 +634,8 @@ class Characters:
             self.ranged_power *= 10 #Default power
         else:
             self.ranged_power *= max(1.0, ranged_coef * self.body.ranged_attack_global_ratio())
-        self.magic_power = self.body.global_ratio() * (self.spirit + self.willpower/2) \
-            * 10 / (1 + 1.0/2)
-    
+        self.magic_power_ratio = self.body.global_ratio() * (self.spirit + self.willpower/2) / (1 + 1.0/2)
+        self.magic_power = self.magic_power_ratio * 10
     
     def calculate_defense(self):
         #Calculate equipments defense
@@ -805,8 +732,8 @@ class Characters:
         penetration_rate = enemy.penetration_rate * ammo_used.penetration_rate
         self.attack_received(enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate)
     
-    def magic_attack_received(self, enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate):
-        self.attack_received(enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate)
+    def magic_attack_received(self, enemy, attack_value, attack_coef, resistance_dim_rate, penetration_rate):
+        print("to be defined")
         
     def attack_received(self, enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate):
         a = enemy.attack_characteristics(self, attack_coef, member)
