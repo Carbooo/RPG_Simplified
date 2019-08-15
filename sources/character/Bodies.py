@@ -379,6 +379,11 @@ class Bodies:
     def loose_life(self, damage, member):
         cr_life = self.body_members[member].life
         damage_ratio = damage / self.body_members[member].life
+        self.body_members[member].life = max(0, self.body_members[member].life - damage)
+        self.print_loose_life(damage_ratio, damage)
+        return self.body_members[member].life / cr_life  # Used for spend_time & stamina resulting of the hit
+
+    def print_loose_life(self, damage_ratio, damage):
         if damage_ratio < 0.1:
             print("The attack has only made a flesh wound")
         elif damage_ratio < 0.2:
@@ -392,13 +397,15 @@ class Bodies:
         else:
             print("The attack has made deadly damages!")
         time.sleep(2)
-
-        self.body_members[member].life -= damage
         print("The attack has made", int(round(damage)), "life damages")
         time.sleep(2)
-
-        # Used for spend_time & spend_stamina resulting of the hit
-        return self.body_members[member].life / cr_life
+        
+    def loose_life_through_magic(self, damage, member):
+        # Magic spell touches several members at once, need to regroup them
+        cr_life = self.body_members[member].life
+        damage_ratio = damage / self.body_members[member].life
+        self.body_members[member].life = max(0, self.body_members[member].life - damage)
+        return self.body_members[member].life / cr_life, damage_ratio, damage
 
     ########################### STAMINA FUNCTIONS ##########################
     def spend_stamina(self, value):
@@ -645,11 +652,11 @@ class Bodies:
             self.shape = "KO"
 
     ########################## CHOOSE MEMBER FUNCTIONS #####################
-    def melee_choose_member(self, coefficient):
-        # Coefficient must be an integer between 0 and 5 (6 members)
+    def melee_choose_member(self, accuracy_ratio):
+        # Target coefficient must be an integer between 0 and 5 (6 members)
         # The higher is the coefficient, the better target it will be
         coefficient = int(min(5, max(0, math.floor(
-            coefficient * len(self.body_members) * random.random()))))
+            accuracy_ratio * len(self.body_members) * random.random()))))
 
         members_list = self.list_all_members_resistance()
         ordered_list = self.list_all_members_resistance_ordered(members_list)
@@ -701,10 +708,9 @@ class Bodies:
 
         return ordered_list
 
-    def ranged_choose_member(self, coefficient):
-        # Coefficient = HitRatio
-        # Aim at the center of the body (i.e. the chest)
-        member_ratio_list = self.member_size_adjusted(coefficient, 1)  # 1 for chest
+    def ranged_choose_member(self, hit_chance):
+        # Always aim at the center of the body (i.e. the chest)
+        member_ratio_list = self.member_size_adjusted(hit_chance, 1)  # 1 for chest
 
         # Calculate member hit
         ratio = random.random()

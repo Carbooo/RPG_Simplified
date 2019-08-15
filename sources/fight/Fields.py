@@ -128,6 +128,12 @@ class Fields:
                 self.calculate_ranged_obstacle_ratio(attacker, defender) > 0:
             return True
         return False
+        
+    def is_target_magically_reachable(self, attacker, defender):
+        if defender.is_alive() and attacker.is_distance_magically_reachable(defender) and \
+                self.calculate_ranged_obstacle_ratio(attacker, defender) > 0:
+            return True
+        return False
 
     def calculate_ranged_obstacle_ratio(self, attacker, enemy):
         min_abs = min(attacker.abscissa, enemy.abscissa)
@@ -160,7 +166,7 @@ class Fields:
 
         # Test wrong direction of the arrow
         # Calculate defender position at +/- variation angle
-        variation = random.gauss(0, 1) * 10 / attacker.accuracy_ratio("Ranged")
+        variation = random.gauss(0, Characters.variance) * 10
         pos_p = copy.copy(defender)
         attacker.set_enemy_pos_variation(pos_p, variation)
         min_abs_p = min(attacker.abscissa, pos_p.abscissa)

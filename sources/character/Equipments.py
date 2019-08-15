@@ -165,7 +165,7 @@ class Weapons(Equipments):
         self.defense = self.original_defense
         self.original_melee_power = float(melee_power)
         self.melee_power = self.original_melee_power
-        self.original_penetration_rate = float(penetration_rate) / 10.0
+        self.original_penetration_rate = float(penetration_rate) / 100.0
         self.penetration_rate = self.original_penetration_rate
         self.original_resistance_dim_rate = float(resistance_dim_rate) / 100.0
         self.resistance_dim_rate = self.original_resistance_dim_rate

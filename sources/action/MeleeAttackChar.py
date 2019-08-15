@@ -12,7 +12,6 @@ class MeleeAttackChar:
     """Class to melee attack a character"""
 
     attack_effect = [0, 25, 50, 75]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]
-    medium = 1.0  # Gauss expected value
     variance = 0.25  # Gauss variance
 
     def __init__(self, fight, character, target):
@@ -111,15 +110,13 @@ class MeleeAttackChar:
             self.actual_defense = "Defense"
 
         # Calculate attack and defend values
-        attack_accuracy = random.gauss(MeleeAttackChar.medium, MeleeAttackChar.variance) * math.pow(
+        attack_accuracy = random.gauss(1, MeleeAttackChar.variance) * math.pow(
                                         self.attacker.melee_handiness * math.pow(self.attacker.melee_range, 1.0 / 3), 
                                         0.75)
-        attack_power = Characters.get_melee_attack(attack_accuracy,
-                                                   random.gauss(MeleeAttackChar.medium, MeleeAttackChar.variance)
-                                                   * self.attacker.melee_power)
+        attack_power = random.gauss(1, MeleeAttackChar.variance) * Characters.get_melee_attack(attack_accuracy, self.attacker.melee_power)
 
-        dodge_level = random.gauss(MeleeAttackChar.medium, MeleeAttackChar.variance) * self.defender.dodging
-        defense_level = random.gauss(MeleeAttackChar.medium, MeleeAttackChar.variance) * self.defender.melee_defense
+        dodge_level = random.gauss(1, MeleeAttackChar.variance) * self.defender.dodging
+        defense_level = random.gauss(1, MeleeAttackChar.variance) * self.defender.melee_defense
 
         dodge_result = attack_accuracy - dodge_level
         defense_result = attack_power - defense_level
@@ -140,10 +137,7 @@ class MeleeAttackChar:
         return attack_result
 
     def melee_attack_type(self, attack_value):
-        # Member hit ratio & attack_coef
-        ratio = (attack_value / MeleeAttackChar.attack_effect[2] - 1) * self.attacker.accuracy_ratio()
-
-        if attack_value < MeleeAttackChar.attack_effect[0]:
+       if attack_value < MeleeAttackChar.attack_effect[0]:
             # Only block for very low damages
             self.block()
             time.sleep(3)
@@ -163,35 +157,30 @@ class MeleeAttackChar:
                 time.sleep(3)
             else:
                 print("The attack is a normal hit")
-                member = self.defender.body.melee_choose_member(ratio)
-                self.defender.melee_attack_received(self.attacker, attack_value, ratio, member)
+                self.defender.melee_attack_received(self.attacker, attack_value)
         elif attack_value < MeleeAttackChar.attack_effect[3]:
-            # Hit or hit + delay for high damages
+            # Big hit or hit + delay for high damages
             r = random.random()
             if r < 0.5:
                 print("The attack will hit and slightly delay the player!")
                 time.sleep(2)
                 self.delay(attack_value / 2)
-                member = self.defender.body.melee_choose_member(ratio)
-                self.defender.melee_attack_received(self.attacker, attack_value * 3 / 4, ratio, member)
+                self.defender.melee_attack_received(self.attacker, attack_value * 3 / 4)
             else:
                 print("The attack is a strong hit!")
-                member = self.defender.body.melee_choose_member(ratio)
-                self.defender.melee_attack_received(self.attacker, attack_value * 4 / 3, ratio, member)
+                self.defender.melee_attack_received(self.attacker, attack_value * 4 / 3)
         else:
-            # Hit, hit + delay, big hit or double hit
+            # Big hit + delay or huge hit
             r = random.random()
             if r < 0.5:
                 print("The attack will hit AND delay the player!")
                 time.sleep(2)
                 self.delay(attack_value * 2 / 3)
-                member = self.defender.body.melee_choose_member(ratio)
-                self.defender.melee_attack_received(self.attacker, attack_value, ratio, member)
+                self.defender.melee_attack_received(self.attacker, attack_value)
             else:
                 print("The attack is a HUGE HIT!")
                 time.sleep(2)
-                member = self.defender.body.melee_choose_member(ratio)
-                self.defender.melee_attack_received(self.attacker, attack_value * 3 / 2, ratio, member)
+                self.defender.melee_attack_received(self.attacker, attack_value * 3 / 2)
 
     def block(self):
         self.defender.print_basic()

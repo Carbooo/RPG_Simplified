@@ -19,6 +19,7 @@ class Characters:
     instances_count = 0
     max_position_area = 6 # Max range for characters positions
     variance = 0.1 # Gauss variance
+    high_variance = 0.25 # Gauss variance
     max_bonus = 1.35 # Max load bonus
     load_mean = 50.0 # Load reference for characters characteristics
     bulk_mean = 6.0 # Bulk reference for characters characteristics
@@ -463,11 +464,11 @@ class Characters:
     def all_shields_absorbed_damage(self, damage):
         weapons_list = []
         defense = 0
-        for weapon in range(len(self.weapons_use)):
+        for weapon in self.weapons_use:
             if isinstance(weapon, Shields):
                 defense += weapon.defense
                 weapons_list.append(weapon)
-        for weapon in range(len(weapons_list)):
+        for weapon in weapons_list:
             self.weapon_absorbed_damage(weapon, damage * weapon.defense / defense)
                     
 
@@ -497,7 +498,6 @@ class Characters:
         self.body.load_ratio = math.pow(self.load_ratio, 0.5)
         self.use_load_ratio = min(Characters.max_bonus, Characters.use_load_mean / max(1, use_load) * self.force_ratio)
 
-    
     def calculate_bulk_ratios(self):
         bulk = 0.0
         use_bulk = 0.0
@@ -517,21 +517,8 @@ class Characters:
         self.use_bulk_ratio = min(Characters.max_bonus, \
             Characters.use_bulk_mean / max(1, use_bulk) * self.force_ratio)
 
-
     def calculate_agility(self):
         self.agility = max(1, self.original_agility * self.load_ratio * self.bulk_ratio)
-     
-     
-    def accuracy_ratio(self, attack_type="None"):
-        if attack_type == "Melee":
-            return max(1, self.melee_handiness) / Characters.accuracy_mean
-        elif attack_type == "Ranged":
-            return max(1, self.ranged_accuracy) / Characters.accuracy_mean
-        elif self.is_using_a_ranged_weapon():
-            return max(1, self.ranged_accuracy) / Characters.accuracy_mean
-        else:
-            return max(1, self.melee_handiness) / Characters.accuracy_mean
-    
      
     def calculate_accuracies(self):
         #Calculate weapons accuracies
@@ -569,9 +556,10 @@ class Characters:
         #Set accuracies
         self.melee_handiness = max(1, self.body.melee_attack_global_ratio() * \
             melee_coef * melee_weapons_handiness / melee_weapons_nb)
+        self.melee_handiness_ratio = self.melee_handiness / Characters.accuracy_mean
         self.ranged_accuracy = max(1, self.body.ranged_attack_global_ratio() * \
-            ranged_coef * ranged_weapons_accuracy / ranged_weapons_nb)    
-     
+            ranged_coef * ranged_weapons_accuracy / ranged_weapons_nb)
+        self.ranged_accuracy_ratio = self.ranged_accuracy / Characters.accuracy_mean
          
     def calculate_melee_range(self):
         #Calculate weapons melee_range
@@ -590,7 +578,6 @@ class Characters:
         #Set range
         self.melee_range = max(1, melee_range / melee_weapons_nb)    
      
-         
     def calculate_attack_power(self):
         #Calculate weapons damages
         self.melee_power = 0.0
@@ -641,10 +628,12 @@ class Characters:
         #Calculate equipments defense
         melee_defense = 0.0
         ranged_defense = 0.0
+        shield_magic_defense = 0.0  # Where shield can be used against magic attacks
         for weapon in self.weapons_use:
             if isinstance(weapon, Shields):
                 melee_defense += weapon.defense * self.body.weapon_ratio(weapon)
                 ranged_defense += weapon.defense * self.body.weapon_ratio(weapon)
+                shield_magic_defense += weapon.defense * self.body.weapon_ratio(weapon)
             elif isinstance(weapon, AttackWeapons):
                 melee_defense += weapon.defense * self.body.weapon_ratio(weapon)
         
@@ -668,7 +657,7 @@ class Characters:
         self.ranged_defense = ranged_defense * ranged_coef
         self.magic_defense = max(1, (self.spirit + self.willpower/2 + self.constitution/3) \
              * 10 / (1 + 1.0/2 + 1.0/3))
-
+        self.magic_defense_with_shields = self.magic_defense + shield_magic_defense
         
     def calculate_dodging(self):
         #More equipment used, lower dodge ratio
@@ -676,15 +665,12 @@ class Characters:
         self.dodging = max(1, self.body.defense_global_ratio() * 10 * \
             (self.reflex + self.agility) / (1.0 + 1.0) / self.constitution_ratio)
 
-
     @staticmethod
     def get_speed_ratio_by_coef(coefficient):
         return max(Characters.min_speed, coefficient)
         
-        
     def calculate_speed_ratio(self): 
         self.speed_ratio = Characters.get_speed_ratio_by_coef(self.body.global_ratio())
-
 
     def calculate_characteristic(self):
         self.calculate_load_ratios()
@@ -722,68 +708,103 @@ class Characters:
     
     
 ###################### DAMAGE FUNCTIONS ########################
-    def melee_attack_received(self, enemy, attack_value, attack_coef, member):
-        resistance_dim_rate = enemy.resistance_dim_rate
-        penetration_rate = enemy.penetration_rate
-        self.attack_received(enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate)
+    def melee_attack_received(self, enemy, attack_value):
+        member = self.body.melee_choose_member(enemy.melee_handiness_ratio)
+        self.physical_damage_received(enemy, attack_value, member, enemy.melee_handiness_ratio, enemy.resistance_dim_rate, enemy.penetration_rate)
     
-    def ranged_attack_received(self, enemy, attack_value, attack_coef, member, ammo_used):
+    def ranged_attack_received(self, enemy, attack_value, hit_chance, ammo_used):
+        member = self.body.ranged_choose_member(hit_chance)
+        accuracy_ratio = 0.5 + hit_chance  # Between 0,5 and 1,5, similar to melee handiness_ratio
         resistance_dim_rate = enemy.resistance_dim_rate * ammo_used.resistance_dim_rate
         penetration_rate = enemy.penetration_rate * ammo_used.penetration_rate
-        self.attack_received(enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate)
+        self.physical_damage_received(enemy, attack_value, member, accuracy_ratio, resistance_dim_rate, penetration_rate)
     
-    def magic_attack_received(self, enemy, attack_value, attack_coef, resistance_dim_rate, penetration_rate):
-        print("to be defined")
-        
-    def attack_received(self, enemy, attack_value, attack_coef, member, resistance_dim_rate, penetration_rate):
-        a = enemy.attack_characteristics(self, attack_coef, member)
-        attack_value *= a[0] / attack_coef
-        
+    def physical_damage_received(self, enemy, attack_value, member, accuracy_ratio, resistance_dim_rate, penetration_rate):
         enemy.print_basic()
         print("-- has HIT --", end=' ')
         self.print_basic()
-        print("-- with a power of", int(round(attack_value)), "--")
+        print("-- with a power of", int(round(attack_value)))
         time.sleep(2)        
         
-        self.damage_received(attack_value, a[1], member, resistance_dim_rate, penetration_rate)
-        
+        armor_coef = self.get_armor_coef(enemy, member, accuracy_ratio)
+        damage_result = self.body.armor_damage_absorbed(attack_value, member, armor_coef, resistance_dim_rate, penetration_rate)
+        if damage_result > 0:
+            life_ratio = self.body.loose_life(damage_result, member)
+            # Damages received diminish the defender
+            life_ratio = math.pow(2 - life_ratio, 2) - 1
+            print("The shock of the attack delays the player of", round(life_ratio,2), "turn(s) and consume stamina")
+            time.sleep(3)
+            self.spend_time(life_ratio)
+            self.spend_stamina(life_ratio * 10)
     
-    def attack_characteristics(self, defender, attack_coef, member):
-        #Attack&Armor ratio
-        cover_ratio = defender.body.member_cover_ratio(member)
-        ratio = random.gauss(1, Characters.variance) * attack_coef \
-            * self.accuracy_ratio() * (1 - cover_ratio)
+    def get_armor_coef(self, enemy, member, accuracy_ratio):
+        cover_ratio = self.body.member_cover_ratio(member)
+        avoid_armor_chances = (1 - random.gauss(1, Characters.high_variance) * cover_ratio) * accuracy_ratio
         
         if cover_ratio <= 0:
             print("The player has no armor!")
             time.sleep(2)
-            armor_coef = 0
-        elif ratio < 0.9:
-            print("The hit will meet a full armor part")
-            time.sleep(2)
-            armor_coef = 1
-        else:
+            return 0
+        elif random.random() < avoid_armor_chances:
             print("The hit will avoid the armor!")
             time.sleep(2)
-            attack_coef *= (1 - cover_ratio / 2)
-            armor_coef = 0
+            return 1
+        else:
+            print("The hit will meet a full armor part")
+            time.sleep(2)
+            return 0
+    
+    def magical_damage_received(self, enemy, attack_value, spread_ratio, can_use_shield, resistance_dim_rate, penetration_rate):
+        attack_value += enemy.magic_power * random.gauss(1, Characters.high_variance)
+        if can_use_shield:
+            attack_value -= self.magic_defense_with_shields * random.gauss(1, Characters.high_variance)
+        else:
+            self.all_shields_absorbed_damage(attack_value)
+            attack_value -= self.magic_defense * random.gauss(1, Characters.high_variance)
+        
+        if attack_value <= 0:
+            self.print_basic()
+            print("-- has BLOCKED the attack of --", end=' ')
+            enemy.print_basic()
+            time.sleep(4)
+        else:
+            enemy.print_basic()
+            print("-- has HIT --", end=' ')
+            self.print_basic()
+            print("-- with a power of", int(round(attack_value)))
+            if spread_ratio > 0:
+                print("-- spreading with a ratio of", int(round(spread_ratio)))
+            time.sleep(2)
             
-        return [attack_coef, armor_coef]
-    
-    
-    def damage_received(self, damage, armor_coef, member, resistance_dim_rate, penetration_rate):
-        damage_result = self.body.armor_damage_absorbed(damage, member, armor_coef, resistance_dim_rate, penetration_rate)
-        if damage_result > 0:
-            life_ratio = self.body.loose_life(damage_result, member)
+            life_ratio = 0
+            damage_ratio = 0
+            damage = 0
+            for i in range(len(self.body.body_members)):
+                if i != 1:  # Chest is always the target of magic spell, no need to adapt damages
+                    # Damages to other members depend on spread ratio and is proportional to total life of the member
+                    attack_value *= spread_ratio * Bodies.life_distribution[i] / Bodies.life_distribution[1]
+                life_ratio, damage_ratio, damage += self.magical_damage_received_per_member(i, attack_value, resistance_dim_rate, penetration_rate)
+            
+            if damage_ratio > 0:
+                self.body.print_loose_life(damage_ratio / 6, damage)  # Ratio per member, but print total damage
+                
+            # Damages received diminish the defender
+            life_ratio = (math.pow(2 - life_ratio / 6, 2) - 1) * 2  # 6 members, multiply by 2 because several members are hit
             if life_ratio > 0:
-                #Damages received diminish the defender
-                life_ratio = math.pow(2 - life_ratio, 2) - 1
-                print("The shock of the attack delays the player of", round(life_ratio,2), "turn(s)")
+                print("The shock of the attack delays the player of", round(life_ratio,2), "turn(s) and consume stamina")
                 time.sleep(3)
                 self.spend_time(life_ratio)
-                self.spend_stamina(life_ratio)
-        
+                self.spend_stamina(life_ratio * 10)
     
+    def magical_damage_received_per_member(member, attack_value, resistance_dim_rate, penetration_rate):
+        cover_ratio = self.body.member_cover_ratio(member)
+        damage_result = self.body.armor_damage_absorbed(attack_value, member, cover_ratio, resistance_dim_rate, penetration_rate)
+        if damage_result > 0:
+            return self.body.loose_life_through_magic(damage_result, member)
+        else:
+            return 1, 0, 0
+            
+        
 ###################### RANGED FUNCTIONS ########################
     def calculate_point_distance(self, abscissa, ordinate):
         return math.sqrt( \
@@ -797,7 +818,7 @@ class Characters:
     
     
     def power_hit_chance_ratio(self, hit_chance):
-        return min(1.0, hit_chance / min(1.0, max(0.0001, random.random() * 1.5)))
+        return math.sqrt(hit_chance / 0.5)
     
         
     def has_range(self):
@@ -810,7 +831,6 @@ class Characters:
             return 0
         else:
             return max_range
-            
     
     def is_distance_reachable(self, enemy):        
         if self.calculate_point_distance(enemy.abscissa, enemy.ordinate) \
@@ -818,52 +838,10 @@ class Characters:
             return True
         return False
     
-    
-    def char_to_point_angle(self, abscissa, ordinate):
-        return math.atan2(ordinate - self.ordinate, abscissa - self.abscissa)
-    
-    
-    def angle_gap_to_enemy(self, enemy):
-        angle = math.fabs(self.last_direction - \
-            self.char_to_point_angle(enemy.abscissa, enemy.ordinate))
-        #print "last_direction:", math.degrees(self.last_direction)
-        #print "char_to_point_angle:", math.degrees(self.char_to_point_angle(enemy.abscissa, enemy.ordinate))
-        #print "angle:", math.degrees(angle)
-        #print "pi_angle:", math.degrees(2 * math.pi - angle)
-        #The shorter angle between the angle and the tour minus the angle
-        #print "AngleGapToEnemy:", math.degrees(min(angle, 2 * math.pi - angle))
-        return min(angle, 2 * math.pi - angle)
-    
-    
-    def angle_gap_ratio(self, enemy):
-        return 1
-        #1 is no angle, 0 is an attack in the back
-        #print "AngleRatio:", math.degrees(self.angle_gap_to_enemy(enemy) / math.pi)
-        angle_ratio = 1 - self.angle_gap_to_enemy(enemy) / math.pi
-        #ratio 1 - (angle_ratio * 1.3)^3
-        return max(0.0001, 1 - math.pow(angle_ratio * 1.3, 3))
-
-
-    def calculate_point_to_enemy_path_cos_angle(self, enemy, abscissa, ordinate):
-        u_abs = enemy.abscissa - self.abscissa
-        u_ord = enemy.ordinate - self.ordinate
-        v_abs = abscissa - self.abscissa
-        v_ord = ordinate - self.ordinate
- 
-        return (u_abs*v_abs + u_ord*v_ord) / ( \
-            math.sqrt(math.pow(u_abs,2) + math.pow(u_ord,2)) * \
-            math.sqrt(math.pow(v_abs,2) + math.pow(v_ord,2)))
-
-
-    def calculate_point_to_enemy_path_angle(self, enemy, abscissa, ordinate):
-        angle = math.acos( \
-            self.calculate_point_to_enemy_path_cos_angle(enemy, abscissa, ordinate))
-
-        if ordinate < self.ordinate:
-            angle = 2 * math.pi - angle
-        
-        return angle
-
+    def is_distance_magically_reachable(self, enemy):        
+        if self.calculate_point_distance(enemy.abscissa, enemy.ordinate) <= 50:  # Around 100 meters
+            return True
+        return False
     
     def calculate_point_to_enemy_path_distance(self, enemy, abscissa, ordinate):
         #Only work if abscissa & ordinate are in the segment path
@@ -871,20 +849,6 @@ class Characters:
         ac_length = self.calculate_point_distance(abscissa, ordinate)
         ah_length = ac_length * self.calculate_point_to_enemy_path_cos_angle(enemy, abscissa, ordinate)
         return math.sqrt(max(0, math.pow(ac_length, 2) - math.pow(ah_length, 2)))
-    
-    
-    def set_enemy_pos_variation(self, enemy, variation):
-        #Calculate angle between enemy and abscissa axis
-        c = copy.copy(self) #Is used for abscissa axis
-        c.abscissa += 1
-        angle = self.calculate_point_to_enemy_path_angle( \
-            c, enemy.abscissa, enemy.ordinate)
-        
-        #Set the variated position
-        angle += math.radians(variation)
-        enemy.abscissa += int(round(self.has_range() * math.cos(angle)))
-        enemy.ordinate += int(round(self.has_range() * math.sin(angle)))
-    
     
     def has_ammo(self):
         for weapon in self.weapons_use:

@@ -13,7 +13,6 @@ class RangedAttackChar:
     'Class to ranged attack a character'
     
     attack_effect = [25, 50]  # [Blocked", "Hit", "Hit & stopped"]
-    medium = 1.0  # Gauss expected value
     variance = 0.25  # Gauss variance
 
     def __init__(self, fight, character):
@@ -60,7 +59,7 @@ class RangedAttackChar:
         # Print in hit chance order
         enemy_list_bis = copy.copy(enemy_list)
         hit_chance_list_bis = copy.copy(hit_chance_list)
-        while len(hit_chance_list_bis) > 0.01:
+        while len(hit_chance_list_bis) > 0:
             hit_number = -1
             hit_chance = 0
             for j in range(len(hit_chance_list_bis)):
@@ -144,23 +143,21 @@ class RangedAttackChar:
         print("ranged_att_coef:", att_coef)
         
         # Range defense result
-        attack_power = random.gauss(RangedAttackChar.medium, RangedAttackChar.variance) * att_coef * \
+        attack_power = random.gauss(1.0, RangedAttackChar.variance) * att_coef * \
             self.attacker.ranged_power
-        defense_level = random.gauss(RangedAttackChar.medium, RangedAttackChar.variance) * \
+        defense_level = random.gauss(1.0, RangedAttackChar.variance) * \
             self.defender.ranged_defense
         attack_result = attack_power - defense_level
+        print("attack_power:", attack_power)
         print("attack_result:", attack_result)
         
-        # Shield defense malus
-        self.defender.all_shields_absorbed_damage(min(attack_power, defense_level))
-    
         # Attack result --> Either block or be fully hit
         if attack_result <= RangedAttackChar.attack_effect[0]:
-            print("The attack has been fully blocked by the defender")
+            self.defender.all_shields_absorbed_damage(attack_power)
+            print("The attack has been fully blocked / avoided by the defender")
             time.sleep(5)
         else:
-            member = self.defender.body.ranged_choose_member(hit_chance)
-            self.defender.ranged_attack_received(self.attacker, attack_power, 1, member, self.ammo_used)
+            self.defender.ranged_attack_received(self.attacker, attack_power, hit_chance, self.ammo_used)
 
     def shoot_hit_chance(self):
         # Distance = -a*(x-1) + b --> distance min = 1.0, distance max = 0.0
@@ -169,7 +166,7 @@ class RangedAttackChar:
         
         h_obs = self.fight.field.calculate_ranged_obstacle_ratio(self.attacker, self.defender)
         
-        return min(1, self.attacker.accuracy_ratio("Ranged")
+        return min(1, self.attacker.ranged_accuracy_ratio
             * (1 - self.defender.chances_to_be_ranged_missed(self.fight.current_timeline)) \
             * h_dist * h_obs)
         
