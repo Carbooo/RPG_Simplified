@@ -36,9 +36,9 @@ class Characters:
     Rest = ["Rest a little", "RES", 1.0, 0.0, "Resting"]
     
     Defending = ["Is defending against an attack", "DEF", 0.0, 0.0, "Defending"]
-    MeleeAttack = ["Melee attack an enemy character", "MAT", 0.35, 1.0, "Melee attacking"]
-    RangedAttack = ["Ranged attack an enemy character", "RAT", 0.35, 0.5, "Ranged attacking"]
-    Reload = ["Reload your ranged weapon", "REL", 1.0, 0.1, "Reloading"]
+    MeleeAttack = ["Melee attack an enemy character", "MAT", 0.5, 1.0, "Melee attacking"]
+    RangedAttack = ["Ranged attack an enemy character", "RAT", 0.5, 0.75, "Ranged attacking"]
+    Reload = ["Reload your ranged weapon", "REL", 0.5, 0.1, "Reloading"]
     
     # Between each case, there are approximatively 2 meters
     # Normal run is around 2.7 meters --> around 1 case per second
@@ -54,6 +54,35 @@ class Characters:
     Save = ["Save the current game state", "SAV", 0.0, 0.0, "Saving"]
     Load = ["Load a previous game state", "LOA", 0.0, 0.0, "Loading"]
     
+    # Spells
+    Spell = ["Cast a spell", "SPL", 0.0, 0.0, "Casting"]
+    spells = []
+    
+    wrath_spells = [
+        "description" : "Wrath spell",
+        "code" : "WRA",
+        "list" : []
+    ]
+    spells.append(wrath_spells)
+    wrath_improve_strength = [
+        "description" : "Improve your strength",
+        "code" : "STR",
+        "time_cost" : 1,
+        "stamina_cost" : 1,
+        "type" : "wrath",
+        "energy" : 10
+    ]
+    wrath_spells["list"].append(wrath_improve_strength)
+    wrath_fireball = [
+        "description" : "Throw a fireball",
+        "code" : "FBL",
+        "time_cost" : 3,
+        "stamina_cost" : 10,
+        "type" : "wrath",
+        "energy" : 30
+    ]
+    wrath_spells["list"].append(wrath_fireball)
+    
     Actions = []
     Actions.append(Pass)
     Actions.append(Rest)
@@ -68,6 +97,7 @@ class Characters:
     Actions.append(Information)
     Actions.append(Save)
     Actions.append(Load)
+    Actions.append(Spell)
     
     def __init__(self, name, constitution, force, agility, dexterity, reflex, \
     willpower, spirit, prefered_hand, head_armor, chest_armor, arms_armor, legs_armor, \

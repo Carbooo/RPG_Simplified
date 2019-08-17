@@ -7,19 +7,19 @@ from sources.spell.Spells import Spells
 class WrathSpells:
     """Class to cast wrath spells"""
  
-    def __init__(self, fight, caster, type, energy, spell_id):
-        Spells.__init__(self, fight, caster, type, energy, spell_id)
+    def __init__(self, fight, caster, energy, spell_code):
+        Spells.__init__(self, fight, caster, "wrath", energy, spell_code)
         
     def start(self):
-        if self.spell_id == "STR":
+        if self.spell_code == "STR":
             return self.improve_strength()
-        elif self.spell_id == "FBL":
+        elif self.spell_code == "FBL":
             return self.fireball()
         else:
             return False
     
     def execute(self):
-        if self.spell_id == "STR":
+        if self.spell_code == "STR":
             return self.end_improve_strength()
         else:
             return False

@@ -10,7 +10,8 @@ from sources.action.RangedAttackChar import RangedAttackChar
 from sources.action.ReloadChar import ReloadChar
 from sources.action.RestChar import RestChar
 from sources.action.SaveAndLoad import Save, Load
-
+from sources.spell.Spells import Spells
+from sources.spell.WrathSpells import WrathSpells
 
 #############################################################
 ##################### FIGHTS CLASS ##########################
@@ -383,6 +384,49 @@ class Fights:
         if not action.is_a_success:
             return False
         return True
+    
+    def choose_spell(self, character):
+        print("You have decided to cast a spell")
+        print("Which type of spell?")
+        for spell_type in Characters.spells:
+            print(spell_type["description"] + " (" + spell_type["code"] + ")")
+        
+        While 1:
+            read = input('--> Spell type (0 for cancel) : ')
+            if cancel_action(read):
+                return False
+            
+            for spell_type in Characters.spells:
+                if read == spell_type["code"]:
+                    print("You chose to cast a " + spell_type["description"])
+                    print("Which spell do you want to cast?")
+                    
+                    for spell in spell_type["list"]:
+                        print(spell["description"] + " (" + spell["code"] + ")")
+        
+                    While 1:
+                        read = input('--> Spell (0 for cancel) : ')
+                        if cancel_action(read):
+                            return False
+                        
+                        for spell in spell_type["list"]:
+                            if read == spell["code"]:
+                                print("You have decided to " + spell["description"])
+                                action = self.initiate_spell_object(character,
+                                                            spell_type["code"],
+                                                            spell["energy"], 
+                                                            spell["code"]) 
+                                if not action.is_a_success:
+                                    return False
+                                return True
+                            
+                        print("Spell:", read, "is not recognized")
+                    
+            print("Spell type:", read, "is not recognized")
+    
+    def initiate_spell_object(self, caster, spell_type_code, energy, spell_code):
+        if spell_type_code == "WRA":
+            return WrathSpells(self, caster, energy, spell_code)
     
     def cancel_action(self, read):
         try:
