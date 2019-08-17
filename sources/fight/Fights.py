@@ -278,6 +278,9 @@ class Fights:
             
             elif read == Characters.Load[1]:
                 self.load_action(character)
+            
+            elif read == Characters.Spell[1]:
+                self.choose_spell(character)
                 
             else:
                 print("Action:", read, "is not recognized")
