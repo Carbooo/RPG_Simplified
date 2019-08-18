@@ -78,7 +78,6 @@ class Fights:
             self.save_all_speed()
             self.current_timeline = next_event.timeline
             self.time_effect_on_all()
-            self.reset_all()
             self.last_timeline = self.current_timeline
             
             #Automatic turn every 1 timeline
@@ -199,9 +198,12 @@ class Fights:
         self.scheduler = scheduler_list
         
     def time_effect_on_all(self):
+        time_diff = self.current_timeline - self.last_timeline
         for char in self.char_order:
-            char.body.turn_rest(self.current_timeline - self.last_timeline)
+            char.body.turn_rest(time_diff)
             self.field.calculate_state(char)
+            for type in char.feelings:
+                char.feelings[type].natural_energy_update(time_diff)
     
     def end_turn(self):
         #Timelines and scheduling
@@ -417,7 +419,6 @@ class Fights:
                                 print("You have decided to " + spell["description"])
                                 action = self.initiate_spell_object(character,
                                                             spell_type["code"],
-                                                            spell["energy"], 
                                                             spell["code"]) 
                                 if not action.is_a_success:
                                     return False
@@ -427,9 +428,9 @@ class Fights:
                     
             print("Spell type:", read, "is not recognized")
     
-    def initiate_spell_object(self, caster, spell_type_code, energy, spell_code):
+    def initiate_spell_object(self, caster, spell_type_code, spell_code):
         if spell_type_code == "WRA":
-            return WrathSpells(self, caster, energy, spell_code)
+            return WrathSpells(self, caster, spell_code)
     
     def cancel_action(self, read):
         try:

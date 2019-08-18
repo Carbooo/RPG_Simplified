@@ -6,8 +6,13 @@ from sources.spell.Spells import Spells
 
 class WrathSpells:
     """Class to cast wrath spells"""
+    
+    spells_energy = [
+        "STR" : 10,
+        "FBL" : 30
+    ]
  
-    def __init__(self, fight, caster, energy, spell_code):
+    def __init__(self, fight, caster, spell_code):
         Spells.__init__(self, fight, caster, "wrath", energy, spell_code)
         
     def start(self):
@@ -25,6 +30,9 @@ class WrathSpells:
             return False
             
     def improve_strength(self):
+        if not self.caster.feelings["wrath"].check_energy(WrathSpells.spells_energy["STR"]):
+            return False
+            
         self.target = self.caster
         self.target.force *= 2 * self.caster.magic_power_ratio
         self.target.reflex *= 0.8 * self.caster.magic_power_ratio
@@ -32,6 +40,7 @@ class WrathSpells:
         self.target.calculate_characteristic()
         self.timeline = self.caster.timeline + 5 * self.caster.magic_power_ratio
         self.fight.scheduler.append(self)
+        self.caster.feelings["wrath"].use_energy(WrathSpells.spells_energy["STR"])
         return True
     
     def end_improve_strength(self):
@@ -42,6 +51,9 @@ class WrathSpells:
         return True
         
     def fireball(self):
+        if not self.caster.feelings["wrath"].check_energy(WrathSpells.spells_energy["FBL"]):
+            return False
+        
         if self.fight.belong_to_team(self.caster) == self.fight.team1:
             team = self.fight.team2
         else:
@@ -69,6 +81,7 @@ class WrathSpells:
                     if enemy.get_id() == read:
                         self.target = enemy
                         self.target.magical_damage_received(self.caster, 50, 0.5, True, 0.5, 0.25)
+                        self.caster.feelings["wrath"].use_energy(WrathSpells.spells_energy["FBL"])
                         return True
                         
                 print("ID:", read, "is not available")

@@ -6,6 +6,7 @@ from sources.character.Equipments import Equipments, Weapons, Shields, AttackWea
     MeleeWeapons, RangedWeapons, Bows, Crossbows, Ammo, NoneWeapon, NoneAmmo
 from sources.character.Bodies import Bodies
 from sources.character.BodyMembers import BodyMembers
+from sources.character.Feelings import Feelings
 
 
 #############################################################
@@ -69,8 +70,7 @@ class Characters:
         "code" : "STR",
         "time_cost" : 1,
         "stamina_cost" : 1,
-        "type" : "wrath",
-        "energy" : 10
+        "type" : "wrath"
     ]
     wrath_spells["list"].append(wrath_improve_strength)
     wrath_fireball = [
@@ -78,8 +78,7 @@ class Characters:
         "code" : "FBL",
         "time_cost" : 3,
         "stamina_cost" : 10,
-        "type" : "wrath",
-        "energy" : 30
+        "type" : "wrath"
     ]
     wrath_spells["list"].append(wrath_fireball)
     
@@ -151,6 +150,18 @@ class Characters:
             head_armor, chest_armor, arms_armor, legs_armor, \
             weapon1, weapon2, weapon3, weapon4, \
             ammo_type1, ammo_number1, ammo_type2, ammo_number2)
+        
+        # Set feelings
+        self.empathy = 10
+        self.empathy_ratio = self.empathy / 10
+        self.feelings = [
+            "wrath" : Feelings("wrath", 10, 10, 100),
+            "joy" : Feelings("joy", 10, 10, 100),
+            "love" : Feelings("love", 10, 10, 100),
+            "hate" : Feelings("hate", 10, 10, 100),
+            "fear" : Feelings("fear", 10, 10, 100),
+            "sadness" : Feelings("sadness", 10, 10, 100)
+        ]
         
         #Calculate character characteristics
         self.calculate_characteristic()
@@ -748,6 +759,28 @@ class Characters:
         resistance_dim_rate = enemy.resistance_dim_rate * ammo_used.resistance_dim_rate
         penetration_rate = enemy.penetration_rate * ammo_used.penetration_rate
         self.physical_damage_received(enemy, attack_value, member, accuracy_ratio, resistance_dim_rate, penetration_rate)
+    
+    def magical_attack_received(self, enemy, attack_value, spread_distance, can_use_shield, resistance_dim_rate, penetration_rate):
+        attack_value += enemy.magic_power * random.gauss(1, Characters.high_variance)
+        if can_use_shield:
+            attack_value -= self.magic_defense_with_shields * random.gauss(1, Characters.high_variance)
+        else:
+            self.all_shields_absorbed_damage(attack_value)
+            attack_value -= self.magic_defense * random.gauss(1, Characters.high_variance)
+        
+        if attack_value <= 0:
+            self.print_basic()
+            print("-- has BLOCKED the attack of --", end=' ')
+            enemy.print_basic()
+            time.sleep(4)
+        else:
+            enemy.print_basic()
+            print("-- has HIT --", end=' ')
+            self.print_basic()
+            print("-- with a power of", int(round(attack_value)))
+            if spread_ratio > 0:
+                print("-- spreading with a ratio of", int(round(spread_ratio)))
+            time.sleep(2)
     
     def physical_damage_received(self, enemy, attack_value, member, accuracy_ratio, resistance_dim_rate, penetration_rate):
         enemy.print_basic()
