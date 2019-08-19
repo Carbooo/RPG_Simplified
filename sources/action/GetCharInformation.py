@@ -3,16 +3,15 @@ from sources.action.Actions import Actions
 #############################################################
 ################## GET CHAR INFORMATION CLASS ###############
 #############################################################
-class GetCharInformation:
+class GetCharInformation(Actions):
     'Class to get information on a character'
     
     def __init__(self, fight):
-        Actions.__init__(self, fight)
+        super().__init__(self, fight)
         self.is_a_success = self.start()
         
         
     def start(self):
-        Actions.start(self)
         print("Choose one of the following character:")
         
         for char in self.fight.team1.characters_list:

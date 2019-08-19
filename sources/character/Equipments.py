@@ -123,23 +123,23 @@ class Armors(Equipments):
         return self.def_cover / 10
     
     
-    def damage_absorbed(self, damage, armor_coef, resistance_dim_rate, penetration_rate):
+    def damage_absorbed(self, damage, armor_coef, resis_dim_rate, pen_rate):
         if armor_coef == 0:
             #The armor did not cover the attack
             return [1, damage] #1 = Not broken ratio
         
-        damage_result = damage - self.defense * armor_coef / penetration_rate
+        damage_result = damage - self.defense * armor_coef / pen_rate
         if damage_result <= 0:
             print("Damages absorbed by armor:", int(round(damage)))
             time.sleep(2)
-            ratio = self.decrease(damage * armor_coef * resistance_dim_rate)
+            ratio = self.decrease(damage * armor_coef * resis_dim_rate)
             print("The armor has absorbed the remaining damages and no life has been lost")
             time.sleep(3)
             return [ratio, 0]
         else:
-            print("Damages absorbed by armor:", int(round(self.defense * armor_coef / penetration_rate)))
+            print("Damages absorbed by armor:", int(round(self.defense * armor_coef / pen_rate)))
             time.sleep(2)
-            ratio = self.decrease(self.defense * armor_coef * resistance_dim_rate)
+            ratio = self.decrease(self.defense * armor_coef * resis_dim_rate)
             return [ratio, damage_result]
         
     
@@ -156,19 +156,19 @@ class Weapons(Equipments):
     'Common sub class of equipments for all weapons'
 
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, \
-    penetration_rate, resistance_dim_rate, melee_handiness, melee_range):
+    pen_rate, resis_dim_rate, melee_handiness, melee_range):
         #Defense is managed in one parameter only (all characteristics, except resistance, are merged)
-        #Attack is managed in several parameters (melee_power, penetration_rate, resistance_dim_rate, melee_handiness, melee_range)
+        #Attack is managed in several parameters (melee_power, pen_rate, resis_dim_rate, melee_handiness, melee_range)
         Equipments.__init__(self, name, load, bulk, resistance)
         self.hand = hand
         self.original_defense = float(defense)
         self.defense = self.original_defense
         self.original_melee_power = float(melee_power)
         self.melee_power = self.original_melee_power
-        self.original_penetration_rate = float(penetration_rate) / 100.0
-        self.penetration_rate = self.original_penetration_rate
-        self.original_resistance_dim_rate = float(resistance_dim_rate) / 100.0
-        self.resistance_dim_rate = self.original_resistance_dim_rate
+        self.original_pen_rate = float(pen_rate) / 100.0
+        self.pen_rate = self.original_pen_rate
+        self.original_resis_dim_rate = float(resis_dim_rate) / 100.0
+        self.resis_dim_rate = self.original_resis_dim_rate
         self.original_melee_handiness = float(melee_handiness)
         self.melee_handiness = self.original_melee_handiness
         self.original_melee_range = float(melee_range)
@@ -179,8 +179,8 @@ class Weapons(Equipments):
         Equipments.print_obj(self)
         print(", Hand:", self.hand, ", Defense:", round(self.defense, 1), \
             ", Melee power:", round(self.melee_power, 1), ", Penetration rate:", \
-            round(self.penetration_rate, 2), ", Resistance dim. rate:", \
-            round(self.resistance_dim_rate, 2), ", Melee handiness:", \
+            round(self.pen_rate, 2), ", Resistance dim. rate:", \
+            round(self.resis_dim_rate, 2), ", Melee handiness:", \
             round(self.melee_handiness, 1), ", Melee range:", \
             round(self.melee_range, 1),  end=' ')
     
@@ -189,8 +189,8 @@ class Weapons(Equipments):
         ratio = Equipments.decrease(self, damage, def_malus_rate)
         self.defense = self.original_defense * math.pow(ratio, 1.0/3)
         self.melee_power = self.original_melee_power * math.pow(ratio, 1.0/3)
-        self.penetration_rate = self.original_penetration_rate * math.pow(ratio, 1.0/4)
-        self.resistance_dim_rate = self.original_resistance_dim_rate * math.pow(ratio, 1.0/4)
+        self.pen_rate = self.original_pen_rate * math.pow(ratio, 1.0/4)
+        self.resis_dim_rate = self.original_resis_dim_rate * math.pow(ratio, 1.0/4)
         self.melee_handiness = self.original_melee_handiness * math.pow(ratio, 1.0/4)
         self.melee_range = self.original_melee_range * math.pow(ratio, 1.0/4)
         return ratio
@@ -203,9 +203,9 @@ class Shields(Weapons):
     'Common sub class of weapons for all shields'
     
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, \
-    penetration_rate, resistance_dim_rate, melee_handiness, melee_range):
+    pen_rate, resis_dim_rate, melee_handiness, melee_range):
         Weapons.__init__(self, name, load, bulk, resistance, hand, defense, \
-            melee_power, penetration_rate, resistance_dim_rate, melee_handiness, melee_range)
+            melee_power, pen_rate, resis_dim_rate, melee_handiness, melee_range)
         self.type = "Shield"
     
         
@@ -226,9 +226,9 @@ class AttackWeapons(Weapons):
     'Common sub class of weapons for all attack weapons'
     
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, \
-    penetration_rate, resistance_dim_rate, melee_handiness, melee_range):
+    pen_rate, resis_dim_rate, melee_handiness, melee_range):
         Weapons.__init__(self, name, load, bulk, resistance, hand, defense, \
-            melee_power, penetration_rate, resistance_dim_rate, melee_handiness, melee_range)
+            melee_power, pen_rate, resis_dim_rate, melee_handiness, melee_range)
     
         
     def print_obj(self):
@@ -247,9 +247,9 @@ class MeleeWeapons(AttackWeapons):
     'Common sub class of attack weapons for all melee weapons'
     
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, \
-    penetration_rate, resistance_dim_rate, melee_handiness, melee_range):
+    pen_rate, resis_dim_rate, melee_handiness, melee_range):
         AttackWeapons.__init__(self, name, load, bulk, resistance, hand, defense, \
-            melee_power, penetration_rate, resistance_dim_rate, melee_handiness, melee_range)
+            melee_power, pen_rate, resis_dim_rate, melee_handiness, melee_range)
         self.type = "MeleeWeapon"
     
         
@@ -270,17 +270,17 @@ class Ammo(Equipments):
     'Common sub class of equipments for all ammo'
     
     def __init__(self, name, load, bulk, resistance, ranged_weapon_type, stability, \
-    flesh_damage, penetration_rate, resistance_dim_rate):
+    flesh_damage, pen_rate, resis_dim_rate):
         Equipments.__init__(self, name, load, bulk, resistance)
         self.type = "Arrow"
         self.original_stability = float(stability)
         self.stability = self.original_stability
         self.original_flesh_damage = float(flesh_damage)
         self.flesh_damage = self.original_flesh_damage
-        self.original_penetration_rate = float(penetration_rate) / 10.0
-        self.penetration_rate = self.original_penetration_rate
-        self.original_resistance_dim_rate = float(resistance_dim_rate) / 10.0
-        self.resistance_dim_rate = self.original_resistance_dim_rate
+        self.original_pen_rate = float(pen_rate) / 10.0
+        self.pen_rate = self.original_pen_rate
+        self.original_resis_dim_rate = float(resis_dim_rate) / 10.0
+        self.resis_dim_rate = self.original_resis_dim_rate
         self.ranged_weapon_type = False
         if ranged_weapon_type == "Bow":
             self.ranged_weapon_type = Bows
@@ -292,14 +292,14 @@ class Ammo(Equipments):
         Equipments.print_obj(self)
         print(", stability:", round(self.stability, 1), \
             ", flesh damage:", round(self.flesh_damage, 1), \
-            ", Penetration rate:", round(self.penetration_rate, 2))
+            ", Penetration rate:", round(self.pen_rate, 2))
             
     
     def decrease(self, damage):
         ratio = Equipments.decrease(self, damage)
         self.stability = self.original_stability * math.pow(ratio, 1.0/3)
         self.flesh_damage = self.original_flesh_damage * math.pow(ratio, 1.0/2)
-        self.penetration_rate = self.original_penetration_rate * math.pow(ratio, 1.0/2)
+        self.pen_rate = self.original_pen_rate * math.pow(ratio, 1.0/2)
         return ratio
     
     
@@ -314,10 +314,10 @@ class RangedWeapons(AttackWeapons):
     'Common sub class of attack weapons for all ranged weapons'
     
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, \
-    penetration_rate, resistance_dim_rate, melee_handiness, melee_range, range_power, \
+    pen_rate, resis_dim_rate, melee_handiness, melee_range, range_power, \
     accuracy, reload_time):
         AttackWeapons.__init__(self, name, load, bulk, resistance, hand, defense, \
-            melee_handiness, melee_range, melee_power, penetration_rate, resistance_dim_rate)
+            melee_handiness, melee_range, melee_power, pen_rate, resis_dim_rate)
         self.type = "RangedWeapon"
         self.original_range_power = float(range_power)
         self.range_power = self.original_range_power
@@ -392,10 +392,10 @@ class Bows(RangedWeapons):
     'Common sub class of attack weapons for all ranged weapons'
     
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, \
-    penetration_rate, resistance_dim_rate, melee_handiness, melee_range, range_power, \
+    pen_rate, resis_dim_rate, melee_handiness, melee_range, range_power, \
     accuracy, reload_time):
         RangedWeapons.__init__(self, name, load, bulk, resistance, hand, defense, melee_power, \
-            penetration_rate, resistance_dim_rate, melee_handiness, melee_range, range_power, \
+            pen_rate, resis_dim_rate, melee_handiness, melee_range, range_power, \
             accuracy, reload_time)
         self.type = "Bow"
         
@@ -412,10 +412,10 @@ class Crossbows(RangedWeapons):
     'Common sub class of attack weapons for all ranged weapons'
     
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, \
-    penetration_rate, resistance_dim_rate, melee_handiness, melee_range, range_power, \
+    pen_rate, resis_dim_rate, melee_handiness, melee_range, range_power, \
     accuracy, reload_time):
         RangedWeapons.__init__(self, name, load, bulk, resistance, hand, defense, melee_power, \
-            penetration_rate, resistance_dim_rate, melee_handiness, melee_range, range_power, \
+            pen_rate, resis_dim_rate, melee_handiness, melee_range, range_power, \
             accuracy, reload_time)
         self.type = "Crossbow"
         

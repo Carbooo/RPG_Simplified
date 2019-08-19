@@ -380,10 +380,7 @@ class Bodies:
         cr_life = self.body_members[member].life
         damage_ratio = damage / self.body_members[member].life
         self.body_members[member].life = max(0, self.body_members[member].life - damage)
-        self.print_loose_life(damage_ratio, damage)
-        return self.body_members[member].life / cr_life  # Used for spend_time & stamina resulting of the hit
-
-    def print_loose_life(self, damage_ratio, damage):
+        
         if damage_ratio < 0.1:
             print("The attack has only made a flesh wound")
         elif damage_ratio < 0.2:
@@ -400,13 +397,8 @@ class Bodies:
         print("The attack has made", int(round(damage)), "life damages")
         time.sleep(2)
         
-    def loose_life_through_magic(self, damage, member):
-        # Magic spell touches several members at once, need to regroup them
-        cr_life = self.body_members[member].life
-        damage_ratio = damage / self.body_members[member].life
-        self.body_members[member].life = max(0, self.body_members[member].life - damage)
-        return self.body_members[member].life / cr_life, damage_ratio, damage
-
+        return self.body_members[member].life / cr_life  # Used for spend_time & stamina resulting of the hit 
+        
     ########################### STAMINA FUNCTIONS ##########################
     def spend_stamina(self, value):
         self.stamina = max(0, self.stamina - float(value) * BodyMembers.turn_stamina / self.load_ratio)

@@ -24,12 +24,6 @@ class Fields:
     obstacle_types_list = [no_obstacle, melee_handicap, melee_obstacle, ranged_handicap, ranged_obstacle, full_handicap,
                            full_obstacle]
 
-    MovementsStr = \
-        [["LEFT", "L"], ["TOP LEFT", "TL"],
-         ["TOP", "T"], ["TOP RIGHT", "TR"],
-         ["RIGHT", "R"], ["BOTTOM RIGHT", "BR"],
-         ["BOTTOM", "B"], ["BOTTOM LEFT", "BL"],
-         ["EXACT POSITION", "P"]]
     MovementsVal = \
         [[-1, 0], [-1, 1], [0, 1], [1, 1],
          [1, 0], [1, -1], [0, -1], [-1, -1]]
@@ -114,6 +108,12 @@ class Fields:
         if not self.characters_array[abscissa, ordinate].is_none_character():
             return False
         return True
+    
+    def get_character_from_pos(self, abscissa, ordinate):
+        if self.characters_array[abscissa, ordinate].is_none_character():
+            return False
+        else
+            return self.characters_array[abscissa, ordinate]
 
     def is_case_ranged_free(self, abscissa, ordinate):
         if not self.is_a_case(abscissa, ordinate):
@@ -123,28 +123,34 @@ class Fields:
             return False
         return True
 
-    def is_target_reachable(self, attacker, defender):
-        if defender.is_alive() and attacker.is_distance_reachable(defender) and \
-                self.calculate_ranged_obstacle_ratio(attacker, defender) > 0:
+    def is_target_reachable(self, attacker, target):
+        if target.is_alive() and attacker.is_distance_reachable(target) and \
+                self.calculate_ranged_obstacle_ratio(attacker, target) > 0:
             return True
         return False
         
-    def is_target_magically_reachable(self, attacker, defender):
-        if defender.is_alive() and attacker.is_distance_magically_reachable(defender) and \
-                self.calculate_ranged_obstacle_ratio(attacker, defender) > 0:
+    def is_target_magically_reachable(self, attacker, target):
+        if target.is_alive() and attacker.is_distance_magically_reachable(target) and \
+                self.calculate_ranged_obstacle_ratio(attacker, target) > 0:
             return True
         return False
+        
+    def get_magical_accuracy(self, attacker, target):
+        coef = attacker.get_magic_distance_ratio(target) \
+             * self.calculate_ranged_obstacle_ratio(attacker, target)
+             * self.attacker.magic_power_ratio
+        return 0.5 + coef  # Between 0.5 and 1.5 as other attacks
 
-    def calculate_ranged_obstacle_ratio(self, attacker, enemy):
-        min_abs = min(attacker.abscissa, enemy.abscissa)
-        min_ord = min(attacker.ordinate, enemy.ordinate)
+    def calculate_ranged_obstacle_ratio(self, attacker, target):
+        min_abs = min(attacker.abscissa, target.abscissa)
+        min_ord = min(attacker.ordinate, target.ordinate)
         path_ratio = 1
 
-        for i in range(abs(attacker.abscissa - enemy.abscissa) + 1):
-            for j in range(abs(attacker.ordinate - enemy.ordinate) + 1):
+        for i in range(abs(attacker.abscissa - target.abscissa) + 1):
+            for j in range(abs(attacker.ordinate - target.ordinate) + 1):
                 if (min_abs + i != attacker.abscissa or min_ord + j != attacker.ordinate) and \
-                        (min_abs + i != enemy.abscissa or min_ord + j != enemy.ordinate) and \
-                        attacker.calculate_point_to_enemy_path_distance(enemy, min_abs + i, min_ord + j) <= 0.5:
+                        (min_abs + i != target.abscissa or min_ord + j != target.ordinate) and \
+                        attacker.calculate_point_to_target_path_distance(target, min_abs + i, min_ord + j) <= 0.5:
 
                     if self.obstacles_array[min_abs + i, min_ord + j] == Fields.ranged_obstacle or \
                             self.obstacles_array[min_abs + i, min_ord + j] == Fields.full_obstacle or \
@@ -157,7 +163,7 @@ class Fields:
 
         return path_ratio
 
-    def shoot_has_hit_another_target(self, attacker, defender, hit_chance):
+    def shoot_has_hit_another_target(self, attacker, target, hit_chance):
         # Test if it has missed the target
         rd = random.random()
         if rd <= hit_chance:
@@ -165,10 +171,10 @@ class Fields:
             return True
 
         # Test wrong direction of the arrow
-        # Calculate defender position at +/- variation angle
+        # Calculate target position at +/- variation angle
         variation = random.gauss(0, Characters.variance) * 10
-        pos_p = copy.copy(defender)
-        attacker.set_enemy_pos_variation(pos_p, variation)
+        pos_p = copy.copy(target)
+        attacker.set_target_pos_variation(pos_p, variation)
         min_abs_p = min(attacker.abscissa, pos_p.abscissa)
         min_ord_p = min(attacker.ordinate, pos_p.ordinate)
 
@@ -181,7 +187,7 @@ class Fields:
             pos_p_ord_range.reverse()
 
         # Calculate shoot length
-        length = attacker.calculate_point_distance(defender.abscissa, defender.ordinate)
+        length = attacker.calculate_point_distance(target.abscissa, target.ordinate)
         length += (attacker.has_range() - length) / 3  # shoot length depend of target distance
         length *= max(0, random.gauss(1, Characters.variance))
 
@@ -192,10 +198,10 @@ class Fields:
                 c_ord = min_ord_p + j
 
                 # Not in the path of the arrow
-                if (c_abs == defender.abscissa and c_ord == defender.ordinate) or \
+                if (c_abs == target.abscissa and c_ord == target.ordinate) or \
                         (c_abs == attacker.abscissa and c_ord == attacker.ordinate) or \
                         attacker.calculate_point_distance(c_abs, c_ord) > length or \
-                        attacker.calculate_point_to_enemy_path_distance(pos_p, c_abs, c_ord) >= 0.5:
+                        attacker.calculate_point_to_target_path_distance(pos_p, c_abs, c_ord) >= 0.5:
                     continue
 
                 # Shoot out of field or blocked by an obstacle
@@ -247,42 +253,42 @@ class Fields:
         self.set_character(character)
         return False
 
-    def melee_fight_move(self, defender, attacker):
+    def melee_fight_move(self, target, attacker):
         # Find all possible positions
-        defender_positions = []
+        target_positions = []
         attacker_positions = []
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
-                def_abs = defender.abscissa + i
-                def_ord = defender.ordinate + j
+                def_abs = target.abscissa + i
+                def_ord = target.ordinate + j
                 if self.is_case_free(def_abs, def_ord) or (i == 0 and j == 0):
-                    defender_positions.append([def_abs, def_ord])
+                    target_positions.append([def_abs, def_ord])
                 att_abs = attacker.abscissa + i
                 att_ord = attacker.ordinate + j
                 if self.is_case_free(att_abs, att_ord) or (i == 0 and j == 0):
                     attacker_positions.append([att_abs, att_ord])
 
-        # Set defender position (farthest possible from attacker)
+        # Set target position (farthest possible from attacker)
         max_chance = 0
         position = -1
-        for i in range(len(defender_positions)):
+        for i in range(len(target_positions)):
             ratio = (1 + \
-                     abs(defender_positions[i][0] - attacker.abscissa) + \
-                     abs(defender_positions[i][1] - attacker.ordinate)) * \
+                     abs(target_positions[i][0] - attacker.abscissa) + \
+                     abs(target_positions[i][1] - attacker.ordinate)) * \
                     random.random()
             if max_chance < ratio:
                 max_chance = ratio
                 position = i
-        self.move_character(defender, \
-                           defender_positions[position][0], defender_positions[position][1])
+        self.move_character(target, \
+                           target_positions[position][0], target_positions[position][1])
 
-        # Set attacker position (closest possible from defender)
+        # Set attacker position (closest possible from target)
         max_chance = 0
         position = -1
         for i in range(len(attacker_positions)):
             ratio = (1.0 / (1 + \
-                            abs(attacker_positions[i][0] - defender.abscissa) + \
-                            abs(attacker_positions[i][1] - defender.ordinate))) * \
+                            abs(attacker_positions[i][0] - target.abscissa) + \
+                            abs(attacker_positions[i][1] - target.ordinate))) * \
                     random.random()
             if max_chance < ratio:
                 max_chance = ratio

@@ -1,44 +1,43 @@
 import time as time
-from sources.action.Actions import Actions
+from sources.action.Actions import ActiveActions
 
 
 #############################################################
 ######################## ACTIONS CLASS ######################
 #############################################################
-class RestChar:
+class RestChar(ActiveActions):
     'Class to make a character rest'
 
-    rest_config = ["Normal rest", 1, 1, 5]  # [Type, Rest coef, min_turn, max_turn]
+    rest_config = [
+        "min_turn" : 1,
+        "max_turn" : 5
+    ]
+    
+    def __init__(self, fight, initiator):
+        super().__init__(self, fight, initiator)
+        self.nb_of_turn = -1
+        self.is_a_success = self.start()
 
-    def __init__(self, fight, character, nb_of_turn):
-        Actions.__init__(self, fight)
-        self.character = character
-        self.nb_of_turn = nb_of_turn
-        self.is_a_success = self.start(automatic)
+    def start(self):
+        print("How much time do you want to rest?")
+        txt = "--> Number of turns (0 = Cancel): "
+        while 1:
+            try:
+                self.nb_of_turn = int(input(txt))
+                if self.fight.cancel_action(self.nb_of_turn):
+                    return False
+                elif self.nb_of_turn < RestChar.rest_config["min_turn"]:
+                    print("You cannot rest less than", RestChar.rest_config["min_turn"], "turns")
+                elif self.nb_of_turn > RestChar.rest_config["max_turn"]:
+                    print("You cannot rest more than", RestChar.rest_config["max_turn"], "turns")
+                else:
+                    break
+            except:
+                print("The input is not an integer")
 
-    def start(self, automatic):
-        Actions.start(self)
-        if not automatic:
-            print("How much time do you want to rest?")
-            txt = "--> Number of turns (0 = Cancel): "
-            while 1:
-                try:
-                    self.nb_of_turn = int(input(txt))
-                    if self.fight.cancel_action(self.nb_of_turn):
-                        return False
-                    elif self.nb_of_turn < RestChar.rest_config[2]:
-                        print("You cannot rest less than", RestChar.rest_config[2], "turns")
-                    elif self.nb_of_turn > RestChar.rest_config[3]:
-                        print("You cannot rest more than", RestChar.rest_config[3], "turns")
-                    else:
-                        break
-                except:
-                    print("The input is not an integer")
+        print("You have decided to rest", self.nb_of_turn, "turn(s)")
+        time.sleep(3)
 
-            print("You have decided to rest", self.nb_of_turn, "turn(s)")
-            time.sleep(3)
-
-        self.character.spend_absolute_time(self.nb_of_turn)
-        self.character.body.global_rest(RestChar.rest_config[1] * self.nb_of_turn)
-        self.character.calculate_characteristic()
+        self.initiator.body.global_rest(self.nb_of_turn)
+        self.end([], 0, self.nb_of_turn, True)
         return True

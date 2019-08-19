@@ -1,20 +1,19 @@
 import math as math
 import time as time
 from sources.character.Characters import Characters
-from sources.action.Actions import Actions
+from sources.action.Actions import ActiveActions
 
 
 #############################################################
 ######################## MOVE CHAR CLASS ####################
 #############################################################
-class MoveChar:
-    """Class to move a self.character"""
+class MoveChar(ActiveActions):
+    """Class to move a self.initiator"""
  
     nb_of_move_before_recalculating_path = 2 #Ratio when the path will be recalculated
 
-    def __init__(self, fight, character):
-        Actions.__init__(self, fight)
-        self.character = character
+    def __init__(self, fight, initiator):
+        super().__init__(self, fight, initiator)
         self.target_abs = -1
         self.target_ord = -1
         self.path = []
@@ -24,8 +23,6 @@ class MoveChar:
 
 ####################### MOVE ACTIONS ########################  
     def start(self):
-        Actions.start(self)
-        
         if not self.initial_move_check():
             return False
              
@@ -61,7 +58,7 @@ class MoveChar:
                 print("")
                 continue
     
-            self.path = self.fight.field.choose_path_move(self.character, abscissa, ordinate)
+            self.path = self.fight.field.choose_path_move(self.initiator, abscissa, ordinate)
             if not self.path:
                 print("Position:", abscissa, "x", ordinate, "cannot be reached")
                 continue
@@ -74,25 +71,22 @@ class MoveChar:
         self.target_abs = coord[0]
         self.target_ord = coord[1]
         
-        if not self.check_move_stamina() or not self.fight.field.move_character(self.character, self.target_abs, self.target_ord):
+        if not self.check_move_stamina() or not self.fight.field.move_character(self.initiator, self.target_abs, self.target_ord):
             return self.cancel_move()
         
-        self.character.spend_time(self.get_move_coef() * Characters.Move[2])
-        self.character.spend_move_stamina(self.get_move_coef() * Characters.Move[3]) 
-        self.character.calculate_characteristic()
+        self.end([], self.get_move_coef() * Characters.Move[3], self.get_move_coef() * Characters.Move[2])
         
         print("You are moving to", self.target_abs, "x", self.target_ord)
         time.sleep(2)
-        print("You are following the path:", self.character.current_path)
+        print("You are following the path:", self.initiator.current_path)
         time.sleep(3)
         return True
     
     def get_move_coef(self):
         coef = 1.0 \
-            / self.fight.field.obstacle_movement_ratio(self.character.abscissa, self.character.ordinate, self.target_abs, self.target_ord) \
-            / self.character.movement_handicap_ratio() \
-            / self.character.speed_ratio
-        if abs(self.target_abs - self.character.abscissa) + abs(self.target_ord - self.character.ordinate) == 2:
+            / self.fight.field.obstacle_movement_ratio(self.initiator.abscissa, self.initiator.ordinate, self.target_abs, self.target_ord) \
+            / self.initiator.movement_handicap_ratio() \
+        if abs(self.target_abs - self.initiator.abscissa) + abs(self.target_ord - self.initiator.ordinate) == 2:
             return coef * math.sqrt(2)
         else:
             return coef
@@ -102,7 +96,7 @@ class MoveChar:
         print("*********************************************************************")
         print("Position:", self.target_abs, "x", self.target_ord, "is no longer reachable")
         print("The move of (", end=' ')
-        self.character.print_basic()
+        self.initiator.print_basic()
         print(") has been cancelled !")
         print("*********************************************************************")
         print("")
@@ -116,7 +110,7 @@ class MoveChar:
         # Update path regularly to adapt to field changes
         if self.nb_of_move_left <= 0:
             coord = self.path[len(self.path) - 1]
-            path = self.fight.field.choose_path_move(self.character, coord[0], coord[1])
+            path = self.fight.field.choose_path_move(self.initiator, coord[0], coord[1])
             if path:
                 self.path = path
                 self.nb_of_move_left = MoveChar.nb_of_move_before_recalculating_path
@@ -128,25 +122,25 @@ class MoveChar:
         return self.move_character()
 
     def initial_move_check(self):
-        if self.fight.field.can_move(self.character) is False:
+        if self.fight.field.can_move(self.initiator) is False:
             print("No free case available for move action")
             print("")
             return False
         
-        if not self.character.check_stamina(1.0 
-                              / self.character.movement_handicap_ratio()
-                              / self.character.speed_ratio):
+        if not self.initiator.check_stamina(1.0 
+                              / self.initiator.movement_handicap_ratio()
+                              / self.initiator.speed_ratio):
             print("You do not have enough stamina (", \
-                self.character.body.return_current_stamina(), ") to move")     
+                self.initiator.body.return_current_stamina(), ") to move")     
             print("")
             return False
         
         return True
     
     def check_move_stamina(self):
-        if not self.character.check_stamina(self.get_move_coef() * Characters.Move[3]):
+        if not self.initiator.check_stamina(self.get_move_coef() * Characters.Move[3]):
             print("You do not have enough stamina (", \
-                self.character.body.return_current_stamina(), \
+                self.initiator.body.return_current_stamina(), \
                 ") to move in that position (abs:", \
                 self.target_abs, ",ord:", self.target_ord, ")")
             return False

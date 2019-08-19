@@ -1,44 +1,40 @@
 import time as time
 from sources.character.Equipments import RangedWeapons, Crossbows
 from sources.character.Characters import Characters
-from sources.action.Actions import Actions
+from sources.action.Actions import ActiveActions
 
 
 #############################################################
-################### MELEE ATTACK CHAR CLASS #################
+###################### RELOAD CHAR CLASS ####################
 #############################################################
-class ReloadChar:
-    """Class to melee attack a self.character"""
+class ReloadChar(ActiveActions):
+    """Class to melee attack a self.initiator"""
 
-    time_ratio = 0.95  # Reload just before finishing the action
-
-    def __init__(self, fight, character):
-        Actions.__init__(self, fight)
-        self.character = character
+    def __init__(self, fight, initiator):
+        super().__init__(self, fight, initiator)
         self.reload_list = []
         self.reload_time = 0
         self.is_a_success = self.start()
 
     def start(self):
-        Actions.start(self)
-        if self.character.check_stamina(Characters.Reload[3]) is False:
+        if self.initiator.check_stamina(Characters.Reload[3]) is False:
             print("You do not have enough stamina (",
-                  self.character.body.return_current_stamina(), ") to reload, action cancelled!")
+                  self.initiator.body.return_current_stamina(), ") to reload, action cancelled!")
             return False
-        elif self.character.is_using_a_ranged_weapon() is False:
+        elif self.initiator.is_using_a_ranged_weapon() is False:
             print("You are not using a ranged weapon, action cancelled!")
             return False
-        elif self.character.has_reloaded():
+        elif self.initiator.has_reloaded():
             print("You have already reloaded your ranged weapons, action cancelled!")
             return False
-        elif self.character.has_ammo() is False:
+        elif self.initiator.has_ammo() is False:
             print("You do not have ammo anymore, action cancelled!")
             return False
 
-        for weapon in self.character.weapons_use:
+        for weapon in self.initiator.weapons_use:
             if isinstance(weapon, RangedWeapons):
                 ammo_available = []
-                for ammo in self.character.ammo:
+                for ammo in self.initiator.ammo:
                     if ammo.ranged_weapon_type == weapon.__class__:
                         ammo_found = False
                         for ammo_bis in ammo_available:
@@ -82,13 +78,13 @@ class ReloadChar:
             print("(ReloadChar) Cannot reload, because reload list is empty")
             return False
 
-        self.character.reload(self.reload_list[0][0], self.reload_list[0][1])
+        self.initiator.reload(self.reload_list[0][0], self.reload_list[0][1])
 
         if isinstance(self.reload_list[0][0], Crossbows):
-            self.character.spend_reload_stamina(self.reload_time * Characters.Reload[3] * 10)
+            stamina = self.reload_time * Characters.Reload[3] * 10
         else:
-            self.character.spend_stamina(self.reload_time * Characters.Reload[3])
-        self.character.calculate_characteristic()
+            stamina = self.reload_time * Characters.Reload[3]
+        self.end([], stamina, self.reload_time)
         return True
 
     def calculate_timelines(self):
@@ -98,7 +94,5 @@ class ReloadChar:
             return False
 
         weapon = self.reload_list[0][0]
-        self.reload_time = (weapon.reload_time - weapon.current_reload) * Characters.Reload[2] \
-                           * self.character.speed_ratio
-        self.character.spend_time(self.reload_time)
+        self.reload_time = (weapon.reload_time - weapon.current_reload) * self.initiator.speed_ratio
         return True

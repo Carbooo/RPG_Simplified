@@ -10,8 +10,8 @@ from sources.action.RangedAttackChar import RangedAttackChar
 from sources.action.ReloadChar import ReloadChar
 from sources.action.RestChar import RestChar
 from sources.action.SaveAndLoad import Save, Load
-from sources.spell.Spells import Spells
-from sources.spell.WrathSpells import WrathSpells
+from sources.action.spell.Spells import Spells
+from sources.action.spell.WrathSpells import WrathSpells
 
 #############################################################
 ##################### FIGHTS CLASS ##########################
@@ -75,10 +75,9 @@ class Fights:
         while self.team1.is_life_active() and self.team2.is_life_active():
             #Set turn settings
             next_event = self.scheduler[0]
-            self.save_all_speed()
+            self.last_timeline = self.current_timeline
             self.current_timeline = next_event.timeline
             self.time_effect_on_all()
-            self.last_timeline = self.current_timeline
             
             #Automatic turn every 1 timeline
             if isinstance(next_event, Fights):
@@ -256,20 +255,8 @@ class Fights:
                 if self.move_action(character):
                     break
             
-            elif read == Characters.EquipAll[1]:
-                if self.equip_all_action(character):
-                    break
-            
-            elif read == Characters.EquipSpec[1]:
-                if self.equip_spec_action(character):
-                    break
-
-            elif read == Characters.UnequipAll[1]:
-                if self.unequip_all_action(character):
-                    break
-            
-            elif read == Characters.UnequipSpec[1]:
-                if self.unequip_spec_action(character):
+            elif read == Characters.Equip[1]:
+                if self.equip_action(character):
                     break
             
             elif read == Characters.Information[1]:
@@ -294,7 +281,6 @@ class Fights:
             return False
         character.last_action = action
         return True
-
 
     def rest_action(self, character):
         action = RestChar(self, character)
@@ -333,40 +319,13 @@ class Fights:
         character.last_action = action
         return False
                         
-    def equip_all_action(self, character):     
-        print("You have decided to equip all your weapons")
+    def equip_action(self, character):     
+        print("You have decided to modify your equipment")
         action = EquipChar(self, character)
         if not action.is_a_success:
             return False
         character.last_action = action
         return True
-    
-    def equip_spec_action(self, character):
-        print("You have decided to equip specific weapons")
-        action = EquipChar(self, character)
-        if not action.is_a_success:
-            return False
-        character.last_action = action
-        return True            
-    
-    
-    def unequip_all_action(self, character):
-        print("You have decided to unequipped all your weapons")
-        action = EquipChar(self, character)
-        if not action.is_a_success:
-            return False
-        character.last_action = action
-        return True            
-
-
-    def unequip_spec_action(self, character):    
-        print("You have decided to unequip specific weapons")
-        action = EquipChar(self, character)
-        if not action.is_a_success:
-            return False
-        character.last_action = action
-        return True
-    
     
     def information_action(self, character):
         print("You have decided to look for information")

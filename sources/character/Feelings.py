@@ -1,10 +1,12 @@
-
+import math as math
 
 #############################################################
 ##################### FEELINGS CLASS ########################
 #############################################################
 class Feelings:
     """Common base class to handle the six feelings"""
+    
+    natural_update_ratio = 50  # Energy difference ratio to turn update
     
     def __init__(self, type, sensibility, mastering, initial_energy):
         self.type = type
@@ -13,29 +15,34 @@ class Feelings:
         self.mastering = mastering
         self.mastering_ratio = mastering / 10
         self.energy = initial_energy
+        self.energy_ratio = initial_energy / 100
     
-    def gain_energy(self, standard_energy):
-        self.energy += standard_energy * self.sensibility_ratio
+    def update_energy(self, energy):
+        self.energy = max(0, self.energy + energy)
+        self.energy_ratio = self.energy / 100
+        
+    def gain_energy(self, energy):
+        self.update_energy(energy * self.sensibility_ratio)
     
-    def loose_energy(self, standard_energy):
-        self.energy -= standard_energy / self.sensibility_ratio
-        if self.energy < 0:
-            print("Error: Feeling level below 0")
+    def loose_energy(self, energy):
+        self.update_energy(- energy / self.sensibility_ratio)
       
-    def use_energy(self, standard_energy):
-        self.energy -= standard_energy / self.mastering_ratio
-        if self.energy < 0:
-            print("Error: Feeling level below 0")
-            
-    def check_energy(self, standard_energy):
-        if self.energy >= standard_energy / self.mastering_ratio:
+    def use_energy(self, energy):
+        if not self.check_energy(energy):
+            print("Error: Energy feeling below 0")
+        
+        self.loose_energy(energy * self.energy_ratio)
+        return self.energy_ratio * self.mastering_ratio
+        
+    def check_energy(self, energy):
+        if self.energy >= energy * self.energy_ratio / self.sensibility_ratio:
             return True
         else:
-            print("Not enough energy to cast this spell")
             return False
             
     def natural_energy_update(self, time):
-        if self.energy >= 150:
-            self.gain_energy(0.1 * self.energy * time)
-        elif self.energy <= 50:
-            self.loose_energy(min(self.energy, 10 * time))
+        energy = abs(math.pow((self.energy - 100) / Feelings.natural_update_ratio, 3) * time)
+        if self.energy > 100:
+            self.gain_energy(energy)
+        elif self.energy < 100 and self.energy > 0:
+            self.loose_energy(energy)
