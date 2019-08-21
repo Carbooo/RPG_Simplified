@@ -13,7 +13,7 @@ class EquipChar(ActiveActions):
     
     def __init__(self, fight, initiator):
         super().__init__(self, fight, initiator)
-        self.initiator = initiator
+        self.name = "Modifying equipment"
         self.next_equipment = []
         self.next_unequipment = []
         self.equip_time = 0.0
@@ -91,8 +91,12 @@ class EquipChar(ActiveActions):
                 return False
 
             available_equipment = False
-            for i in range(len(equipped_list)):
+            for i in equipped_list:
                 if read == equipped_list[i].get_id():
+                    if isinstance(equipped_list[i], Bows) and equipped_list[i].is_reloaded():
+                        print("You cannot unequip a loaded bow!")
+                        continue
+                    
                     available_equipment = True
                     equipment_to_remove.append(equipped_list.pop(i))
                     break

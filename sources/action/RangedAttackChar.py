@@ -16,6 +16,7 @@ class RangedAttackChar(ActiveActions):
 
     def __init__(self, fight, initiator):
         super().__init__(self, fight, initiator)
+        self.name = "Ranged attacking"
         self.target = NoneCharacter
         self.ammo_used = self.initiator.get_current_ammo()
         self.shooting_time = 1
@@ -66,7 +67,7 @@ class RangedAttackChar(ActiveActions):
             self.target = enemy_list_bis.pop(hit_number)
             print("----- HIT CHANCE:", round(hit_chance_list_bis.pop(hit_number),2))
             print("----- Fighting availability: ",
-                    self.target.get_fighting_availability(self.initiator.timeline),
+                    self.target.get_fighting_availability(self.timeline),
                     " -----")
             self.target.print_state()
         
@@ -105,6 +106,8 @@ class RangedAttackChar(ActiveActions):
         print("*********************************************************************")
         print("")
         time.sleep(5)
+        
+        self.target.stop_action(self.timeline)
         
         target = self.fight.field.shoot_has_hit_another_target(self.initiator, self.target, hit_chance)
         if not target:
@@ -167,9 +170,7 @@ class RangedAttackChar(ActiveActions):
         
         h_obs = self.fight.field.calculate_ranged_obstacle_ratio(self.initiator, self.target)
         
-        return min(1, self.initiator.ranged_accuracy_ratio
-            * (1 - self.target.chances_to_be_ranged_missed(self.fight.current_timeline)) \
-            * h_dist * h_obs)
+        return self.initiator.ranged_accuracy_ratio * h_dist * h_obs
         
     def can_ranged_attack(self):
         if self.initiator.has_ammo() is False:

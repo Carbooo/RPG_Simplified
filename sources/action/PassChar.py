@@ -9,6 +9,7 @@ class PassChar(ActiveActions):
     
     def __init__(self, fight, initiator):
         super().__init__(self, fight, initiator)
+        self.name = "Passing time"
         self.is_a_success = self.start()
         
     def start(self):

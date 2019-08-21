@@ -15,6 +15,7 @@ class MeleeAttackChar(ActiveActions):
     
     def __init__(self, fight, initiator, target):
         super().__init__(self, fight, initiator)
+        self.name = "Melee attacking"
         self.target = target
         self.actual_defense = "None"  # Can be "Dodge", "Defense" or "No defense"
         self.is_a_success = self.start()
@@ -51,7 +52,7 @@ class MeleeAttackChar(ActiveActions):
             if self.initiator.can_melee_attack(self.target):
                 print("----------------------------")
                 print("----- Fighting availability: ",
-                    self.target.get_fighting_availability(self.initiator.timeline),
+                    self.target.get_fighting_availability(self.timeline),
                     " -----")
                 self.target.print_state()
                 enemy_list.append(self.target)
@@ -76,7 +77,8 @@ class MeleeAttackChar(ActiveActions):
         return True
 
     def result(self):
-        # Result of the fight
+        self.target.stop_action(self.timeline)
+        
         attack_result = self.melee_defense_result()
         print("attack_result:", attack_result)
         self.melee_attack_type(attack_result)

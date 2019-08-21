@@ -97,7 +97,7 @@ class WrathSpells(Spells):
         self.target.dexterity = math.pow(self.target.dexterity, 1.0 / coef)
         self.diff_dexterity -= self.target.dexterity
         
-        self.add_active_spell(selff.initiator, self.spell_power["duration"] * coef)
+        self.add_active_spell(self.initiator, self.spell_power["duration"] * coef)
         return True
     
     def end_improve_strength(self):
@@ -109,7 +109,7 @@ class WrathSpells(Spells):
         return True
         
     def start_fireball(self):
-        if not self.is_able_to_cast():
+        if not self.is_able_to_cast(2):
             return False
         
         self.target = self.choose_enemy_target()

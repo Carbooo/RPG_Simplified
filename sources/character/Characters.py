@@ -219,17 +219,30 @@ class Characters:
         
 ################### RESET & STATE FUNCTIONS ######################
     def stop_action(self, timeline):
-        action = self.last_action
-        if isinstance(action, EquipChar):
-            # Not ready to fight, defense divided by 2
-            self.previous_attacks.append(timeline, action)
-        elif isinstance(action, ReloadChar) \
-          or isinstance(action, RestChar) \
-          or isinstance(action, Spells):
-            # In addition to the "not ready" malus, cancel current action
-            self.previous_attacks.append(timeline, action)
-            self.last_action = None
-    
+        if isinstance(self.last_action, EquipChar) \
+        or isinstance(self.last_action, ReloadChar) \
+        or isinstance(self.last_action, RestChar) \
+        or isinstance(self.last_action, Spells):
+            self.previous_attacks.append(timeline, self.last_action)
+            print("The attack surprises you during your current action(", 
+                  self.last_action.name, ")!")
+            print("Your defense is diminished!")
+            
+            if isinstance(self.last_action, ReloadChar) \
+            or isinstance(self.last_action, RestChar) \
+            or isinstance(self.last_action, Spells):
+                print("Your current action is canceled!")
+                self.last_action = None
+                self.timeline = timeline
+                self.spend_time(Characters.defense_time / 2)
+                
+            if isinstance(self.last_action, ReloadChar):
+                print("You loose the ammo used for reloading!")
+                self.ammo.remove(self.last_action.ammo_to_load)
+                
+        if self.loose_reloaded_ammo():
+            print("Your bow has lost its loaded arrow!")
+                   
     def calculate_state(self):
         old_state = self.body.state
         self.body.calculate_states()

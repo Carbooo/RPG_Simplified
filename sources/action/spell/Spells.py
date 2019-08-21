@@ -22,13 +22,17 @@ class Spells(ActiveActions):
         self.magical_coef = random.gauss(1, global_variables.high_variance) \
                           * self.initiator.feelings[self.type].use_energy(self.spell_energy)
                           
-    def is_able_to_cast(self):
+    def is_able_to_cast(self, free_hands_required = 0):
         if not self.initiator.feelings[self.type].check_energy(self.spell_energy):
-            print("You don't have enough energy to cast this spell")
+            print("You don't have enough energy (", self.spell_energy, ") to cast this spell")
             return False
         
         if not self.initiator.check_stamina(self.spell_stamina):
-            print("You don't have enough stamina to cast this spell")
+            print("You don't have enough stamina (", self.spell_stamina, ") to cast this spell")
+            return False
+        
+        if self.initiator.body.free_hands < free_hands_required:
+            print("You don't have enough free hands (", free_hands_required, ") to cast this spell")
             return False
         
         return True
@@ -49,6 +53,8 @@ class Spells(ActiveActions):
         return char_list
         
     def magical_attack_received(self, attack_value, accuracy_ratio, is_localized, can_use_shield, resis_dim_rate, pen_rate):
+        self.target.stop_action(self.initiator.timeline)
+        
         if can_use_shield:
             attack_value -= self.target.magic_defense_with_shields * self.get_attack_coef(self.target)
             self.target.all_shields_absorbed_damage(attack_value)

@@ -9,7 +9,7 @@ class Actions:
     def __init__(self, fight):
         self.fight = fight
         self.is_a_success = False
-
+        
 
 #############################################################
 ##################### ACTIVE ACTIONS CLASS ##################
@@ -19,6 +19,7 @@ class ActiveActions(Actions):
 
     def __init__(self, fight, initiator):
         super().__init__(self, fight)
+        self.name = "Generic active actions"
         self.initiator = initiator
         self.timeline = self.initiator.timeline
         

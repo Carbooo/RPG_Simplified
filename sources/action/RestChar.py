@@ -15,6 +15,7 @@ class RestChar(ActiveActions):
     
     def __init__(self, fight, initiator):
         super().__init__(self, fight, initiator)
+        self.name = "Resting"
         self.nb_of_turn = -1
         self.is_a_success = self.start()
 
