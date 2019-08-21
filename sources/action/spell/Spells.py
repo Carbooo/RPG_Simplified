@@ -12,7 +12,27 @@ class Spells(ActiveActions):
         self.target = None
         self.type = type
         self.spell_code = spell_code
+        self.magical_coef = 0
+        self.spell_stamina = 0
+        self.spell_time = 0
+        self.spell_energy = 0
+        self.spell_power = {}
 
+    def set_magical_coef(self):
+        self.magical_coef = random.gauss(1, global_variables.high_variance) \
+                          * self.initiator.feelings[self.type].use_energy(self.spell_energy)
+                          
+    def is_able_to_cast(self):
+        if not self.initiator.feelings[self.type].check_energy(self.spell_energy):
+            print("You don't have enough energy to cast this spell")
+            return False
+        
+        if not self.initiator.check_stamina(self.spell_stamina):
+            print("You don't have enough stamina to cast this spell")
+            return False
+        
+        return True
+                     
     def get_all_spread_targets(self, spread_distance):
         max_distance = spread_distance + 1.0
         char_list = []
@@ -30,15 +50,11 @@ class Spells(ActiveActions):
         
     def magical_attack_received(self, attack_value, accuracy_ratio, is_localized, can_use_shield, resis_dim_rate, pen_rate):
         if can_use_shield:
-            attack_value -= self.target.magic_defense_with_shields \
-                          * random.gauss(1, global_variables.high_variance) \
-                          * self.target.get_fighting_availability(self.initiator.timeline)
+            attack_value -= self.target.magic_defense_with_shields * self.get_attack_coef(self.target)
             self.target.all_shields_absorbed_damage(attack_value)
         else:
-            attack_value -= self.target.magic_defense \
-                          * random.gauss(1, global_variables.high_variance)
-                          * self.target.get_fighting_availability(self.initiator.timeline)
-        
+            attack_value -= self.target.magic_defense * self.get_attack_coef(self.target)
+                          
         if attack_value <= 0:
             self.target.print_basic()
             print("-- has BLOCKED the attack of --", end=' ')
@@ -53,3 +69,55 @@ class Spells(ActiveActions):
         
         self.target.previous_attacks.append((self.initiator.timeline, self))
     
+    def choose_enemy_target(self):
+        if self.fight.belong_to_team(self.initiator) == self.fight.team1:
+            team = self.fight.team2
+        else:
+            team = self.fight.team1
+        
+        print("--------- ATTACKER -----------")
+        self.initiator.print_attack_state()
+        print("")
+        print("--------- TARGETS -----------")
+        print("Choose one of the following enemies:")
+        enemy_list = []
+        for char in team.characters_list:
+            if self.fight.field.is_target_magically_reachable(self.initiator, char):
+                enemy_list.append(char)
+                char.print_state()
+        
+        while 1:
+            try:
+                print("")
+                read = int(input('--> ID (0 = Cancel): '))
+                if self.fight.cancel_action(read):
+                    return False
+                    
+                for enemy in enemy_list:
+                    if enemy.get_id() == read:
+                        return enemy
+                        
+                print("ID:", read, "is not available")
+                        
+            except:
+                print("The input is not an ID")
+
+    def add_active_spell(self, char, duration):
+        self.timeline = self.initiator.timeline + duration
+        self.fight.scheduler.append(self)
+        char.active_spells.append(self)
+    
+    def end_active_spell(self, char):
+        self.fight.scheduler.remove(self)
+        char.active_spells.remove(self)
+    
+    def identical_active_spell(self, char):
+        for spell in char.active_spells:
+            if spell.type == self.type and spell.spell_code == self.spell_code:
+                return spell
+        return False
+    
+    def remove_identical_active_spell(self, char):
+        spell = self.identical_active_spell(char)
+        if spell:
+            spell.end_active_spell(char)

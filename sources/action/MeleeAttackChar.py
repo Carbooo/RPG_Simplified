@@ -12,8 +12,7 @@ class MeleeAttackChar(ActiveActions):
     """Class to melee attack a character"""
 
     attack_effect = [0, 25, 50, 75]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]
-    variance = 0.25  # Gauss variance
-
+    
     def __init__(self, fight, initiator, target):
         super().__init__(self, fight, initiator)
         self.target = target
@@ -89,7 +88,7 @@ class MeleeAttackChar(ActiveActions):
             self.target.spend_dodge_stamina(1.0 / 4.0)
             self.target.spend_defense_stamina(3.0 / 4.0)
 
-        self.end([self.initiator, self.target], Characters.MeleeAttack[3], Characters.MeleeAttack[2])
+        self.end_update([self.initiator, self.target], Characters.MeleeAttack[3], Characters.MeleeAttack[2])
         
         # State result
         self.fight.field.calculate_state(self.target)
@@ -110,18 +109,14 @@ class MeleeAttackChar(ActiveActions):
             self.actual_defense = "Defense"
 
         # Calculate attack and defend values
-        attack_accuracy = random.gauss(1, MeleeAttackChar.variance) \
-                        * math.pow(self.initiator.melee_handiness * math.pow(self.initiator.melee_range, 1.0 / 3), 0.75) \
-                        * self.initiator.get_fighting_availability(self.initiator.timeline)
-        attack_power = random.gauss(1, MeleeAttackChar.variance) \
-                     * Characters.get_melee_attack(attack_accuracy, self.initiator.melee_power) \
-                     * self.initiator.get_fighting_availability(self.initiator.timeline)
-
-        dodge_level = random.gauss(1, MeleeAttackChar.variance) * self.target.dodging \
-                    * self.target.get_fighting_availability(self.initiator.timeline)
-        defense_level = random.gauss(1, MeleeAttackChar.variance) * self.target.melee_defense \
-                      * self.target.get_fighting_availability(self.initiator.timeline)
-
+        attack_accuracy = math.pow(self.initiator.melee_handiness * math.pow(self.initiator.melee_range, 1.0 / 3), 0.75) \
+                        * self.get_attack_coef(self.initiator)
+        attack_power = Characters.get_melee_attack(attack_accuracy, self.initiator.melee_power) \
+                     * self.get_attack_coef(self.initiator)
+                     
+        dodge_level = self.target.dodging * self.get_attack_coef(self.target)
+        defense_level = self.target.melee_defense * self.get_attack_coef(self.target)
+                      
         dodge_result = attack_accuracy - dodge_level
         defense_result = attack_power - defense_level
 

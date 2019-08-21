@@ -1,3 +1,4 @@
+import math as math
 from sources.spell.Spells import Spells
 import sources.miscellaneous.global_variables as global_variables
 
@@ -8,69 +9,95 @@ import sources.miscellaneous.global_variables as global_variables
 class WrathSpells(Spells):
     """Class to cast wrath spells"""
     
-    spells_energy = [
+    spells_energy = {
         "STR" : 10.0,
         "FBL" : 30.0
-    ]
-    spells_time = [
+    }
+    spells_time = {
         "STR" : 1.0,
         "FBL" : 2.5
-    ]
-    spells_stamina = [
+    }
+    spells_stamina = {
         "STR" : 1.0,
         "FBL" : 7.5
-    ]
-    spells_power = [
-        "STR" : [
+    }
+    spells_power = {
+        "STR" : {
             "force" : 2.0,
             "reflex" : 0.8,
             "dexterity" : 0.6,
             "duration" : 5.0
-        ],
-        "FBL" : [
+        },
+        "FBL" : {
             "attack_value" : 50.0,
             "spread_distance" : 1,
             "resis_dim_rate" : 0.5,
             "pen_rate" : 0.25
-        ]
-    ]
+        }to 
+    }
  
     def __init__(self, fight, initiator, spell_code):
         super().__init__(self, fight, initiator, "wrath", spell_code)
+        self.spell_stamina = WrathSpells.spells_stamina[self.spell_code]
+        self.spell_time = WrathSpells.spells_time[self.spell_code]
+        self.spell_energy = WrathSpells.spells_energy[self.spell_code]
+        self.spell_power = WrathSpells.spells_power[self.spell_code]
         
     def start(self):
         if self.spell_code == "STR":
-            return self.improve_strength()
+            return self.start_improve_strength()
         elif self.spell_code == "FBL":
-            return self.fireball()
+            return self.start_fireball()
         else:
             return False
     
     def execute(self):
         if self.spell_code == "STR":
+            return self.improve_strength()
+        elif self.spell_code == "FBL":
+            return self.throw_fireball()
+        else:
+            return False
+    
+    def end(self):
+        if self.spell_code == "STR":
             return self.end_improve_strength()
         else:
             return False
-            
-    def improve_strength(self):
-        if not self.initiator.feelings["wrath"].check_energy(WrathSpells.spells_energy["STR"]):
+    
+    def start_improve_strength(self):
+        if not self.is_able_to_cast():
             return False
+        
+        print("You have decided to improve your strength.")
+        print("The effect will start soon!")
+        time.sleep(3)
             
         self.target = self.initiator
-        coef = self.initiator.feelings["wrath"].use_energy(WrathSpells.spells_energy["STR"]) \
-             * self.initiator.magic_power_ratio
+        self.set_magical_coef() 
+        self.end_update([], self.spell_stamina / self.magical_coef, self.spell_time / self.magical_coef)
+        return True
+        
+    def improve_strength(self):
+        self.remove_identical_active_spell(self.initiator)
+        coef = self.magical_coef * self.initiator.magic_power_ratio
+        
         self.diff_force = self.target.force
-        self.target.force *= WrathSpells.spells_power["STR"]["force"] * coef
+        self.target.force *= self.spell_power["force"]
+        self.target.force = math.pow(self.target.force, coef)
         self.diff_force -= self.target.force
+        
         self.diff_reflex = self.target.reflex
-        self.target.reflex *= WrathSpells.spells_power["STR"]["reflex"] * coef
+        self.target.reflex *= self.spell_power["reflex"]
+        self.target.reflex = math.pow(self.target.reflex, 1.0 / coef)
         self.diff_reflex -= self.target.reflex
+        
         self.diff_dexterity = self.target.dexterity
-        self.target.dexterity *= WrathSpells.spells_power["STR"]["dexterity"] * coef
+        self.target.dexterity *= self.spell_power["dexterity"]
+        self.target.dexterity = math.pow(self.target.dexterity, 1.0 / coef)
         self.diff_dexterity -= self.target.dexterity
-        self.timeline = self.initiator.timeline + WrathSpells.spells_power["STR"]["duration"] * coef
-        self.fight.scheduler.append(self)
-        self.end([], WrathSpells.spells_stamina["STR"], WrathSpells.spells_time["STR"])
+        
+        self.add_active_spell(selff.initiator, self.spell_power["duration"] * coef)
         return True
     
     def end_improve_strength(self):
@@ -78,61 +105,46 @@ class WrathSpells(Spells):
         self.target.reflex += self.diff_reflex
         self.target.dexterity += self.diff_dexterity
         self.target.calculate_characteristic()
+        self.end_active_spell(self.initiator)
         return True
         
-    def fireball(self):
-        if not self.initiator.feelings["wrath"].check_energy(WrathSpells.spells_energy["FBL"]):
-            print("You don't have enough energy to cast this spell")
+    def start_fireball(self):
+        if not self.is_able_to_cast():
             return False
         
-        if not self.initiator.check_stamina(WrathSpells.spells_stamina["FBL"]):
-            print("You don't have enough stamina to cast this spell")
+        self.target = self.choose_enemy_target()
+        if not self.target:
             return False
         
-        if self.fight.belong_to_team(self.initiator) == self.fight.team1:
-            team = self.fight.team2
-        else:
-            team = self.fight.team1
+        print("You have decided to throw a fireball")
+        print("The fireball is charging...")
+        time.sleep(3)
         
-        print("--------- ATTACKER -----------")
-        self.initiator.print_attack_state()
-        print("")
-        print("--------- TARGETS -----------")
-        print("Choose one of the following enemies:")
-        enemy_list = []
-        for char in team.characters_list:
-            if self.fight.field.is_target_magically_reachable(self.initiator, char):
-                enemy_list.append(char)
-                char.print_state()
+        self.set_magical_coef()
+        self.end_update([], self.spell_stamina / self.magical_coef, self.spell_time / self.magical_coef)
+        return True   
+    
+    def throw_fireball(self):
+        if not self.fight.field.is_target_magically_reachable(self.initiator, self.target):
+            print("Your initial target is no longer reachable!")
+            print("Please choose a new one or cancel the attack.")
+            self.target = self.choose_enemy_target()
+            if not self.target:
+                return False
+    
+        attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) \
+                     * self.magical_coef
+                     
+        for char, distance_ratio in self.get_all_spread_targets(self.spell_power["spread_distance"]):
+            self.magical_attack_received(
+                attack_value * distance_ratio,
+                self.fight.field.get_magical_accuracy(self.initiator, char),
+                False,  # is_localized
+                True,  # can_use_shield
+                self.spell_power["resis_dim_rate"], 
+                self.spell_power["pen_rate"]
+            )
         
-        while 1:
-            try:
-                print("")
-                read = int(input('--> ID (0 = Cancel): '))
-                if self.fight.cancel_action(read):
-                    return False
-                    
-                for enemy in enemy_list:
-                    if enemy.get_id() == read:
-                        attack_value = (WrathSpells.spells_power["FBL"]["attack_value"] + self.initiator.magic_power) \
-                                     * self.initiator.feelings["wrath"].use_energy(WrathSpells.spells_energy["FBL"])
-                                     * random.gauss(1, global_variables.high_variance)
-                                     
-                        for char, distance_ratio in self.get_all_spread_targets(WrathSpells.spells_power["FBL"]["spread_distance"]):
-                            self.magical_attack_received(
-                                attack_value * distance_ratio,
-                                self.fight.field.get_magical_accuracy(self.initiator, char),
-                                False,  # is_localized
-                                True,  # can_use_shield
-                                WrathSpells.spells_power["FBL"]["resis_dim_rate"], 
-                                WrathSpells.spells_power["FBL"]["pen_rate"]
-                            )       
-                                
-                        self.end([], WrathSpells.spells_stamina["FBL"], WrathSpells.spells_time["FBL"])
-                        return True
-                        
-                print("ID:", read, "is not available")
-                        
-            except:
-                print("The input is not an ID")
-                continue
+        self.initiator.last_action = None
+        return True
+

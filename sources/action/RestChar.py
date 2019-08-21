@@ -37,7 +37,12 @@ class RestChar(ActiveActions):
 
         print("You have decided to rest", self.nb_of_turn, "turn(s)")
         time.sleep(3)
+        self.end_update([], 0, 1, True)
+        return True
 
-        self.initiator.body.global_rest(self.nb_of_turn)
-        self.end([], 0, self.nb_of_turn, True)
+    def execute(self):
+        self.initiator.body.global_rest(1)
+        self.nb_of_turn -= 1
+        if self.nb_of_turn > 0:
+            self.end_update([], 0, 1, True)
         return True

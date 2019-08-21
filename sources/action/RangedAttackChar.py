@@ -13,7 +13,6 @@ class RangedAttackChar(ActiveActions):
     'Class to ranged attack a character'
     
     attack_effect = [25, 50]  # [Blocked", "Hit", "Hit & stopped"]
-    variance = 0.25  # Gauss variance
 
     def __init__(self, fight, initiator):
         super().__init__(self, fight, initiator)
@@ -132,22 +131,19 @@ class RangedAttackChar(ActiveActions):
             stamina = Characters.RangedAttack[3] * self.shooting_time / 10
         else:
             stamina = Characters.RangedAttack[3] * self.shooting_time
-        self.end([self.initiator, self.target], stamina, Characters.RangedAttack[2] * self.shooting_time)
+        self.end_update([self.initiator, self.target], stamina, Characters.RangedAttack[2] * self.shooting_time)
         return True
 
     def range_defend(self, hit_chance):
         # Calculate att coef
         att_coef = self.initiator.power_distance_ratio(self.target) \
                  * self.initiator.power_hit_chance_ratio(hit_chance) \
-                 * self.initiator.get_fighting_availability(self.initiator.timeline)
+                 * self.get_attack_coef(self.initiator)
         print("ranged_att_coef:", att_coef)
         
         # Range defense result
-        attack_power = random.gauss(1.0, RangedAttackChar.variance) * att_coef * \
-            self.initiator.ranged_power
-        defense_level = random.gauss(1.0, RangedAttackChar.variance) \
-                      * self.target.ranged_defense \
-                      * self.target.get_fighting_availability(self.initiator.timeline)
+        attack_power = self.initiator.ranged_power * att_coef
+        defense_level = self.target.ranged_defense * self.get_attack_coef(self.target)
         attack_result = attack_power - defense_level
         print("attack_power:", attack_power)
         print("attack_result:", attack_result)

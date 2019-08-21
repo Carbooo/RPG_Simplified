@@ -74,7 +74,7 @@ class MoveChar(ActiveActions):
         if not self.check_move_stamina() or not self.fight.field.move_character(self.initiator, self.target_abs, self.target_ord):
             return self.cancel_move()
         
-        self.end([], self.get_move_coef() * Characters.Move[3], self.get_move_coef() * Characters.Move[2])
+        self.end_update([], self.get_move_coef() * Characters.Move[3], self.get_move_coef() * Characters.Move[2])
         
         print("You are moving to", self.target_abs, "x", self.target_ord)
         time.sleep(2)
@@ -128,8 +128,7 @@ class MoveChar(ActiveActions):
             return False
         
         if not self.initiator.check_stamina(1.0 
-                              / self.initiator.movement_handicap_ratio()
-                              / self.initiator.speed_ratio):
+                              / self.initiator.movement_handicap_ratio()):
             print("You do not have enough stamina (", \
                 self.initiator.body.return_current_stamina(), ") to move")     
             print("")

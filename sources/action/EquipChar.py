@@ -192,7 +192,7 @@ class EquipChar(ActiveActions):
                 if not self.initiator.remove_weapon_in_use(weapon):
                     return False
        
-        self.end([self.initiator], self.equip_time * Characters.EquipSpec[3], self.equip_time)
+        self.end_update([self.initiator], self.equip_time * Characters.Equip[3], self.equip_time)
         return True
     
     def calculate_timelines(self, weapons):

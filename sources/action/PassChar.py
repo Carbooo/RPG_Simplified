@@ -25,7 +25,7 @@ class PassChar(ActiveActions):
                 print("The input is not a number")
                 continue
             
-        self.initiator.spend_time(read * Characters.Pass[2])
+        self.initiator.spend_absolute_time(read * Characters.Pass[2])
         print("You have decided to wait", round(read*Characters.Pass[2],1), "turn(s)")
         time.sleep(3)
         return True

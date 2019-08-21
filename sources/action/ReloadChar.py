@@ -8,12 +8,12 @@ from sources.action.Actions import ActiveActions
 ###################### RELOAD CHAR CLASS ####################
 #############################################################
 class ReloadChar(ActiveActions):
-    """Class to melee attack a self.initiator"""
+    """Class to reload a range weapon"""
 
     def __init__(self, fight, initiator):
         super().__init__(self, fight, initiator)
-        self.reload_list = []
-        self.reload_time = 0
+        self.weapon_to_reload = None
+        self.ammo_to_load = None
         self.is_a_success = self.start()
 
     def start(self):
@@ -33,6 +33,7 @@ class ReloadChar(ActiveActions):
 
         for weapon in self.initiator.weapons_use:
             if isinstance(weapon, RangedWeapons):
+                self.weapon_to_reload = weapon
                 ammo_available = []
                 for ammo in self.initiator.ammo:
                     if ammo.ranged_weapon_type == weapon.__class__:
@@ -45,7 +46,8 @@ class ReloadChar(ActiveActions):
                             ammo_available.append(ammo)
 
                 if len(ammo_available) == 1:
-                    self.reload_list.append([weapon, ammo_available[0]])
+                    self.ammo_to_load = ammo_available[0]
+                    
                 elif len(ammo_available) > 1:
                     print("Choose the ammo to reload:")
                     for ammo in ammo_available:
@@ -63,36 +65,23 @@ class ReloadChar(ActiveActions):
                             continue
                         for ammo in ammo_available:
                             if ammo.get_id() == read:
-                                self.reload_list.append([weapon, ammo])
+                                self.ammo_to_load = ammo
                                 ammo_chosen = True
                                 break
                         print("ID:", read, "is not available")
 
-        self.calculate_timelines()
         print("You have decided to reload your ranged weapon")
+        print("Reload in progress...")
         time.sleep(3)
-        return self.result()
-
-    def result(self):
-        if not self.reload_list:
-            print("(ReloadChar) Cannot reload, because reload list is empty")
-            return False
-
-        self.initiator.reload(self.reload_list[0][0], self.reload_list[0][1])
-
-        if isinstance(self.reload_list[0][0], Crossbows):
-            stamina = self.reload_time * Characters.Reload[3] * 10
+        
+        if isinstance(self.weapon_to_reload, Crossbows):
+            stamina = self.weapon_to_reload.reload_time * Characters.Reload[3] * 10
         else:
-            stamina = self.reload_time * Characters.Reload[3]
-        self.end([], stamina, self.reload_time)
+            stamina = self.weapon_to_reload.reload_time * Characters.Reload[3]
+        self.end_update([], stamina, self.weapon_to_reload.reload_time)
         return True
-
-    def calculate_timelines(self):
-        if not self.reload_list:
-            print(self.reload_list)
-            print("(ReloadChar) Cannot calculate ReloadTime because reload list is empty")
-            return False
-
-        weapon = self.reload_list[0][0]
-        self.reload_time = (weapon.reload_time - weapon.current_reload) * self.initiator.speed_ratio
+    
+    def execute(self):
+        self.initiator.reload(weapon_to_reload, self.ammo_to_load)
+        self.initiator.last_action = None  # To remove it from the scheduler
         return True

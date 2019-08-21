@@ -36,7 +36,6 @@ class Characters:
     
     # A turn is around 6 seconds
     # [Action choices, action command, time spend, stamina spend, action description]
-    NoAction = ["No current action", "NOA", 0.0, 0.0, "No action"]
     Pass = ["Wait a little", "PAS", 0.1, 0.0, "Passing time"]
     Rest = ["Rest a little", "RES", 1.0, 0.0, "Resting"]
     
@@ -60,23 +59,23 @@ class Characters:
     Spell = ["Cast a spell", "SPL", 0.0, 0.0, "Casting"]
     spells = []
     
-    wrath_spells = [
+    wrath_spells = {
         "description" : "Wrath spell",
         "code" : "WRA",
         "list" : []
-    ]
+    }
     spells.append(wrath_spells)
-    wrath_improve_strength = [
+    wrath_improve_strength = {
         "description" : "Improve your strength",
         "code" : "STR",
         "type" : "wrath"
-    ]
+    }
     wrath_spells["list"].append(wrath_improve_strength)
-    wrath_fireball = [
+    wrath_fireball = {
         "description" : "Throw a fireball",
         "code" : "FBL",
         "type" : "wrath"
-    ]
+    }
     wrath_spells["list"].append(wrath_fireball)
     
     Actions = []
@@ -134,8 +133,9 @@ class Characters:
         
         #Set characters parameters
         self.timeline = 0.0
-        self.last_action = Characters.NoAction
+        self.last_action = None
         self.previous_attacks = []
+        self.active_spells = []
         
         #Set weapons
         self.weapons_stored = []
@@ -218,31 +218,17 @@ class Characters:
      
         
 ################### RESET & STATE FUNCTIONS ######################
-    def is_modifying_equipment(self):
-        if self.current_action == Characters.UnequipAll or \
-        self.current_action == Characters.UnequipSpec or \
-        self.current_action == Characters.EquipAll or \
-        self.current_action == Characters.EquipSpec:        
-            return True
-        return False
-    
-    def is_moving(self):
-        if self.current_action == Characters.Move:
-            return True
-        return False
-    
-    
-    def is_melee_fighting(self):
-        if self.current_action == Characters.MeleeAttack:
-            return True
-        return False
-    
-    
-    def is_waiting(self):
-        if self.current_action == Characters.Pass or \
-        self.current_action == Characters.NoAction:
-            return True
-        return False
+    def stop_action(self, timeline):
+        action = self.last_action
+        if isinstance(action, EquipChar):
+            # Not ready to fight, defense divided by 2
+            self.previous_attacks.append(timeline, action)
+        elif isinstance(action, ReloadChar) \
+          or isinstance(action, RestChar) \
+          or isinstance(action, Spells):
+            # In addition to the "not ready" malus, cancel current action
+            self.previous_attacks.append(timeline, action)
+            self.last_action = None
     
     def calculate_state(self):
         old_state = self.body.state
@@ -982,7 +968,7 @@ class Characters:
         print(",SpeedRatio:", round(self.speed_ratio, 2), \
             ",Unconsciousness:", round(self.unconsciousness, 2), \
             ",Timeline:", round(self.timeline,2), \
-            ",CurrentAction:", self.current_action[4])
+            ",CurrentAction:", self.last_action[4])
                      
 
     def print_weapons_stored(self):

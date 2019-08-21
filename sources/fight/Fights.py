@@ -85,16 +85,28 @@ class Fights:
             
             #Execute pending spell
             elif isinstance(next_event, Spells):
-                next_event.execute()
+                next_event.end()
                 
             elif isinstance(next_event, Characters):
-                if isinstance(next_event.last_action, MoveChar) and next_event.last_action.path:
+                if (isinstance(next_event.last_action, MoveChar) and next_event.last_action.path) \
+                or (isinstance(next_event.last_action, RestChar) and next_event.last_action.nb_of_turn > 0) \
+                or isinstance(next_event.last_action, ReloadChar) \
+                or isinstance(next_event.last_action, Spells):
                     # Destination not reached, keep moving
-                    next_event.last_action.execute()
+                    # or
+                    # Number of resting turn not reached, keep resting
+                    # or
+                    # Reload actually their range weapon
+                    # or
+                    # Cast actually the charged spell
+                    if not next_event.last_action.execute():
+                        next_event.last_action = None  # Stop action if error encounter
+                    
                 elif next_event.is_shape_k_o():
                     # Rest if too exhausted for any actions
                     next_event.last_action = RestChar(self, next_event, RestChar.rest_config[2])
                     self.print_k_o_state_rest(next_event)
+                    
                 else:
                     #Turn possible actions
                     self.print_new_turn()
