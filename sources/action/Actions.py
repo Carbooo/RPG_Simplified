@@ -21,7 +21,7 @@ class ActiveActions(Actions):
     """
 
     def __init__(self, fight, initiator):
-        super().__init__(self, fight)
+        super().__init__(fight)
         self.name = "Generic active actions"
         self.initiator = initiator
         self.timeline = self.initiator.timeline

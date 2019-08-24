@@ -1,5 +1,7 @@
+import time as time
 from sources.action.Actions import ActiveActions
 from sources.character.Characters import Characters
+
 
 #############################################################
 ########################## PASS CLASS #######################
@@ -8,7 +10,7 @@ class PassChar(ActiveActions):
     'Class to let a character pass time'
     
     def __init__(self, fight, initiator):
-        super().__init__(self, fight, initiator)
+        super().__init__(fight, initiator)
         self.name = "Passing time"
         self.is_a_success = self.start()
         

@@ -2,7 +2,7 @@ import copy as copy
 import math as math
 import numpy as np
 import random as random
-from sources.character.Characters import Characters, NoneCharacter
+from sources.character.Characters import Characters
 
 
 #############################################################
@@ -32,6 +32,7 @@ class Fields:
         self.name = name
         self.abscissa_size = len(obstacles_array[0::, 0])
         self.ordinate_size = len(obstacles_array[0, 0::])
+        self.characters_array = []
         self.obstacles_array = obstacles_array
         self.reliefs_array = reliefs_array
         self.reset_characters_array()
@@ -50,9 +51,9 @@ class Fields:
         # Check the minimum size of a field
         if self.abscissa_size < Characters.max_position_area * 2 \
                 or self.ordinate_size < Characters.max_position_area:
-            print("(Field) The field is too small.", \
-                  "It must be at least:", \
-                  Characters.max_position_area * 2, \
+            print("(Field) The field is too small.",
+                  "It must be at least:",
+                  Characters.max_position_area * 2,
                   "x", Characters.max_position_area)
 
         # Check the columns size
@@ -76,8 +77,7 @@ class Fields:
         for i in range(self.abscissa_size):
             for j in range(self.ordinate_size):
                 if self.obstacles_array[i, j] not in Fields.obstacle_types_list:
-                    print("(Fields) The obstacle array ", \
-                          "contains illegal values")
+                    print("(Fields) The obstacle array contains illegal values")
                     return False
         return True
 
@@ -105,14 +105,14 @@ class Fields:
     def is_case_character_free(self, abscissa, ordinate):
         if not self.is_a_case(abscissa, ordinate):
             return False
-        if not self.characters_array[abscissa, ordinate].is_none_character():
+        if not self.characters_array[abscissa, ordinate] is None:
             return False
         return True
     
     def get_character_from_pos(self, abscissa, ordinate):
-        if self.characters_array[abscissa, ordinate].is_none_character():
+        if self.characters_array[abscissa, ordinate] is None:
             return False
-        else
+        else:
             return self.characters_array[abscissa, ordinate]
 
     def is_case_ranged_free(self, abscissa, ordinate):
@@ -137,7 +137,7 @@ class Fields:
         
     def get_magical_accuracy(self, attacker, target):
         coef = attacker.get_magic_distance_ratio(target) \
-             * self.calculate_ranged_obstacle_ratio(attacker, target)
+             * self.calculate_ranged_obstacle_ratio(attacker, target) \
              * self.attacker.magic_power_ratio
         return 0.5 + coef  # Between 0.5 and 1.5 as other attacks
 
@@ -154,7 +154,7 @@ class Fields:
 
                     if self.obstacles_array[min_abs + i, min_ord + j] == Fields.ranged_obstacle or \
                             self.obstacles_array[min_abs + i, min_ord + j] == Fields.full_obstacle or \
-                            self.characters_array[min_abs + i, min_ord + j].is_none_character() is False:
+                            self.characters_array[min_abs + i, min_ord + j] is None is False:
                         return 0
 
                     if self.obstacles_array[min_abs + i, min_ord + j] == Fields.ranged_handicap or \
@@ -207,8 +207,7 @@ class Fields:
                 # Shoot out of field or blocked by an obstacle
                 if not self.is_a_case(c_abs, c_ord) or \
                         not self.is_case_ranged_free(c_abs, c_ord) or \
-                        (self.obstacles_array[c_abs, c_ord] == Fields.ranged_handicap \
-                         and random.random() < 0.5):
+                        (self.obstacles_array[c_abs, c_ord] == Fields.ranged_handicap and random.random() < 0.5):
                     return False
 
                 # Shoot has hit another character
@@ -224,19 +223,15 @@ class Fields:
         new_state = character.body.state
 
         if new_state != old_state and new_state == "Dead":
-            self.characters_array[character.abscissa, character.ordinate] = \
-                NoneCharacter
+            self.characters_array[character.abscissa, character.ordinate] = None
 
     def reset_characters_array(self):
-        char_array = [NoneCharacter for _ \
-                     in range(self.abscissa_size * self.ordinate_size)]
+        char_array = [None for _ in range(self.abscissa_size * self.ordinate_size)]
         char_array = np.array(char_array)
-        self.characters_array = np.reshape(char_array, \
-                                          (self.abscissa_size, self.ordinate_size))
+        self.characters_array = np.reshape(char_array, (self.abscissa_size, self.ordinate_size))
 
     def remove_character(self, character):
-        self.characters_array[character.abscissa, \
-                             character.ordinate] = NoneCharacter
+        self.characters_array[character.abscissa, character.ordinate] = None
 
     def move_character(self, character, new_abscissa, new_ordinate):
         old_abscissa = character.abscissa
@@ -272,29 +267,25 @@ class Fields:
         max_chance = 0
         position = -1
         for i in range(len(target_positions)):
-            ratio = (1 + \
-                     abs(target_positions[i][0] - attacker.abscissa) + \
-                     abs(target_positions[i][1] - attacker.ordinate)) * \
-                    random.random()
+            ratio = (1 + abs(target_positions[i][0] - attacker.abscissa) +
+                     abs(target_positions[i][1] - attacker.ordinate)
+                     ) * random.random()
             if max_chance < ratio:
                 max_chance = ratio
                 position = i
-        self.move_character(target, \
-                           target_positions[position][0], target_positions[position][1])
+        self.move_character(target, target_positions[position][0], target_positions[position][1])
 
         # Set attacker position (closest possible from target)
         max_chance = 0
         position = -1
         for i in range(len(attacker_positions)):
-            ratio = (1.0 / (1 + \
-                            abs(attacker_positions[i][0] - target.abscissa) + \
-                            abs(attacker_positions[i][1] - target.ordinate))) * \
-                    random.random()
+            ratio = (1.0 / (1 + abs(attacker_positions[i][0] - target.abscissa) +
+                            abs(attacker_positions[i][1] - target.ordinate))
+                     ) * random.random()
             if max_chance < ratio:
                 max_chance = ratio
                 position = i
-        self.move_character(attacker, \
-                           attacker_positions[position][0], attacker_positions[position][1])
+        self.move_character(attacker, attacker_positions[position][0], attacker_positions[position][1])
 
     def obstacle_movement_ratio(self, current_abs, current_ord, target_abs, target_ord):
         if self.is_a_case(target_abs, target_ord):
@@ -308,8 +299,7 @@ class Fields:
     def set_character(self, character):
         # Set a character into its position values
         if self.is_case_free(character.abscissa, character.ordinate):
-            self.characters_array[character.abscissa, \
-                                 character.ordinate] = character
+            self.characters_array[character.abscissa, character.ordinate] = character
             return True
         return False
 
@@ -342,8 +332,7 @@ class Fields:
     def set_team(self, team):
         # Set the team on the left of the field
         # Calculate the middle ordinate
-        zero_ordinate = int(round((self.ordinate_size \
-                                  - Characters.max_position_area) / 2))
+        zero_ordinate = int(round((self.ordinate_size - Characters.max_position_area) / 2))
 
         for char in team.characters_list:
             # update the zero ordinate
@@ -407,7 +396,7 @@ class Fields:
         for i in range(character.abscissa - 1, character.abscissa + 2):
             for j in range(character.ordinate - 1, character.ordinate + 2):
                 if self.is_case_free(i, j):
-                    possible_moves.add[(i, j)]
+                    possible_moves.add((i, j))
         
         if possible_moves and random.random() < probability:
             new_abs, new_ord = random.choice(possible_moves)
@@ -417,9 +406,7 @@ class Fields:
         return False
 
     def heuristic_value(self, source_abs, source_ord, target_abs, target_ord):
-        return math.sqrt( \
-            math.pow(source_abs - target_abs, 2) + \
-            math.pow(source_ord - target_ord, 2))
+        return math.sqrt(math.pow(source_abs - target_abs, 2) + math.pow(source_ord - target_ord, 2))
 
     def movement_cost(self, current_abs, current_ord, target_abs, target_ord):
         if abs(current_abs - target_abs) + abs(current_ord - target_ord) == 2:
@@ -474,12 +461,10 @@ class Fields:
                         move_values.append(new_ord)
 
                         # Calculate movement cost
-                        move_values.append(self.movement_cost(current_abs, \
-                                                            current_ord, new_abs, new_ord))
+                        move_values.append(self.movement_cost(current_abs, current_ord, new_abs, new_ord))
 
                         # Calculate all heuristic values
-                        move_values.append(self.heuristic_value(new_abs, new_ord, \
-                                                              target_abs, target_ord))
+                        move_values.append(self.heuristic_value(new_abs, new_ord, target_abs, target_ord))
 
                 # Choose min (cost-heuristic) path
                 min_cost = 10000000
@@ -491,9 +476,9 @@ class Fields:
                         new_path = copy.copy(current_path_browsed)
                         new_path.append( \
                             [possible_moves[i][0], possible_moves[i][1]])
-                        min_path = [possible_moves[i][0], possible_moves[i][1], \
-                                   current_cost + possible_moves[i][2], new_path, \
-                                   possible_moves[i][3]]
+                        min_path = [possible_moves[i][0], possible_moves[i][1],
+                                    current_cost + possible_moves[i][2], new_path,
+                                    possible_moves[i][3]]
                 if min_cost < 10000000:
                     possible_paths.append(min_path)
 
@@ -562,7 +547,7 @@ class Fields:
 
             # Array content
             for j in range(self.abscissa_size):
-                if char_array[i, j].is_none_character():
+                if char_array[i, j] is None:
                     temp = " " + obs_array[i, j] + "  "
                 else:
                     temp = " " + char_array[i, j].name[:2] + " "

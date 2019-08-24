@@ -218,33 +218,6 @@ class Characters:
      
         
 ################### RESET & STATE FUNCTIONS ######################
-    def stop_action(self, timeline):
-        if isinstance(self.last_action, EquipChar) \
-        or isinstance(self.last_action, ReloadChar) \
-        or isinstance(self.last_action, RestChar) \
-        or isinstance(self.last_action, ConcentrateChar) \
-        or isinstance(self.last_action, Spells):
-            self.previous_attacks.append(timeline, self.last_action)
-            print("The attack surprises you during your current action(", 
-                  self.last_action.name, ")!")
-            print("Your defense is diminished!")
-            
-            if isinstance(self.last_action, ReloadChar) \
-            or isinstance(self.last_action, RestChar) \
-            or isinstance(self.last_action, ConcentrateChar) \
-            or isinstance(self.last_action, Spells):
-                print("Your current action is canceled!")
-                self.last_action = None
-                self.timeline = timeline
-                self.spend_time(Characters.defense_time / 2)
-                
-            if isinstance(self.last_action, ReloadChar):
-                print("You loose the ammo used for reloading!")
-                self.ammo.remove(self.last_action.ammo_to_load)
-                
-        if self.loose_reloaded_ammo():
-            print("Your bow has lost its loaded arrow!")
-    
     def exceeded_feelings_check(self):
         has_exceeded = False
         for feeling in self.feelings:
@@ -841,11 +814,11 @@ class Characters:
         return False
 
     def get_magic_distance_ratio(self, enemy):
-        return 1 - self.calculate_point_distance(enemy.abscissa, enemy.ordinate) / Characters.max_magic_distance:
+        return 1 - self.calculate_point_distance(enemy.abscissa, enemy.ordinate) / Characters.max_magic_distance
     
     def calculate_point_to_enemy_path_distance(self, enemy, abscissa, ordinate):
-        #Only work if abscissa & ordinate are in the segment path
-        #and if abscissa and ordinate are different from char position
+        # Only work if abscissa & ordinate are in the segment path
+        # and if abscissa and ordinate are different from char position
         ac_length = self.calculate_point_distance(abscissa, ordinate)
         ah_length = ac_length * self.calculate_point_to_enemy_path_cos_angle(enemy, abscissa, ordinate)
         return math.sqrt(max(0, math.pow(ac_length, 2) - math.pow(ah_length, 2)))
@@ -988,9 +961,8 @@ class Characters:
                  
     def print_time_state(self):
         print(",SpeedRatio:", round(self.speed_ratio, 2), \
-            ",Unconsciousness:", round(self.unconsciousness, 2), \
             ",Timeline:", round(self.timeline,2), \
-            ",CurrentAction:", self.last_action[4])
+            ",CurrentAction:", self.last_action)
                      
 
     def print_weapons_stored(self):
@@ -1060,11 +1032,3 @@ class Characters:
     def print_obj(self):
         self.print_detailed_state()
         self.print_equipments()
-                
-
-#############################################################
-################### INITIALIZATION ##########################
-#############################################################
-NoneCharacter = Characters("--none--", 0, 0, 0, 0, 0, 0, 0, "ambidextrous", "--none_armor--", "--none_armor--", "--none_armor--", \
-    "--none_armor--", "--none_weapon--", "--none_weapon--", "--none_weapon--", "--none_weapon--", "--none_ammo--", 0, "--none_ammo--", 0, 0, 0)
-NoneCharacter.set_position(-1, -1)

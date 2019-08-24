@@ -1,5 +1,6 @@
 import math as math
-from sources.spell.Spells import Spells
+import time as time
+from sources.action.spell.Spells import Spells
 import sources.miscellaneous.global_variables as global_variables
 
 #############################################################
@@ -33,7 +34,7 @@ class WrathSpells(Spells):
             "spread_distance" : 1,
             "resis_dim_rate" : 0.5,
             "pen_rate" : 0.25
-        }to 
+        }
     }
  
     def __init__(self, fight, initiator, spell_code):

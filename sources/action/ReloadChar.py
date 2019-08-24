@@ -11,7 +11,7 @@ class ReloadChar(ActiveActions):
     """Class to reload a range weapon"""
 
     def __init__(self, fight, initiator):
-        super().__init__(self, fight, initiator)
+        super().__init__(fight, initiator)
         self.name = "Reloading"
         self.weapon_to_reload = None
         self.ammo_to_load = None
@@ -83,6 +83,6 @@ class ReloadChar(ActiveActions):
         return True
     
     def execute(self):
-        self.initiator.reload(weapon_to_reload, self.ammo_to_load)
+        self.initiator.reload(self.weapon_to_reload, self.ammo_to_load)
         self.initiator.last_action = None  # To remove it from the scheduler
         return True

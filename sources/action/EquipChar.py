@@ -3,6 +3,7 @@ import math as math
 import time as time
 from sources.character.Characters import Characters
 from sources.action.Actions import ActiveActions
+from sources.character.Equipments import Bows
 
 
 #############################################################
@@ -12,7 +13,7 @@ class EquipChar(ActiveActions):
     """Class to equip a character"""
     
     def __init__(self, fight, initiator):
-        super().__init__(self, fight, initiator)
+        super().__init__(fight, initiator)
         self.name = "Modifying equipment"
         self.next_equipment = []
         self.next_unequipment = []
@@ -40,7 +41,7 @@ class EquipChar(ActiveActions):
                 
                 if read == "EQP":
                     return self.equip_spec_weapons()
-                elif read == "UQP:
+                elif read == "UQP":
                     return self.unequip_spec_weapons()
                 else:
                     print("Your choice is not recognized!")
@@ -191,7 +192,7 @@ class EquipChar(ActiveActions):
             for weapon in self.next_equipment:
                 if not self.initiator.add_weapon_in_use(weapon):
                     return False
-        else
+        else:
             for weapon in self.next_unequipment:
                 if not self.initiator.remove_weapon_in_use(weapon):
                     return False

@@ -2,21 +2,21 @@ import pickle
 import time as time
 from sources.action.Actions import Actions
 
+
 #############################################################
 ####################### SAVE CLASS ##########################
 #############################################################
 class Save(Actions):
-    'Class to save a fight'
+    """Class to save a fight"""
     
     save_path = 'saves\\'
     save_extension = '.sav'
     
     def __init__(self, fight, filename = False):
-        super().__init__(self, fight)
+        super().__init__(fight)
         self.filename = filename
         self.is_a_success = self.start()
-        
-        
+
     def start(self):
         if self.filename:
             file = open(Save.save_path + self.filename + Save.save_extension, 'wb')
@@ -44,13 +44,11 @@ class Save(Actions):
 ####################### LOAD CLASS ##########################
 #############################################################
 class Load(Actions):
-    'Class to load a fight'
-    
-    
+    """Class to load a fight"""
+
     def __init__(self, fight):
-        super().__init__(self, fight)
+        super().__init__(fight)
         self.is_a_success = self.start()
-        
         
     def start(self):
         print("Write the file name of a previous save:")
@@ -74,4 +72,3 @@ class Load(Actions):
                 time.sleep(3)
                 self.fight.start()
                 exit(0)
-                

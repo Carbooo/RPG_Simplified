@@ -1,14 +1,17 @@
 import copy as copy
 import random as random
 import time as time
-from sources.character.Characters import Characters, NoneCharacter
+import sources.miscellaneous.global_variables as global_variables
+from sources.character.Characters import Characters
 from sources.action.GetCharInformation import GetCharInformation
 from sources.action.EquipChar import EquipChar
 from sources.action.MeleeAttackChar import MeleeAttackChar
 from sources.action.MoveChar import MoveChar
 from sources.action.RangedAttackChar import RangedAttackChar
 from sources.action.ReloadChar import ReloadChar
+from sources.action.PassChar import PassChar
 from sources.action.RestChar import RestChar
+from sources.action.ConcentrateChar import ConcentrateChar
 from sources.action.SaveAndLoad import Save, Load
 from sources.action.spell.Spells import Spells
 from sources.action.spell.WrathSpells import WrathSpells
@@ -81,7 +84,7 @@ class Fights:
             
             #Automatic turn every 1 timeline
             if isinstance(next_event, Fights):
-                self.pass_aturn()
+                self.pass_a_turn()
             
             #Execute pending spell
             elif isinstance(next_event, Spells):
@@ -90,7 +93,7 @@ class Fights:
             elif isinstance(next_event, Characters):
                 if (isinstance(next_event.last_action, MoveChar) and next_event.last_action.path) \
                 or (isinstance(next_event.last_action, RestChar) and next_event.last_action.nb_of_turns > 0) \
-                or (isinstance(next_event.last_action, ConcentrateChar) and next_event.last_action.nb_of_turn > 0) \
+                or (isinstance(next_event.last_action, ConcentrateChar) and next_event.last_action.nb_of_turns > 0) \
                 or isinstance(next_event.last_action, ReloadChar) \
                 or isinstance(next_event.last_action, Spells):
                     # Destination not reached, keep moving
@@ -105,8 +108,9 @@ class Fights:
                     
                 elif next_event.is_shape_k_o():
                     # Rest if too exhausted for any actions
-                    next_event.last_action = RestChar(self, next_event, RestChar.rest_config[2])
                     self.print_k_o_state_rest(next_event)
+                    next_event.body.global_rest(1)
+                    next_event.spend_absolute_time(1)
                     
                 else:
                     #Turn possible actions
@@ -123,17 +127,15 @@ class Fights:
         
         #Victory of a team
         if self.team1.is_life_active():
-            print("Team:", self.team1.name, " (ID:", \
-                self.team1.get_id(), ") has won the fight!")
+            print("Team:", self.team1.name, " (ID:", self.team1.get_id(), ") has won the fight!")
             time.sleep(3)
         else:
-            print("Team:", self.team2.name, " (", \
-                self.team2.get_id(), ") has won the fight!")
+            print("Team:", self.team2.name, " (", self.team2.get_id(), ") has won the fight!")
             time.sleep(3)
             
 
 ################################## TURN FUNCTIONS ####################################
-    def pass_aturn(self):
+    def pass_a_turn(self):
         print("")
         print("*********************************************************************")
         print("******************** A GAME TURN HAS PASSED *************************")
@@ -223,18 +225,10 @@ class Fights:
             
             previous_attacks = copy.copy(char.previous_attacks)
             for attack_timeline, attack in previous_attacks:
-                if self.current_timeline >= attack_timeline + Characters.defense_time / char.speed_ratio:
+                if self.current_timeline >= attack_timeline + global_variables.defense_time / char.speed_ratio:
                     char.previous_attacks.remove((attack_timeline, attack))
                     
     def end_turn(self):
-        #Timelines and scheduling
-        self.recalculate_all_timelines()
-        copy_list = copy.copy(self.scheduler)
-        for event in copy_list:
-            if isinstance(event, Characters) and not event.is_active():
-                self.remove_inactive_char_actions(event)
-        self.order_scheduler()
-        
         #Automatic saves
         Save(self, "AutoSave1")
         if self.nb_of_turn % 3 == 0:
@@ -313,8 +307,8 @@ class Fights:
         character.last_action = action
         return True
     
-    def melee_attack_action(self, character, target = NoneCharacter):
-        action = MeleeAttackChar(self, character, target)
+    def melee_attack_action(self, character):
+        action = MeleeAttackChar(self, character)
         if not action.is_a_success:
             return False
         character.last_action = action
@@ -383,9 +377,9 @@ class Fights:
         for spell_type in Characters.spells:
             print(spell_type["description"] + " (" + spell_type["code"] + ")")
         
-        While 1:
+        while 1:
             read = input('--> Spell type (0 for cancel) : ')
-            if cancel_action(read):
+            if self.cancel_action(read):
                 return False
             
             for spell_type in Characters.spells:
@@ -396,9 +390,9 @@ class Fights:
                     for spell in spell_type["list"]:
                         print(spell["description"] + " (" + spell["code"] + ")")
         
-                    While 1:
+                    while 1:
                         read = input('--> Spell (0 for cancel) : ')
-                        if cancel_action(read):
+                        if self.cancel_action(read):
                             return False
                         
                         for spell in spell_type["list"]:
@@ -429,3 +423,29 @@ class Fights:
             return False            
         except:
             return False
+
+    def stop_action(self, char, timeline):
+        if isinstance(self.last_action, EquipChar) \
+                or isinstance(char.last_action, ReloadChar) \
+                or isinstance(char.last_action, RestChar) \
+                or isinstance(char.last_action, ConcentrateChar) \
+                or isinstance(char.last_action, Spells):
+            char.previous_attacks.append(timeline, char.last_action)
+            print("The attack surprises you during your current action(", char.last_action.name, ")!")
+            print("Your defense is diminished!")
+
+            if isinstance(char.last_action, ReloadChar) \
+                    or isinstance(char.last_action, RestChar) \
+                    or isinstance(char.last_action, ConcentrateChar) \
+                    or isinstance(char.last_action, Spells):
+                print("Your current action is canceled!")
+                char.last_action = None
+                char.timeline = timeline
+                char.spend_time(global_variables.defense_time / 2)
+
+            if isinstance(char.last_action, ReloadChar):
+                print("You loose the ammo used for reloading!")
+                char.ammo.remove(char.last_action.ammo_to_load)
+
+        if char.loose_reloaded_ammo():
+            print("Your bow has lost its loaded arrow!")

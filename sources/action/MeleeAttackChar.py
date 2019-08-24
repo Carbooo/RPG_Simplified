@@ -15,10 +15,10 @@ class MeleeAttackChar(ActiveActions):
     random_defenser_move_probability = 0.25
     random_attacker_move_probability = 0.5
     
-    def __init__(self, fight, initiator, target):
-        super().__init__(self, fight, initiator)
+    def __init__(self, fight, initiator):
+        super().__init__(fight, initiator)
         self.name = "Melee attacking"
-        self.target = target
+        self.target = None
         self.actual_defense = "None"  # Can be "Dodge", "Defense" or "No defense"
         self.is_a_success = self.start()
 
@@ -79,7 +79,7 @@ class MeleeAttackChar(ActiveActions):
         return True
 
     def result(self):
-        self.target.stop_action(self.timeline)
+        self.fight.stop_action(self.target, self.timeline)
         
         attack_result = self.melee_defense_result()
         print("attack_result:", attack_result)
@@ -149,7 +149,7 @@ class MeleeAttackChar(ActiveActions):
         return attack_result
 
     def melee_attack_type(self, attack_value):
-       if attack_value < MeleeAttackChar.attack_effect[0]:
+        if attack_value < MeleeAttackChar.attack_effect[0]:
             # Only block for very low damages
             self.block()
             time.sleep(3)

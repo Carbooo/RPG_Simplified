@@ -1,6 +1,8 @@
 import time as time
+import math as math
 from sources.action.Actions import ActiveActions
 import sources.miscellaneous.global_variables as global_variables
+
 
 #############################################################
 ###################### CONCENTRATE CLASS ####################
@@ -8,13 +10,13 @@ import sources.miscellaneous.global_variables as global_variables
 class ConcentrateChar(ActiveActions):
     'Class to make a character concentrate'
 
-    min_turn = 3,
-    max_turn = 10,
+    min_turn = 3
+    max_turn = 10
     concentration_rate = 1.0/3.0
     deconcentration_rate = 1.5
     
     def __init__(self, fight, initiator):
-        super().__init__(self, fight, initiator)
+        super().__init__(fight, initiator)
         self.name = "Concentrating"
         self.nb_of_turns = -1
         self.concentration_ratio = 1

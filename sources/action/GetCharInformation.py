@@ -1,5 +1,6 @@
 from sources.action.Actions import Actions
 
+
 #############################################################
 ################## GET CHAR INFORMATION CLASS ###############
 #############################################################
@@ -7,9 +8,8 @@ class GetCharInformation(Actions):
     'Class to get information on a character'
     
     def __init__(self, fight):
-        super().__init__(self, fight)
+        super().__init__(fight)
         self.is_a_success = self.start()
-        
         
     def start(self):
         print("Choose one of the following character:")
@@ -46,4 +46,3 @@ class GetCharInformation(Actions):
                     return True                
             
             print("ID:", read, "is not available")
-    

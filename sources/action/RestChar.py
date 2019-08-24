@@ -7,14 +7,14 @@ from sources.action.Actions import ActiveActions
 ########################## REST CLASS #######################
 #############################################################
 class RestChar(ActiveActions):
-    'Class to make a character rest'
+    """Class to make a character rest"""
 
     min_turn = 1
-    max_turn = 10,
+    max_turn = 10
     resting_ratio = 1.0/3.0
     
     def __init__(self, fight, initiator):
-        super().__init__(self, fight, initiator)
+        super().__init__(fight, initiator)
         self.name = "Resting"
         self.nb_of_turns = -1
         self.resting_ratio = 1

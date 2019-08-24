@@ -208,8 +208,6 @@ class PrintData:
             self.print_characteristics()
         elif data_type == "Teams":
             self.print_teams()
-        elif data_type == "Fields":
-            self.print_fields()
         else:
             print("Type:", data_type, "is not recognized.",
                   "No data has been imported")
