@@ -32,12 +32,12 @@ class Characters:
     critical_hit_chance = 0.083 # Chances to hit the head or other key areas (1 / 12)
     critical_hit_boost = 6.0
     max_magic_distance = 100.0  # Around 200 meters
-    defense_time = 0.5  # Turn time before having a fully operational defense
     
     # A turn is around 6 seconds
     # [Action choices, action command, time spend, stamina spend, action description]
     Pass = ["Wait a little", "PAS", 0.1, 0.0, "Passing time"]
     Rest = ["Rest a little", "RES", 1.0, 0.0, "Resting"]
+    Concentrate = ["Concentrate on your mind and feelings", "CON", 1.0, 0.0, "Concentrating"]
     
     Defending = ["Is defending against an attack", "DEF", 0.0, 0.0, "Defending"]
     MeleeAttack = ["Melee attack an enemy character", "MAT", 0.5, 1.0, "Melee attacking"]
@@ -90,6 +90,7 @@ class Characters:
     Actions.append(Save)
     Actions.append(Load)
     Actions.append(Spell)
+    Actions.append(Concentrate)
     
     def __init__(self, name, constitution, force, agility, dexterity, reflex, \
     willpower, spirit, prefered_hand, head_armor, chest_armor, arms_armor, legs_armor, \
@@ -149,23 +150,22 @@ class Characters:
         # Set feelings
         self.empathy = 10
         self.empathy_ratio = self.empathy / 10
-        self.feelings = [
+        self.nb_of_concentrate = 0
+        self.feelings = {
             "wrath" : Feelings("wrath", 10.0, 10.0, 100.0),
             "joy" : Feelings("joy", 10.0, 10.0, 100.0),
             "love" : Feelings("love", 10.0, 10.0, 100.0),
             "hate" : Feelings("hate", 10.0, 10.0, 100.0),
             "fear" : Feelings("fear", 10.0, 10.0, 100.0),
             "sadness" : Feelings("sadness", 10.0, 10.0, 100.0)
-        ]
+        }
         
         #Calculate character characteristics
         self.calculate_characteristic()
         
-    
     def get_id(self):
         return self.ID
 
-        
     def copy(self):
         #Copy character
         char = copy.copy(self)
@@ -222,6 +222,7 @@ class Characters:
         if isinstance(self.last_action, EquipChar) \
         or isinstance(self.last_action, ReloadChar) \
         or isinstance(self.last_action, RestChar) \
+        or isinstance(self.last_action, ConcentrateChar) \
         or isinstance(self.last_action, Spells):
             self.previous_attacks.append(timeline, self.last_action)
             print("The attack surprises you during your current action(", 
@@ -230,6 +231,7 @@ class Characters:
             
             if isinstance(self.last_action, ReloadChar) \
             or isinstance(self.last_action, RestChar) \
+            or isinstance(self.last_action, ConcentrateChar) \
             or isinstance(self.last_action, Spells):
                 print("Your current action is canceled!")
                 self.last_action = None
@@ -242,7 +244,14 @@ class Characters:
                 
         if self.loose_reloaded_ammo():
             print("Your bow has lost its loaded arrow!")
-                   
+    
+    def exceeded_feelings_check(self):
+        has_exceeded = False
+        for feeling in self.feelings:
+            if feeling.die_of_exceeded_energy(self):
+                has_exceeded = True
+        return has_exceeded
+    
     def calculate_state(self):
         old_state = self.body.state
         self.body.calculate_states()
@@ -710,7 +719,7 @@ class Characters:
         self.speed_ratio = Characters.get_speed_ratio_by_coef(self.body.global_ratio())
 
     def get_fighting_availability(self, timeline):
-        char_defense_time = Characters.defense_time * self.speed_ratio
+        char_defense_time = global_variables.defense_time * self.speed_ratio
         total_time = 0
         for attack_timeline, attack in self.previous_attacks:
             time = attack_timeline + char_defense_time - timeline

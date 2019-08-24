@@ -75,7 +75,7 @@ class WrathSpells(Spells):
             
         self.target = self.initiator
         self.set_magical_coef() 
-        self.end_update([], self.spell_stamina / self.magical_coef, self.spell_time / self.magical_coef)
+        self.end_update([], self.get_stamina_with_coef(), self.get_time_with_coef())
         return True
         
     def improve_strength(self):
@@ -83,21 +83,18 @@ class WrathSpells(Spells):
         coef = self.magical_coef * self.initiator.magic_power_ratio
         
         self.diff_force = self.target.force
-        self.target.force *= self.spell_power["force"]
-        self.target.force = math.pow(self.target.force, coef)
+        self.target.force *= math.pow(self.spell_power["force"], coef)
         self.diff_force -= self.target.force
         
         self.diff_reflex = self.target.reflex
-        self.target.reflex *= self.spell_power["reflex"]
-        self.target.reflex = math.pow(self.target.reflex, 1.0 / coef)
+        self.target.reflex *= math.pow(self.spell_power["reflex"], coef)
         self.diff_reflex -= self.target.reflex
         
         self.diff_dexterity = self.target.dexterity
-        self.target.dexterity *= self.spell_power["dexterity"]
-        self.target.dexterity = math.pow(self.target.dexterity, 1.0 / coef)
+        self.target.dexterity *= math.pow(self.spell_power["dexterity"], coef)
         self.diff_dexterity -= self.target.dexterity
         
-        self.add_active_spell(self.initiator, self.spell_power["duration"] * coef)
+        self.add_active_spell(self.initiator, self.spell_power["duration"] * math.sqrt(coef))
         return True
     
     def end_improve_strength(self):
@@ -121,7 +118,7 @@ class WrathSpells(Spells):
         time.sleep(3)
         
         self.set_magical_coef()
-        self.end_update([], self.spell_stamina / self.magical_coef, self.spell_time / self.magical_coef)
+        self.end_update([], self.get_stamina_with_coef(), self.get_time_with_coef())
         return True   
     
     def throw_fireball(self):

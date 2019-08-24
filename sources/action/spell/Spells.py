@@ -1,3 +1,4 @@
+import math as math
 from sources.action.Actions import ActiveActions
 import sources.miscellaneous.global_variables as global_variables
 
@@ -20,8 +21,14 @@ class Spells(ActiveActions):
 
     def set_magical_coef(self):
         self.magical_coef = random.gauss(1, global_variables.high_variance) \
-                          * self.initiator.feelings[self.type].use_energy(self.spell_energy)
-                          
+                          * self.initiator.feelings[self.type].use_energy(self.spell_energy)   
+    
+    def get_stamina_with_coef(self):
+        return self.spell_stamina / math.pow(self.magical_coef, 1.0 / 4.0)
+                        
+    def get_time_with_coef(self):
+        return self.spell_time / math.pow(self.magical_coef, 1.0 / 4.0)
+                        
     def is_able_to_cast(self, free_hands_required = 0):
         if not self.initiator.feelings[self.type].check_energy(self.spell_energy):
             print("You don't have enough energy (", self.spell_energy, ") to cast this spell")

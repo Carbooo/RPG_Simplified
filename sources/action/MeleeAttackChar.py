@@ -12,6 +12,8 @@ class MeleeAttackChar(ActiveActions):
     """Class to melee attack a character"""
 
     attack_effect = [0, 25, 50, 75]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]
+    random_defenser_move_probability = 0.25
+    random_attacker_move_probability = 0.5
     
     def __init__(self, fight, initiator, target):
         super().__init__(self, fight, initiator)
@@ -83,13 +85,22 @@ class MeleeAttackChar(ActiveActions):
         print("attack_result:", attack_result)
         self.melee_attack_type(attack_result)
 
-        if self.actual_defense == "Dodge":
-            self.target.spend_dodge_stamina(3.0 / 4.0)
-            self.target.spend_defense_stamina( 1.0 / 4.0)
-        elif self.actual_defense == "Defense":
-            self.target.spend_dodge_stamina(1.0 / 4.0)
-            self.target.spend_defense_stamina(3.0 / 4.0)
-
+        abscissa = self.target.abscissa
+        ordinate = self.target.ordinate
+        if self.actual_defense == "Dodge" and \
+           self.fight.field.random_move(self.target, MeleeAttackChar.random_defenser_move_probability * 2):
+                print("The fight made the defenser move from their position!")
+                if random.random() < MeleeAttackChar.random_attacker_move_probability:
+                    self.fight.field.move_character(self.initiator, abscissa, ordinate)
+                    print("And the attacker took the initial position of the defender!")
+                
+        elif self.actual_defense == "Defense" and \
+             self.fight.field.random_move(self.target, MeleeAttackChar.random_defenser_move_probability):
+                print("The fight made the defenser move from their position!")
+                if random.random() < MeleeAttackChar.random_attacker_move_probability:
+                    self.fight.field.move_character(self.initiator, abscissa, ordinate)
+                    print("And the attacker took the initial position of the defender!")
+                
         self.end_update([self.initiator, self.target], Characters.MeleeAttack[3], Characters.MeleeAttack[2])
         
         # State result

@@ -9,13 +9,16 @@ class Actions:
     def __init__(self, fight):
         self.fight = fight
         self.is_a_success = False
-        
 
 #############################################################
 ##################### ACTIVE ACTIONS CLASS ##################
 #############################################################
 class ActiveActions(Actions):
-    """Super class for all real actions"""
+    """
+    Super class for all real actions.
+    
+    For all new action, stop_action and get_ranged_action_ratio must be updated
+    """
 
     def __init__(self, fight, initiator):
         super().__init__(self, fight)

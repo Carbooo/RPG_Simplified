@@ -2,9 +2,9 @@ import copy as copy
 import math as math
 import random as random
 import time as time
+import sources.miscellaneous.global_variables as global_variables
 from sources.character.Characters import Characters, NoneCharacter
 from sources.action.Actions import ActiveActions
-
 
 #############################################################
 ################### RANGED ATTACK CHAR CLASS ################
@@ -13,6 +13,8 @@ class RangedAttackChar(ActiveActions):
     'Class to ranged attack a character'
     
     attack_effect = [25, 50]  # [Blocked", "Hit", "Hit & stopped"]
+    move_char_handicap = 0.66
+    melee_fight_handicap = 0.75
 
     def __init__(self, fight, initiator):
         super().__init__(self, fight, initiator)
@@ -170,8 +172,26 @@ class RangedAttackChar(ActiveActions):
         
         h_obs = self.fight.field.calculate_ranged_obstacle_ratio(self.initiator, self.target)
         
-        return self.initiator.ranged_accuracy_ratio * h_dist * h_obs
+        h_action = self.get_ranged_action_ratio()
         
+        return self.initiator.ranged_accuracy_ratio * h_dist * h_obs * h_action
+    
+    def get_ranged_action_ratio(self):
+        nb_of_attacks = 0
+        for attack_timeline, attack in self.target.previous_attacks:
+            if self.timeline < attack_timeline + global_variables.defense_time / self.target.speed_ratio
+                nb_of_attacks += 1
+        
+        if nb_of_attacks > 0:
+            coef = math.pow(RangedAttackChar.melee_fight_handicap, nb_of_attacks)
+        else:
+            coef = 1
+            
+        if isinstance(self.target.last_action, MoveChar):
+            coef *= RangedAttackChar.move_char_handicap
+            
+        return coef
+            
     def can_ranged_attack(self):
         if self.initiator.has_ammo() is False:
             print("No ammo for a ranged attack")

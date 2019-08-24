@@ -402,6 +402,20 @@ class Fields:
                     return True
         return False
 
+    def random_move(self, character, probability):
+        possible_moves = []
+        for i in range(character.abscissa - 1, character.abscissa + 2):
+            for j in range(character.ordinate - 1, character.ordinate + 2):
+                if self.is_case_free(i, j):
+                    possible_moves.add[(i, j)]
+        
+        if possible_moves and random.random() < probability:
+            new_abs, new_ord = random.choice(possible_moves)
+            self.move_character(character, new_abs, new_ord)
+            return True
+
+        return False
+
     def heuristic_value(self, source_abs, source_ord, target_abs, target_ord):
         return math.sqrt( \
             math.pow(source_abs - target_abs, 2) + \

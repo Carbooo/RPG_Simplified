@@ -89,16 +89,17 @@ class Fights:
                 
             elif isinstance(next_event, Characters):
                 if (isinstance(next_event.last_action, MoveChar) and next_event.last_action.path) \
-                or (isinstance(next_event.last_action, RestChar) and next_event.last_action.nb_of_turn > 0) \
+                or (isinstance(next_event.last_action, RestChar) and next_event.last_action.nb_of_turns > 0) \
+                or (isinstance(next_event.last_action, ConcentrateChar) and next_event.last_action.nb_of_turn > 0) \
                 or isinstance(next_event.last_action, ReloadChar) \
                 or isinstance(next_event.last_action, Spells):
                     # Destination not reached, keep moving
                     # or
-                    # Number of resting turn not reached, keep resting
+                    # Number of resting / concentrating turns not reached, continue it
                     # or
-                    # Reload actually their range weapon
+                    # Actually reload their range weapon
                     # or
-                    # Cast actually the charged spell
+                    # Actually cast the charged spell
                     if not next_event.last_action.execute():
                         next_event.last_action = None  # Stop action if error encounter
                     
@@ -138,9 +139,12 @@ class Fights:
         print("******************** A GAME TURN HAS PASSED *************************")
         print("*********************************************************************")
         self.timeline += 1 
-        time.sleep(3)    
-    
-    
+        time.sleep(3)
+        
+        for char in self.char_order:
+            if char.die_of_exceeded_energy():
+                self.field.calculate_state(char)
+        
     def print_new_turn(self):
         print("")
         print("*********************************************************************")
@@ -213,9 +217,15 @@ class Fights:
         for char in self.char_order:
             char.body.turn_rest(time_diff)
             self.field.calculate_state(char)
+            
             for type in char.feelings:
                 char.feelings[type].natural_energy_update(time_diff)
-    
+            
+            previous_attacks = copy.copy(char.previous_attacks)
+            for attack_timeline, attack in previous_attacks:
+                if self.current_timeline >= attack_timeline + Characters.defense_time / char.speed_ratio:
+                    char.previous_attacks.remove((attack_timeline, attack))
+                    
     def end_turn(self):
         #Timelines and scheduling
         self.recalculate_all_timelines()
@@ -283,9 +293,11 @@ class Fights:
             elif read == Characters.Spell[1]:
                 self.choose_spell(character)
                 
+            elif read == Characters.Concentrate[1]:
+                self.concentrate_action(character)
+                
             else:
                 print("Action:", read, "is not recognized")
-
 
     def pass_action(self, character):
         action = PassChar(self, character)
@@ -314,7 +326,6 @@ class Fights:
             return False
         character.last_action = action
         return True
-
         
     def reload_action(self, character):
         action = ReloadChar(self, character)
@@ -322,7 +333,6 @@ class Fights:
             return False
         character.last_action = action
         return True
-    
     
     def move_action(self, character):
         action = MoveChar(self, character)
@@ -345,7 +355,6 @@ class Fights:
         if not action.is_a_success:
             return False
         return True
-        
 
     def save_action(self, character):
         print("You have decided to save the current game state")
@@ -359,6 +368,13 @@ class Fights:
         action = Load(self)
         if not action.is_a_success:
             return False
+        return True
+    
+    def concentrate_action(self, character):
+        action = ConcentrateChar(self, character)
+        if not action.is_a_success:
+            return False
+        character.last_action = action
         return True
     
     def choose_spell(self, character):
