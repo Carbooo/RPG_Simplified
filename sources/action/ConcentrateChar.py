@@ -27,7 +27,7 @@ class ConcentrateChar(ActiveActions):
     def start(self):
         print("On which feeling do you want to concentrate?")
         for feeling in global_variables.feelings_list:
-            print(feeling)
+            print("- ", feeling)
         txt = "--> Feeling (0 = Cancel): "
         while 1:
             self.feeling = input(txt)
@@ -38,6 +38,7 @@ class ConcentrateChar(ActiveActions):
             else:
                 print("The feeling is not recognized")
 
+        print("")
         print("Do you want to increase (INC) or decrease (DEC) the feeling?")
         txt = "--> INC / DEC (0 = Cancel): "
         while 1:
@@ -52,7 +53,8 @@ class ConcentrateChar(ActiveActions):
                 break
             else:
                 print("Command invalid. You must choose between increase (INC) and decrease (DEC).")
-            
+
+        print("")
         print("How much time do you want to concentrate? (Concentrating longer make it more efficient)")
         print("Beware that each new concentration is less efficient than the previous ones!")
         txt = "--> Number of turns (0 = Cancel): "
@@ -62,15 +64,16 @@ class ConcentrateChar(ActiveActions):
                 if self.fight.cancel_action(self.nb_of_turns):
                     return False
                 elif self.nb_of_turns < ConcentrateChar.min_turn:
-                    print("You cannot rest less than ", ConcentrateChar.min_turn, " turns")
+                    print("You cannot rest less than", ConcentrateChar.min_turn, "turns")
                 elif self.nb_of_turns > ConcentrateChar.max_turn:
-                    print("You cannot rest more than ", ConcentrateChar.max_turn, " turns")
+                    print("You cannot rest more than", ConcentrateChar.max_turn, "turns")
                 else:
                     break
             except:
                 print("The input is not an integer")
 
-        print("You have decided to ", self.action, " your ", self.feeling, " for ", self.nb_of_turns, " turn(s)")
+        print("")
+        print("You have decided to", self.action, "your", self.feeling, "for", self.nb_of_turns, "turns")
         time.sleep(3)
         
         self.concentration_ratio = math.pow(self.nb_of_turns, ConcentrateChar.concentration_rate)

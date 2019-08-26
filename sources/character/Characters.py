@@ -49,7 +49,7 @@ class Characters:
     # Time of reflexion and other handicaps increase time per cases
     Move = ["Move to an adjacent case", "MOV", 0.15, 0.1, "Moving"]
 
-    Equip = ["Equip / Unequip weapons", "EQS", 0.5, 0.1, "Equiping"]
+    Equip = ["Equip / Unequip weapons", "EQP", 0.5, 0.1, "Equiping"]
     
     Information = ["Information on a character state", "INF", 0.0, 0.0, "Information"]
     Save = ["Save the current game state", "SAV", 0.0, 0.0, "Saving"]
@@ -220,8 +220,8 @@ class Characters:
 ################### RESET & STATE FUNCTIONS ######################
     def exceeded_feelings_check(self):
         has_exceeded = False
-        for feeling in self.feelings:
-            if feeling.die_of_exceeded_energy(self):
+        for key in self.feelings:
+            if self.feelings[key].die_of_exceeded_energy(self):
                 has_exceeded = True
         return has_exceeded
     
@@ -829,8 +829,26 @@ class Characters:
                 if self.ranged_weapon_has_ammo(weapon):
                     return True
         return False
-                
-    
+
+    def calculate_point_to_enemy_path_cos_angle(self, enemy, abscissa, ordinate):
+        u_abs = enemy.abscissa - self.abscissa
+        u_ord = enemy.ordinate - self.ordinate
+        v_abs = abscissa - self.abscissa
+        v_ord = ordinate - self.ordinate
+
+        return (u_abs * v_abs + u_ord * v_ord) / (
+                    math.sqrt(math.pow(u_abs, 2) + math.pow(u_ord, 2)) *
+                    math.sqrt(math.pow(v_abs, 2) + math.pow(v_ord, 2)))
+
+    def calculate_point_to_enemy_path_angle(self, enemy, abscissa, ordinate):
+        angle = math.acos(
+            self.calculate_point_to_enemy_path_cos_angle(enemy, abscissa, ordinate))
+
+        if ordinate < self.ordinate:
+            angle = 2 * math.pi - angle
+
+        return angle
+
     def ranged_weapon_has_ammo(self, ranged_weapon):  
         for ammo in self.ammo:
             if ranged_weapon.__class__ == ammo.ranged_weapon_type:

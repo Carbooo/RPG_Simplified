@@ -12,7 +12,7 @@ class Spells(ActiveActions):
     """Super class for all spells"""
 
     def __init__(self, fight, initiator, type, spell_code):
-        super().__init__(self, fight, initiator)
+        super().__init__(fight, initiator)
         self.target = None
         self.type = type
         self.spell_code = spell_code
@@ -54,10 +54,11 @@ class Spells(ActiveActions):
         return True
 
     def get_all_spread_targets(self, spread_distance):
-        max_distance = spread_distance + 1.0
+        max_distance = spread_distance + 1
+        round_distance = int(math.ceil(spread_distance))
         char_list = []
-        for x in range(-1, max_distance):
-            for y in range(-1, max_distance):
+        for x in range(- round_distance, round_distance + 1):
+            for y in range(- round_distance, round_distance + 1):
                 abscissa = self.target.abscissa + x
                 ordinate = self.target.ordinate + y
                 char = self.fight.field.get_character_from_pos(abscissa, ordinate)
@@ -65,7 +66,6 @@ class Spells(ActiveActions):
                     distance_ratio = (max_distance - char.calculate_point_distance(abscissa, ordinate)) / max_distance
                     if distance_ratio > 0:
                         char_list.append((char, distance_ratio))
-
         return char_list
 
     def magical_attack_received(self, attack_value, accuracy_ratio, is_localized, can_use_shield, resis_dim_rate,

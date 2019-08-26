@@ -128,16 +128,16 @@ class Armors(Equipments):
             #The armor did not cover the attack
             return [1, damage] #1 = Not broken ratio
         
-        damage_result = damage - self.defense * armor_coef / pen_rate
+        damage_result = damage * pen_rate + max(0, damage * (1 -pen_rate) - self.defense * armor_coef)
         if damage_result <= 0:
-            print("Damages absorbed by armor:", int(round(damage)))
+            print("Damages absorbed by armor:", int(round(damage * (1 -pen_rate))))
             time.sleep(2)
             ratio = self.decrease(damage * armor_coef * resis_dim_rate)
             print("The armor has absorbed the remaining damages and no life has been lost")
             time.sleep(3)
             return [ratio, 0]
         else:
-            print("Damages absorbed by armor:", int(round(self.defense * armor_coef / pen_rate)))
+            print("Damages absorbed by armor:", int(round(min(damage * (1 - pen_rate), self.defense * armor_coef))))
             time.sleep(2)
             ratio = self.decrease(self.defense * armor_coef * resis_dim_rate)
             return [ratio, damage_result]

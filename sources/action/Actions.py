@@ -1,4 +1,6 @@
 import sources.miscellaneous.global_variables as global_variables
+import random as random
+
 
 #############################################################
 ######################## ACTIONS CLASS ######################

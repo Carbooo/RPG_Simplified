@@ -38,11 +38,12 @@ class WrathSpells(Spells):
     }
  
     def __init__(self, fight, initiator, spell_code):
-        super().__init__(self, fight, initiator, "wrath", spell_code)
+        super().__init__(fight, initiator, "wrath", spell_code)
         self.spell_stamina = WrathSpells.spells_stamina[self.spell_code]
         self.spell_time = WrathSpells.spells_time[self.spell_code]
         self.spell_energy = WrathSpells.spells_energy[self.spell_code]
         self.spell_power = WrathSpells.spells_power[self.spell_code]
+        self.is_a_success = self.start()
         
     def start(self):
         if self.spell_code == "STR":
@@ -96,6 +97,7 @@ class WrathSpells(Spells):
         self.diff_dexterity -= self.target.dexterity
         
         self.add_active_spell(self.initiator, self.spell_power["duration"] * math.sqrt(coef))
+        self.initiator.last_action = None  # To remove it from the scheduler
         return True
     
     def end_improve_strength(self):
@@ -130,10 +132,11 @@ class WrathSpells(Spells):
             if not self.target:
                 return False
     
-        attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) \
-                     * self.magical_coef
+        attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
                      
-        for char, distance_ratio in self.get_all_spread_targets(self.spell_power["spread_distance"]):
+        for char, distance_ratio in self.get_all_spread_targets(
+                self.spell_power["spread_distance"] * self.magical_coef
+        ):
             self.magical_attack_received(
                 attack_value * distance_ratio,
                 self.fight.field.get_magical_accuracy(self.initiator, char),
@@ -142,7 +145,7 @@ class WrathSpells(Spells):
                 self.spell_power["resis_dim_rate"], 
                 self.spell_power["pen_rate"]
             )
-        
-        self.initiator.last_action = None
+
+        self.initiator.last_action = None  # To remove it from the scheduler
         return True
 

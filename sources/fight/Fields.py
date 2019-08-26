@@ -110,6 +110,8 @@ class Fields:
         return True
     
     def get_character_from_pos(self, abscissa, ordinate):
+        if not self.is_a_case(abscissa, ordinate):
+            return False
         if self.characters_array[abscissa, ordinate] is None:
             return False
         else:
@@ -138,7 +140,7 @@ class Fields:
     def get_magical_accuracy(self, attacker, target):
         coef = attacker.get_magic_distance_ratio(target) \
              * self.calculate_ranged_obstacle_ratio(attacker, target) \
-             * self.attacker.magic_power_ratio
+             * attacker.magic_power_ratio
         return 0.5 + coef  # Between 0.5 and 1.5 as other attacks
 
     def calculate_ranged_obstacle_ratio(self, attacker, target):
@@ -150,7 +152,7 @@ class Fields:
             for j in range(abs(attacker.ordinate - target.ordinate) + 1):
                 if (min_abs + i != attacker.abscissa or min_ord + j != attacker.ordinate) and \
                         (min_abs + i != target.abscissa or min_ord + j != target.ordinate) and \
-                        attacker.calculate_point_to_target_path_distance(target, min_abs + i, min_ord + j) <= 0.5:
+                        attacker.calculate_point_to_enemy_path_distance(target, min_abs + i, min_ord + j) <= 0.5:
 
                     if self.obstacles_array[min_abs + i, min_ord + j] == Fields.ranged_obstacle or \
                             self.obstacles_array[min_abs + i, min_ord + j] == Fields.full_obstacle or \
@@ -201,7 +203,7 @@ class Fields:
                 if (c_abs == target.abscissa and c_ord == target.ordinate) or \
                         (c_abs == attacker.abscissa and c_ord == attacker.ordinate) or \
                         attacker.calculate_point_distance(c_abs, c_ord) > length or \
-                        attacker.calculate_point_to_target_path_distance(pos_p, c_abs, c_ord) >= 0.5:
+                        attacker.calculate_point_to_enemy_path_distance(pos_p, c_abs, c_ord) >= 0.5:
                     continue
 
                 # Shoot out of field or blocked by an obstacle

@@ -144,7 +144,7 @@ class Fights:
         time.sleep(3)
         
         for char in self.char_order:
-            if char.die_of_exceeded_energy():
+            if char.exceeded_feelings_check():
                 self.field.calculate_state(char)
         
     def print_new_turn(self):
@@ -229,6 +229,8 @@ class Fights:
                     char.previous_attacks.remove((attack_timeline, attack))
                     
     def end_turn(self):
+        self.order_scheduler()
+
         #Automatic saves
         Save(self, "AutoSave1")
         if self.nb_of_turn % 3 == 0:
@@ -285,11 +287,11 @@ class Fights:
                 self.load_action(character)
             
             elif read == Characters.Spell[1]:
-                self.choose_spell(character)
-                
+                if self.choose_spell(character):
+                    break
             elif read == Characters.Concentrate[1]:
-                self.concentrate_action(character)
-                
+                if self.concentrate_action(character):
+                    break
             else:
                 print("Action:", read, "is not recognized")
 
@@ -330,10 +332,10 @@ class Fights:
     
     def move_action(self, character):
         action = MoveChar(self, character)
-        if action.is_a_success:
-            return True
+        if not action.is_a_success:
+            return False
         character.last_action = action
-        return False
+        return True
                         
     def equip_action(self, character):     
         print("You have decided to modify your equipment")
@@ -375,7 +377,7 @@ class Fights:
         print("You have decided to cast a spell")
         print("Which type of spell?")
         for spell_type in Characters.spells:
-            print(spell_type["description"] + " (" + spell_type["code"] + ")")
+            print("-", spell_type["description"], "(" + spell_type["code"] + ")")
         
         while 1:
             read = input('--> Spell type (0 for cancel) : ')
@@ -388,7 +390,7 @@ class Fights:
                     print("Which spell do you want to cast?")
                     
                     for spell in spell_type["list"]:
-                        print(spell["description"] + " (" + spell["code"] + ")")
+                        print("- ", spell["description"] + " (" + spell["code"] + ")")
         
                     while 1:
                         read = input('--> Spell (0 for cancel) : ')
@@ -397,12 +399,10 @@ class Fights:
                         
                         for spell in spell_type["list"]:
                             if read == spell["code"]:
-                                print("You have decided to " + spell["description"])
-                                action = self.initiate_spell_object(character,
-                                                            spell_type["code"],
-                                                            spell["code"]) 
+                                action = self.initiate_spell_object(character, spell_type["code"], spell["code"])
                                 if not action.is_a_success:
                                     return False
+                                character.last_action = action
                                 return True
                             
                         print("Spell:", read, "is not recognized")
@@ -425,12 +425,12 @@ class Fights:
             return False
 
     def stop_action(self, char, timeline):
-        if isinstance(self.last_action, EquipChar) \
+        if isinstance(char.last_action, EquipChar) \
                 or isinstance(char.last_action, ReloadChar) \
                 or isinstance(char.last_action, RestChar) \
                 or isinstance(char.last_action, ConcentrateChar) \
                 or isinstance(char.last_action, Spells):
-            char.previous_attacks.append(timeline, char.last_action)
+            char.previous_attacks.append((timeline, char.last_action))
             print("The attack surprises you during your current action(", char.last_action.name, ")!")
             print("Your defense is diminished!")
 

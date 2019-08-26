@@ -63,8 +63,7 @@ class MoveChar(ActiveActions):
                 print("Position:", abscissa, "x", ordinate, "cannot be reached")
                 continue
 
-            self.move_character()
-            return False
+            return self.move_character()
 
     def move_character(self):
         coord = self.path.pop(0)
@@ -77,9 +76,12 @@ class MoveChar(ActiveActions):
 
         self.end_update([], self.get_move_coef() * Characters.Move[3], self.get_move_coef() * Characters.Move[2])
 
-        print("You are moving to", self.target_abs, "x", self.target_ord)
-        time.sleep(2)
-        print("You are following the path:", self.initiator.current_path)
+        print("")
+        print("*********************************************************************")
+        print(self.initiator.print_basic(), "is moving to", self.target_abs, "x", self.target_ord)
+        print("Next steps are:", self.path)
+        print("*********************************************************************")
+        print("")
         time.sleep(3)
         return True
 

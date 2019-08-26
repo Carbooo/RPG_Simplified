@@ -42,7 +42,7 @@ class MeleeAttackChar(ActiveActions):
         else:
             team = self.fight.team1
 
-        print("--------- self.initiator -----------")
+        print("--------- ATTACKER -----------")
         self.initiator.print_attack_state()
         print("")
 
