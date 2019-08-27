@@ -86,9 +86,9 @@ class Fights:
             if isinstance(next_event, Fights):
                 self.pass_a_turn()
             
-            #Execute pending spell
+            #Terminate active spell
             elif isinstance(next_event, Spells):
-                next_event.end()
+                next_event.end_active_spell()
                 
             elif isinstance(next_event, Characters):
                 if (isinstance(next_event.last_action, MoveChar) and next_event.last_action.path) \

@@ -90,16 +90,20 @@ class MeleeAttackChar(ActiveActions):
         if self.actual_defense == "Dodge" and \
            self.fight.field.random_move(self.target, MeleeAttackChar.random_defenser_move_probability * 2):
                 print("The fight made the defenser move from their position!")
+                time.sleep(2)
                 if random.random() < MeleeAttackChar.random_attacker_move_probability:
                     self.fight.field.move_character(self.initiator, abscissa, ordinate)
                     print("And the attacker took the initial position of the defender!")
+                    time.sleep(2)
                 
         elif self.actual_defense == "Defense" and \
              self.fight.field.random_move(self.target, MeleeAttackChar.random_defenser_move_probability):
                 print("The fight made the defenser move from their position!")
+                time.sleep(2)
                 if random.random() < MeleeAttackChar.random_attacker_move_probability:
                     self.fight.field.move_character(self.initiator, abscissa, ordinate)
                     print("And the attacker took the initial position of the defender!")
+                    time.sleep(2)
                 
         self.end_update([self.initiator, self.target], Characters.MeleeAttack[3], Characters.MeleeAttack[2])
         

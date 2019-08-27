@@ -62,9 +62,6 @@ class EquipChar(ActiveActions):
         return self.result()
 
     def unequip_spec_weapons(self):
-        print("You have decided to unequip weapons")
-        time.sleep(2)
-        
         equipped_list = copy.copy(self.initiator.weapons_use)
         equipment_to_remove = []
         while 1:
@@ -92,14 +89,15 @@ class EquipChar(ActiveActions):
                 return False
 
             available_equipment = False
-            for i in equipped_list:
-                if read == equipped_list[i].get_id():
-                    if isinstance(equipped_list[i], Bows) and equipped_list[i].is_reloaded():
+            for equip in equipped_list:
+                if read == equip.get_id():
+                    if isinstance(equip, Bows) and equip.is_reloaded():
                         print("You cannot unequip a loaded bow!")
                         continue
                     
                     available_equipment = True
-                    equipment_to_remove.append(equipped_list.pop(i))
+                    equipment_to_remove.append(equip)
+                    equipped_list.remove(equip)
                     break
                 
             if available_equipment is False:
@@ -121,9 +119,6 @@ class EquipChar(ActiveActions):
         return self.result()
 
     def equip_spec_weapons(self):
-        print("You have decided to equip weapons")
-        time.sleep(2)
-        
         equipped_list = copy.copy(self.initiator.weapons_use)
         not_equipped_list = []
         new_equipment = []

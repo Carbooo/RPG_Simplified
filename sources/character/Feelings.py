@@ -79,4 +79,7 @@ class Feelings:
                 print("Your ", self.type, " energy has overwhelmed you and your life is over!")
                 char.body.loose_life(100, 1)
                 return True
-    
+
+    def print_obj(self):
+        print("Type:", self.type, ", Sensibility:", self.sensibility, ", Mastering:",
+              self.mastering, ", Energy:", self.energy)

@@ -398,7 +398,7 @@ class Fields:
         for i in range(character.abscissa - 1, character.abscissa + 2):
             for j in range(character.ordinate - 1, character.ordinate + 2):
                 if self.is_case_free(i, j):
-                    possible_moves.add((i, j))
+                    possible_moves.append((i, j))
         
         if possible_moves and random.random() < probability:
             new_abs, new_ord = random.choice(possible_moves)

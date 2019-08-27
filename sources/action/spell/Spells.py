@@ -134,6 +134,7 @@ class Spells(ActiveActions):
     def end_active_spell(self, char):
         self.fight.scheduler.remove(self)
         char.active_spells.remove(self)
+        self.end()
 
     def identical_active_spell(self, char):
         for spell in char.active_spells:

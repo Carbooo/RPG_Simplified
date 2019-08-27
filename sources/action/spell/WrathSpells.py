@@ -85,6 +85,7 @@ class WrathSpells(Spells):
         coef = self.magical_coef * self.initiator.magic_power_ratio
         
         self.diff_force = self.target.force
+        print(math.pow(self.spell_power["force"], coef))
         self.target.force *= math.pow(self.spell_power["force"], coef)
         self.diff_force -= self.target.force
         
@@ -105,7 +106,6 @@ class WrathSpells(Spells):
         self.target.reflex += self.diff_reflex
         self.target.dexterity += self.diff_dexterity
         self.target.calculate_characteristic()
-        self.end_active_spell(self.initiator)
         return True
         
     def start_fireball(self):

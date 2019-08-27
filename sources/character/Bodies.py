@@ -31,11 +31,9 @@ class Bodies:
         [0.005, 0.19, 0.05, 0.005, 0.4, 0.35],
         [0.005, 0.19, 0.005, 0.05, 0.35, 0.4]]
 
-    def __init__(self, life, stamina, mana, prefered_hand, force_ratio):
+    def __init__(self, life, stamina, prefered_hand, force_ratio):
         self.original_stamina = float(stamina)
         self.stamina = float(stamina)
-        self.original_mana = float(mana)
-        self.mana = float(mana)
         self.force_ratio = force_ratio
         self.load_ratio = 0
         self.state = "OK"
@@ -517,30 +515,6 @@ class Bodies:
         for member in self.body_members:
             member.stamina_rest(coefficient)
 
-    ############################# MANA FUNCTIONS ##########################
-    def mana_ratio(self):
-        return float(self.mana) / self.original_mana
-
-    def get_current_mana(self):
-        return self.mana
-
-    def mana_ratio_adjustment(self, coefficient):
-        if self.get_current_life() <= 0:
-            # Keep a track of the real value of the dead
-            return 1
-        elif coefficient >= 1:
-            return 1
-        else:
-            return 1 - math.pow(1 - coefficient, 1.7)
-
-    def mana_ratio_adjusted(self):
-        return self.mana_ratio_adjustment(self.mana_ratio())
-
-    def mana_rest(self, coefficient):
-        # Full in 1 hour of rest
-        self.mana = max(0, min(self.original_mana, \
-                               self.mana + self.original_mana * coefficient / 600))
-
     ############################# GLOBAL FUNCTIONS ##########################
     def left_arm_global_ratio(self):
         return self.left_arm_life_ratio() * self.left_arm_stamina_ratio()
@@ -581,30 +555,26 @@ class Bodies:
     def global_rest(self, coefficient):
         self.life_rest(coefficient)
         self.stamina_rest(coefficient)
-        self.mana_rest(coefficient)
 
     def turn_rest(self, time_spent):
         # The more life you have, the better the resting is
         # If char is injured, loose energy instead of gaining
         # The more stamina you have, the better it is for other energies
         # Loose energy faster than you gain it
-        # You recover mana and stamina faster when their rate is lower
+        # You recover stamina faster when their rate is lower
         life_r = self.life_ratio() - 0.5
         stamina_r = self.stamina_ratio()
 
         if life_r > 0:
             final_life_rest = life_r * stamina_r * 2
             final_stamina_rest = life_r * (1 - stamina_r) * 2
-            final_mana_rest = life_r * stamina_r * (1 - self.mana_ratio()) * 2
 
         else:
             final_life_rest = math.pow(life_r, 3) * 2000 * (1.5 - stamina_r)
             final_stamina_rest = math.pow(life_r, 3) * 5
-            final_mana_rest = math.pow(life_r, 3) * 5 * (1.5 - stamina_r)
 
         self.life_rest(final_life_rest * time_spent)
         self.stamina_rest(final_stamina_rest * time_spent)
-        self.mana_rest(final_mana_rest * time_spent)
 
     def get_life_state(self, life_r):
         if life_r > 0.85:
@@ -724,39 +694,34 @@ class Bodies:
 
     ########################## PRINTING FUNCTIONS #########################
     def print_life(self):
-        print(",Life:", int(round(self.get_current_life())), end=' ')
+        print(", Life:", int(round(self.get_current_life())), end=' ')
 
     def print_detailed_life(self):
-        print(",Life:", int(round(self.get_current_life())))
+        print(", Life:", int(round(self.get_current_life())))
         for i in range(len(self.body_members)):
             print("\\", BodyMembers.types[i], "life ratio", "\t:", \
                   round(self.body_members[i].life_ratio(), 2))
 
     def print_stamina(self):
-        print(",Stamina:", int(round(self.get_current_stamina())), end=' ')
+        print(", Stamina:", int(round(self.get_current_stamina())), end=' ')
 
     def print_detailed_stamina(self):
-        print(",Stamina:", int(round(self.get_current_stamina())))
+        print(", Stamina:", int(round(self.get_current_stamina())))
         for i in range(len(self.body_members)):
             print("\\", BodyMembers.types[i], "stamina ratio", "\t:", \
                   round(self.body_members[i].stamina_ratio(), 2))
 
-    def print_mana(self):
-        print(",Mana:", int(round(self.get_current_mana())), end=' ')
-
     def print_states(self):
-        print(",State:", self.state, ",Shape:", self.shape, end=' ')
+        print(", State:", self.state, ", Shape:", self.shape, end=' ')
 
     def print_basic(self):
         self.print_life()
         self.print_stamina()
-        self.print_mana()
         self.print_states()
 
     def print_detailed_basic(self):
         self.print_detailed_life()
         self.print_detailed_stamina()
-        self.print_mana()
         self.print_states()
 
     def print_armors(self):

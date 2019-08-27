@@ -124,13 +124,12 @@ class Characters:
         self.spirit_ratio = float(spirit) / 10
         self.set_initial_position(abscissa, ordinate)
         life = max(1, float(self.constitution * 10))
-        mana = max(1, float(self.spirit * 10))
         stamina = max(1, \
             (self.constitution + float(self.willpower)/3 \
             + float(self.agility)/2 + float(self.force)/2) \
             * 10 / (1 + 1.0/3 + 2.0/2))
         self.moral = max(1, float(self.willpower))
-        self.body = Bodies(life, stamina, mana, prefered_hand, self.force_ratio)
+        self.body = Bodies(life, stamina, prefered_hand, self.force_ratio)
         
         #Set characters parameters
         self.timeline = 0.0
@@ -640,8 +639,8 @@ class Characters:
             self.ranged_power *= 10 #Default power
         else:
             self.ranged_power *= max(1.0, ranged_coef * self.body.ranged_attack_global_ratio())
-        self.magic_power_ratio = self.body.global_ratio() * (self.spirit + self.willpower/2) / (1 + 1.0/2)
-        self.magic_power = self.magic_power_ratio * 10
+        self.magic_power_ratio = self.body.global_ratio() * (self.spirit + self.willpower/2) / (1 + 1.0/2) / 10.0
+        self.magic_power = self.magic_power_ratio * 100
     
     def calculate_defense(self):
         #Calculate equipments defense
@@ -728,10 +727,7 @@ class Characters:
         if enemy.is_alive() and self.is_active() and \
         enemy.abscissa in range(self.abscissa - 1, self.abscissa + 2) and \
         enemy.ordinate in range(self.ordinate - 1, self.ordinate + 2):
-            if not enemy.is_moving() or ( \
-            enemy.action_in_progress.old_abs in range(self.abscissa - 1, self.abscissa + 2) and \
-            enemy.action_in_progress.old_ord in range(self.ordinate - 1, self.ordinate + 2)):
-                return True
+            return True
         return False
     
     
@@ -910,55 +906,61 @@ class Characters:
     def print_basic(self):
         print("ID:", self.get_id(), ", Name:", self.name, end=' ')
         
-        
-    def print_position(self):
-        print(", Abscissa:", self.abscissa, \
-            ", Ordinate:", self.ordinate, end=' ')
-        
-        
     def print_equipments(self):
+        print("")
+        print("EQUIPMENTS:")
         self.body.print_full_armors()
         self.print_weapons_use()
         self.print_weapons_stored()
         self.print_ammo()
-        
-        
-    def print_characteristics(self):
-        self.print_basic()
-        print(", Constitution:", int(round(self.constitution)), \
-            ", Force:", int(round(self.force)), \
-            ", Agility:", int(round(self.agility)), \
-            ", Dexterity:", int(round(self.dexterity)), \
-            ", Reflex:", int(round(self.reflex)), \
-            ", Willpower:", int(round(self.willpower)), \
-            ", Spirit:", int(round(self.spirit)), \
-            ", Moral:", int(round(self.moral)), end=' ')
-        self.print_position()
-        self.print_equipments()
-    
-    
-    def print_defense(self):
-        print(",ArmorResistance:", int(round(self.armor_resistance)), \
-            ",ArmorDefense:", int(round(self.armor_defense)), \
-            ",Dodging:", int(round(self.dodging)), \
-            ",MeleeDefense:", int(round(self.melee_defense)), \
-            ",RangedDefense:", int(round(self.ranged_defense)), \
-            ",MagicDefense:", int(round(self.magic_defense)), end=' ')
 
+    def print_characteristics(self):
+        print("")
+        print("CHARACTERISTICS:")
+        print("    Constitution:", int(round(self.constitution)),
+            ", Force:", int(round(self.force)),
+            ", Agility:", int(round(self.agility)),
+            ", Dexterity:", int(round(self.dexterity)),
+            ", Reflex:", int(round(self.reflex)),
+            ", Willpower:", int(round(self.willpower)),
+            ", Spirit:", int(round(self.spirit)),
+            ", Moral:", int(round(self.moral)),
+            ", Empathy:", int(round(self.Empathy)))
+
+    def print_spells_and_feelings(self):
+        print("")
+        print("FEELINGS:")
+        for key in self.feelings:
+            print("-", end=' ')
+            self.feelings[key].print_obj()
+        print("")
+        print("Active spells:", self.active_spells)
+
+    def print_defense(self):
+        print("")
+        print("DEFENSE:")
+        print("    ArmorResistance:", int(round(self.armor_resistance)),
+            ", ArmorDefense:", int(round(self.armor_defense)),
+            ", Dodging:", int(round(self.dodging)),
+            ", MeleeDefense:", int(round(self.melee_defense)),
+            ", RangedDefense:", int(round(self.ranged_defense)),
+            ", MagicDefense:", int(round(self.magic_defense)))
 
     def print_attack(self):
-        print(",MeleeHandiness:", int(round(self.melee_handiness)), \
-            ",MeleePower:", int(round(self.melee_power)), \
-            ",MeleeRange:", int(round(self.melee_range)), \
-            ",PenetrationRate:", int(round(self.pen_rate, 2)), \
-            ",resis_dim_rate:", int(round(self.resis_dim_rate, 2)), end=' ')
+        print("")
+        print("ATTACK:")
+        print("    MeleeHandiness:", int(round(self.melee_handiness)),
+            ", MeleePower:", int(round(self.melee_power)),
+            ", MeleeRange:", int(round(self.melee_range)),
+            ", PenetrationRate:", int(round(self.pen_rate, 2)),
+            ", resis_dim_rate:", int(round(self.resis_dim_rate, 2)),
+            ", MagicPower:", int(round(self.magic_power)), end=' ')
         if self.ranged_power > 1:
-            print(",RangedAccuracy:", int(round(self.ranged_accuracy)), \
-                ",RangedPower:", int(round(self.ranged_power)), end=' ')
+            print(", RangedAccuracy:", int(round(self.ranged_accuracy)),
+                ", RangedPower:", int(round(self.ranged_power)), end=' ')
             self.print_ranged_info()
-        if self.magic_power > 1:
-            print(",MagicPower:", int(round(self.magic_power)), end=' ')
-            
+        else:
+            print("")
 
     def print_ranged_info(self):
         use_ranged_weapon = False
@@ -973,15 +975,13 @@ class Characters:
                 if isinstance(weapon, RangedWeapons):
                     max_range = min(max_range, weapon.get_max_range())
                     reload_left = max(reload_left, weapon.reload_time - weapon.current_reload)
-            print(",MaxRange:", max_range, ",AmmoLeft:", len(self.ammo), \
-                ",ReloadLeft:", reload_left, end=' ')
-                             
+            print(", MaxRange:", max_range, ", AmmoLeft:", len(self.ammo),
+                ", ReloadLeft:", reload_left)
                  
     def print_time_state(self):
-        print(",SpeedRatio:", round(self.speed_ratio, 2), \
-            ",Timeline:", round(self.timeline,2), \
-            ",CurrentAction:", self.last_action)
-                     
+        print(", SpeedRatio:", round(self.speed_ratio, 2),
+            ", Timeline:", round(self.timeline, 2),
+            ", CurrentAction:", self.last_action)
 
     def print_weapons_stored(self):
         print("Weapons stored:")
@@ -993,8 +993,8 @@ class Characters:
             weapon.print_obj()
         return True
 
-
     def print_weapons_use(self):
+        print("")
         print("Weapons used:")
         if len(self.weapons_use) <= 0:
             print("\\No weapon used")
@@ -1003,8 +1003,7 @@ class Characters:
             print("\\", end=' ')
             weapon.print_obj()
         return True
-    
-    
+
     def print_ammo(self):
         print("Ammo available:")
         if len(self.ammo) <= 0:
@@ -1015,37 +1014,34 @@ class Characters:
             weapon.print_obj()
         return True
 
-
     def print_state(self):
         self.print_basic()
         self.body.print_basic()
+        self.print_time_state()
         self.print_defense()
         self.print_attack()
-        self.print_time_state()
-
+        self.print_spells_and_feelings()
 
     def print_detailed_state(self):
         self.print_basic()
         print("")
         self.body.print_detailed_basic()
+        self.print_time_state()
         self.print_defense()
         self.print_attack()
-        self.print_time_state()
-
+        self.print_spells_and_feelings()
 
     def print_defense_state(self):
         self.print_basic()
         self.body.print_basic()
-        self.print_defense()
         self.print_time_state()
-
+        self.print_defense()
 
     def print_attack_state(self):
         self.print_basic()
         self.body.print_basic()
-        self.print_attack()
         self.print_time_state()
-
+        self.print_attack()
   
     def print_obj(self):
         self.print_detailed_state()

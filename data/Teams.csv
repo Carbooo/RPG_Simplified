@@ -9,3 +9,5 @@ TestMixed1;m1;r1
 TestMixed2;m2;r2
 TestShort1;t0
 TestShort2;t1
+TestShortRanged1;r0
+TestShortRanged2;r1
