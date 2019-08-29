@@ -95,21 +95,17 @@ class Equipments:
 class Armors(Equipments):
     'Common sub class of equipments for all armors'
     
-    def __init__(self, name, load, bulk, resistance, def_cover, defense, \
-    body_member):
+    def __init__(self, name, load, bulk, resistance, def_cover, defense):
         Equipments.__init__(self, name, load, bulk, resistance)
         self.type = "Armor"
         self.original_def_cover = float(def_cover)
         self.def_cover = self.original_def_cover
         self.original_defense = float(defense)
-        self.defense = self.original_defense    
-        self.body_member = body_member
-    
+        self.defense = self.original_defense
         
     def print_obj(self):
         Equipments.print_obj(self)
-        print(", DefCover:", round(self.def_cover, 1), ", Defense:", \
-            round(self.defense, 1))
+        print(", DefCover:", round(self.def_cover, 1), ", Defense:", round(self.defense, 1))
         
 
     def decrease(self, damage):
@@ -323,20 +319,17 @@ class RangedWeapons(AttackWeapons):
         self.range_power = self.original_range_power
         self.original_accuracy = float(accuracy)
         self.accuracy = self.original_accuracy
-        self.current_reload = 0
         self.reload_time = reload_time
-        self.current_ammo = False
-    
-    
+        self.current_ammo = None
+
     def print_obj(self):
         AttackWeapons.print_obj(self)
-        print(", Range power:", round(self.range_power, 1), ", Accuracy:", round(self.accuracy, 1), \
-            ", ReloadLeft:", self.reload_time - self.current_reload, ", Ammo:", end=' ')
+        print(", Range power:", round(self.range_power, 1), ", Accuracy:", round(self.accuracy, 1),
+              ", Reload time:", round(self.reload_time, 1), ", Ammo:", end=' ')
         if self.current_ammo:
             print(self.current_ammo.name, end=' ')
         else:
             print("--None--", end=' ')
-        
     
     def decrease(self, damage):
         ratio = AttackWeapons.decrease(self, damage)
@@ -423,15 +416,3 @@ class Crossbows(RangedWeapons):
     def print_obj(self):
         RangedWeapons.print_obj(self)
         print("")
-        
-
-#############################################################
-################### INITIALIZATION ##########################
-#############################################################
-NoneArmor = Armors("--none_armor--", 0, 0, 0, 0, 0, "None")
-NoneArmor.ID = 0
-NoneWeapon = Weapons("--none_weapon--", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-NoneWeapon.ID = 0
-NoneAmmo = Ammo("--none_ammo--", 0, 0, 0, "None", 0, 0, 0, 0)
-NoneAmmo.ID = 0
-

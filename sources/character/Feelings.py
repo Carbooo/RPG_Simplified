@@ -12,14 +12,14 @@ class Feelings:
     max_alive_energy = 1000
     max_safe_energy = 200
     
-    def __init__(self, type, sensibility, mastering, initial_energy):
+    def __init__(self, type, sensibility, mastering):
         self.type = type
-        self.sensibility = sensibility
-        self.sensibility_ratio = sensibility / 10
-        self.mastering = mastering
-        self.mastering_ratio = mastering / 10
-        self.energy = initial_energy
-        self.energy_ratio = initial_energy / 100
+        self.sensibility = float(sensibility)
+        self.sensibility_ratio = float(sensibility) / 10.0
+        self.mastering = float(mastering)
+        self.mastering_ratio = float(mastering) / 10.0
+        self.energy = float(sensibility) * 10.0
+        self.energy_ratio = float(sensibility) * 10.0 / 100
         self.warned_of_exceeded_energy = False
     
     def update_energy(self, energy):
@@ -70,7 +70,7 @@ class Feelings:
             return False
         
         energy_gap = (self.energy - Feelings.max_safe_energy) / (Feelings.max_alive_energy - Feelings.max_safe_energy)
-        if random.random() < energy_gap / self.willpower_ratio / self.mastering_ratio:
+        if random.random() < energy_gap / char.willpower_ratio / self.mastering_ratio:
             if not self.warned_of_exceeded_energy: 
                 print("Your ", self.type, " energy is overwhelming you and may destroy you!")
                 self.warned_of_exceeded_energy = True

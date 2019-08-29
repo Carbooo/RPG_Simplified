@@ -3,7 +3,6 @@ import math as math
 import time as time
 from sources.character.Characters import Characters
 from sources.action.Actions import ActiveActions
-from sources.character.Equipments import Bows
 
 
 #############################################################
@@ -62,7 +61,7 @@ class EquipChar(ActiveActions):
         return self.result()
 
     def unequip_spec_weapons(self):
-        equipped_list = copy.copy(self.initiator.weapons_use)
+        equipped_list = copy.copy(self.initiator.weapons_in_use)
         equipment_to_remove = []
         while 1:
             print("Current weapons:")
@@ -91,10 +90,6 @@ class EquipChar(ActiveActions):
             available_equipment = False
             for equip in equipped_list:
                 if read == equip.get_id():
-                    if isinstance(equip, Bows) and equip.is_reloaded():
-                        print("You cannot unequip a loaded bow!")
-                        continue
-                    
                     available_equipment = True
                     equipment_to_remove.append(equip)
                     equipped_list.remove(equip)
@@ -119,11 +114,11 @@ class EquipChar(ActiveActions):
         return self.result()
 
     def equip_spec_weapons(self):
-        equipped_list = copy.copy(self.initiator.weapons_use)
+        equipped_list = copy.copy(self.initiator.weapons_in_use)
         not_equipped_list = []
         new_equipment = []
         for weapon in self.initiator.weapons_stored:
-            if weapon not in self.initiator.weapons_use:
+            if weapon not in self.initiator.weapons_in_use:
                 not_equipped_list.append(weapon)
                 
         while 1:

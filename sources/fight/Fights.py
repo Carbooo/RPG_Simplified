@@ -179,7 +179,7 @@ class Fights:
         self.field.print_obj()
         print("")
         self.scheduler[0].print_state()
-        self.scheduler[0].print_weapons_use()
+        self.scheduler[0].print_weapons_in_use()
         
     def print_k_o_state_rest(self, character):
         print("")

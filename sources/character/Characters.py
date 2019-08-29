@@ -3,10 +3,9 @@ import math as math
 import random as random
 import time as time
 import sources.miscellaneous.global_variables as global_variables
-from sources.character.Equipments import Equipments, Weapons, Shields, AttackWeapons, \
-    MeleeWeapons, RangedWeapons, Bows, Crossbows, Ammo, NoneWeapon, NoneAmmo
+from sources.character.Equipments import Weapons, Shields, AttackWeapons, \
+    MeleeWeapons, RangedWeapons, Bows, Crossbows
 from sources.character.Bodies import Bodies
-from sources.character.BodyMembers import BodyMembers
 from sources.character.Feelings import Feelings
 
 
@@ -18,7 +17,6 @@ class Characters:
     
     # Characters constants
     list = []
-    instances_count = 0
     max_position_area = 6 # Max range for characters positions
     variance = 0.1 # Gauss variance
     high_variance = 0.25 # Gauss variance
@@ -92,71 +90,79 @@ class Characters:
     Actions.append(Spell)
     Actions.append(Concentrate)
     
-    def __init__(self, name, constitution, force, agility, dexterity, reflex, \
-    willpower, spirit, prefered_hand, head_armor, chest_armor, arms_armor, legs_armor, \
-    weapon1, weapon2, weapon3, weapon4, ammo_type1, ammo_number1, ammo_type2, ammo_number2, \
-    abscissa, ordinate):
-        #Check name availability
+    def __init__(self, name, constitution, force, agility, dexterity, reflex, willpower, spirit, moral, empathy,
+                 armor, weapon1, weapon2, weapon3, weapon4, ammo_type1, ammo_number1, ammo_type2, ammo_number2,
+                 wrath_sensibility, wrath_mastering, joy_sensibility, joy_mastering, 
+                 love_sensibility, love_mastering, hate_sensibility, hate_mastering, 
+                 fear_sensibility, fear_mastering, sadness_sensibility, sadness_mastering,
+                 abscissa, ordinate):
+        # Check name availability
         for char in Characters.list:
             if char.name == name:
                 print("(Characters) Character creation failed because the name:", name, "is already used !")
-                return False
-            
-        #Set ID
-        self.ID = Characters.instances_count
-        Characters.instances_count += 1
-        self.original_i_d = len(Characters.list)
+                exit(0)
+        self.name = name
+        
+        # Set ID
+        self.ID = len(Characters.list)
         Characters.list.append(self)
         
-        #Set characteristics
-        self.name = name
+        # Set characteristics
+        self.original_constitution = float(constitution)
         self.constitution = float(constitution)
-        self.constitution_ratio = max(1, self.constitution) / 10
+        self.constitution_ratio = float(constitution) / 10.0
+        self.original_force = float(force)
         self.force = float(force)
-        self.force_ratio = max(1, self.force) / 10
+        self.force_ratio = float(force) / 10.0
+        self.original_agility = float(agility)
         self.agility = float(agility)
-        self.original_agility = self.agility
+        self.agility_ratio = float(agility) / 10.0
+        self.original_dexterity = float(dexterity)
         self.dexterity = float(dexterity)
+        self.dexterity_ratio = float(dexterity) / 10.0
+        self.original_reflex = float(reflex)
         self.reflex = float(reflex)
+        self.reflex_ratio = float(reflex) / 10.0
+        self.original_willpower = float(willpower)
         self.willpower = float(willpower)
-        self.willpower_ratio = float(willpower) / 10
+        self.willpower_ratio = float(willpower) / 10.0
+        self.original_spirit = float(spirit)
         self.spirit = float(spirit)
-        self.spirit_ratio = float(spirit) / 10
-        self.set_initial_position(abscissa, ordinate)
-        life = max(1, float(self.constitution * 10))
-        stamina = max(1, \
-            (self.constitution + float(self.willpower)/3 \
-            + float(self.agility)/2 + float(self.force)/2) \
-            * 10 / (1 + 1.0/3 + 2.0/2))
-        self.moral = max(1, float(self.willpower))
-        self.body = Bodies(life, stamina, prefered_hand, self.force_ratio)
+        self.spirit_ratio = float(spirit) / 10.0
+        self.original_moral = float(moral)
+        self.moral = float(moral)
+        self.moral_ratio = float(moral) / 10.0
+        self.original_empathy = float(empathy)
+        self.empathy = float(empathy)
+        self.empathy_ratio = float(empathy) / 10.0
+        self.body = Bodies(
+            float(self.constitution) * 10.0, 
+            (float(self.constitution) + float(self.willpower)/3 + float(self.agility)/2 + float(self.force)/2) 
+            / (1.0 + 1.0/3 + 2.0/2) * 10.0
+        )
         
-        #Set characters parameters
+        # Set characters parameters
         self.timeline = 0.0
+        self.set_initial_position(abscissa, ordinate)
         self.last_action = None
         self.previous_attacks = []
         self.active_spells = []
         
-        #Set weapons
-        self.weapons_stored = []
-        self.weapons_use = []
-        self.ammo = []
-        self.set_equipments(\
-            head_armor, chest_armor, arms_armor, legs_armor, \
-            weapon1, weapon2, weapon3, weapon4, \
-            ammo_type1, ammo_number1, ammo_type2, ammo_number2)
+        # Set weapons
+        self.body.set_equipments(
+            armor, weapon1, weapon2, weapon3, weapon4,
+            ammo_type1, ammo_number1, ammo_type2, ammo_number2
+        )
         
         # Set feelings
-        self.empathy = 10
-        self.empathy_ratio = self.empathy / 10
         self.nb_of_concentrate = 0
         self.feelings = {
-            "wrath" : Feelings("wrath", 10.0, 10.0, 100.0),
-            "joy" : Feelings("joy", 10.0, 10.0, 100.0),
-            "love" : Feelings("love", 10.0, 10.0, 100.0),
-            "hate" : Feelings("hate", 10.0, 10.0, 100.0),
-            "fear" : Feelings("fear", 10.0, 10.0, 100.0),
-            "sadness" : Feelings("sadness", 10.0, 10.0, 100.0)
+            "wrath" : Feelings("wrath", wrath_sensibility, wrath_mastering),
+            "joy": Feelings("joy", joy_sensibility, joy_mastering),
+            "love": Feelings("love", love_sensibility, love_mastering),
+            "hate": Feelings("hate", hate_sensibility, hate_mastering),
+            "fear": Feelings("fear", fear_sensibility, fear_mastering),
+            "sadness": Feelings("sadness", sadness_sensibility, sadness_mastering)
         }
         
         #Calculate character characteristics
@@ -165,57 +171,6 @@ class Characters:
     def get_id(self):
         return self.ID
 
-    def copy(self):
-        #Copy character
-        char = copy.copy(self)
-        if char.ID != 0:
-            char.ID = Characters.instances_count
-            Characters.instances_count += 1
-        
-        #Save armors
-        armors_list = []
-        armors_list.append(char.body.head.armor.name)
-        armors_list.append(char.body.chest.armor.name)
-        armors_list.append(char.body.left_arm.armor.name)
-        armors_list.append(char.body.left_leg.armor.name)
-        
-        #Save weapons
-        weapons_list = []
-        for weapon in self.weapons_stored:
-            weapons_list.append(weapon.name)
-        for weapon in self.weapons_use:
-            weapons_list.append(weapon.name)
-        if len(weapons_list) > 4:
-            print("(Characters) Error: cannot copy all character weapons:", weapons_list)
-        for _ in range(4 - len(weapons_list)):
-            weapons_list.append(NoneWeapon)
-        
-        #Save ammo
-        ammo_list = []
-        for ammo in self.ammo:
-            exist = False
-            for ammo_type in ammo_list:
-                if ammo_type[0] == ammo.name:
-                    ammo_type[1] += 1
-                    exist = True
-                    break
-            if not exist:
-                ammo_list.append([ammo.name, 1])
-        if len(ammo_list) > 2:
-            print("(Characters) Error: cannot copy all character ammo:", ammo_list)
-        for _ in range(2 - len(ammo_list)):
-            ammo_list.append([NoneAmmo.name, 0])
-                
-        #Set copy of the equipments
-        char.remove_all_equipments()
-        char.set_equipments(\
-            armors_list[0], armors_list[1], armors_list[2], armors_list[3], \
-            weapons_list[0], weapons_list[1], weapons_list[2], weapons_list[3], \
-            ammo_list[0][0], ammo_list[0][1], ammo_list[1][0], ammo_list[1][1])
-        
-        return char
-     
-        
 ################### RESET & STATE FUNCTIONS ######################
     def exceeded_feelings_check(self):
         has_exceeded = False
@@ -237,99 +192,45 @@ class Characters:
         
         self.calculate_characteristic()
 
-
     def is_shape_k_o(self):
         if self.body.shape == "KO":
             return True
         return False
 
-
     def is_active(self):
-        if self.body.state != "KO" and self.body.state != "Dead" \
-        and self.body.shape != "KO":
+        if self.body.state != "KO" and self.body.state != "Dead" and self.body.shape != "KO":
             return True
         return False
-
 
     def is_life_active(self):
         if self.body.state != "KO" and self.body.state != "Dead":
             return True
         return False
 
-
     def is_alive(self):
         if self.body.state != "Dead":
             return True
         return False
-    
-    
+
     def spend_time(self, time_spent):
         self.spend_absolute_time(time_spent / self.speed_ratio)
     
-    
     def spend_absolute_time(self, time_spent):
         self.timeline += time_spent
-        
-    
-    def check_stamina(self, coefficient):
-        return self.body.get_current_stamina() >= BodyMembers.turn_stamina * coefficient
-    
-    
-    def spend_stamina(self, coefficient, ignore=False):
-        if not ignore and not self.check_stamina(coefficient):
-            print("Error: Stamina below 0")
-        self.body.spend_stamina(coefficient)
-    
-    
-    def spend_move_stamina(self, coefficient):
-        self.body.spend_move_stamina(coefficient)
-            
-    
-    def spend_melee_attack_stamina(self, coefficient):
-        self.body.spend_melee_attack_stamina(coefficient / math.pow(self.force_ratio, 2))
-    
-    
-    def spend_ranged_attack_stamina(self, coefficient):
-        self.body.spend_ranged_attack_stamina(coefficient / math.pow(self.force_ratio, 2))
-            
-    
-    def spend_reload_stamina(self, coefficient):
-        self.body.spend_reload_stamina(coefficient / math.pow(self.force_ratio, 2))
-            
-    
-    def spend_defense_stamina(self, coefficient):
-        self.body.spend_defense_stamina(coefficient / math.pow(self.force_ratio, 2))
-            
-    
-    def spend_dodge_stamina(self, coefficient):
-        self.body.spend_dodge_stamina(coefficient)
-                        
-
-    def is_none_character(self):
-        if self.name == "--none--":
-            return True
-        return False
-
 
 ################## POSITIONS FUNCTIONS ######################
     def check_position(self):
         if self.abscissa not in range(Characters.max_position_area):
-            print("(Characters) Abscissa must be included in [0:", \
-                Characters.max_position_area, "]")
+            print("(Characters) Abscissa must be included in [0:", Characters.max_position_area, "]")
             return False
-        
         if self.ordinate not in range(Characters.max_position_area):
-            print("(Characters) Ordinate must be included in [0:", \
-                Characters.max_position_area, "]")
+            print("(Characters) Ordinate must be included in [0:", Characters.max_position_area, "]")
             return False
-        
         return True
-        
-        
+
     def set_position(self, abscissa, ordinate):
         self.abscissa = abscissa
         self.ordinate = ordinate
-        
         
     def set_initial_position(self, abscissa, ordinate):
         self.abscissa = abscissa
@@ -337,173 +238,23 @@ class Characters:
         
         if self.check_position():
             return True
-        
-        self.abscissa = -1
-        self.ordinate = -1
-        return False
-    
-    
-####################### WEAPONS FUNCTIONS ######################       
+        else:
+            self.abscissa = -1
+            self.ordinate = -1
+            return False
+
+######################### CALCULATE FUNCTIONS ########################
     def movement_handicap_ratio(self):
-        return math.sqrt( \
+        return math.sqrt(
             (math.pow(self.load_ratio, 2) * math.pow(self.use_load_ratio, 1.0/2)) * \
             (math.pow(self.bulk_ratio, 1.0/2) * math.pow(self.use_bulk_ratio, 2)))
     
-    
-    def use_a_shield(self):
-        for weapon in self.weapons_use:
-            if isinstance(weapon, Shields):
-                return True
-        return False
-    
-    
-    def is_using_a_ranged_weapon(self):
-        for weapon in self.weapons_use:
-            if isinstance(weapon, RangedWeapons):
-                return True
-        return False    
-            
-        
-    def is_using_a_melee_weapon(self):
-        for weapon in self.weapons_use:
-            if isinstance(weapon, MeleeWeapons):
-                return True
-        if not self.weapons_use:
-            #If no weapons, can melee attack with hands
-            return True
-        return False
-    
-    
-    def remove_all_equipments(self):
-        self.body.set_armors("--none_armor--", "--none_armor--", "--none_armor--", "--none_armor--")
-        self.weapons_stored = []
-        self.weapons_use = []
-        self.ammo = []
-        
-    
-    def set_equipments(self, \
-    head_armor, chest_armor, arms_armor, legs_armor, \
-    weapon1, weapon2, weapon3, weapon4, \
-    ammo_type1, ammo_number1, ammo_type2, ammo_number2):
-        #Set armors
-        self.body.set_armors(head_armor, chest_armor, arms_armor, legs_armor)
-        
-        #Set weapons
-        weapon_list = [weapon1, weapon2, weapon3, weapon4]
-        for weapon in weapon_list:
-            if weapon == NoneWeapon.name:
-                continue
-            for equip in Equipments.list:
-                if isinstance(equip, Weapons) and equip.name == weapon:
-                    self.weapons_stored.append(equip.copy())
-                    break
-                
-        #Set ammo
-        self.set_ammo(ammo_type1, ammo_number1)
-        self.set_ammo(ammo_type2, ammo_number2)
-    
-    
-    def set_ammo(self, ammo_type, ammo_number):
-        if ammo_type == NoneAmmo.name:
-            return False
-        
-        ammo_found = False
-        for equip in Equipments.list:
-            if isinstance(equip, Ammo) and equip.name == ammo_type:
-                ammo_found = equip
-                break
-        if ammo_found:
-            for _ in range(ammo_number):
-                self.ammo.append(ammo_found.copy())
-            return True
-             
-        print("(Characters) Ammo cannot be set because ammo type (", ammo_type, ") has not been found !")
-        return False
-    
-        
-    def remove_weapon_in_use(self, weapon, dropping=False):
-        if self.body.remove_weapon(weapon):
-            self.weapons_use.remove(weapon)
-            if not dropping:
-                self.weapons_stored.append(weapon)
-            if isinstance(weapon, Bows) and weapon.current_reload > 0:
-                self.ammo.append(weapon.current_reload)
-                weapon.unload()
-            return True
-        return False
-    
-
-    def add_weapon_in_use(self, weapon):
-        if self.body.set_weapon(weapon):
-            self.weapons_stored.remove(weapon)
-            self.weapons_use.append(weapon)
-            return True
-        return False
-
-
-    def nb_of_hands_used(self):
-        nb_of_hands = 0
-        for weapon in self.weapons_use:
-            nb_of_hands += weapon.hand
-        return nb_of_hands
-        
-        
-    def nb_of_hands_stored(self):
-        nb_of_hands = 0
-        for weapon in self.weapons_stored:
-            nb_of_hands += weapon.hand
-        return nb_of_hands
-    
-    
-    def all_weapons_absorbed_damage(self, damage):
-        weapons_list = []
-        defense = 0
-        for weapon in self.weapons_use:
-            try:
-                defense += weapon.defense
-                weapons_list.append(weapon)
-            except:
-                pass
-        for weapon in weapons_list:
-            self.weapon_absorbed_damage(weapon, damage * weapon.defense / defense)
-    
-    
-    def all_melee_weapons_absorbed_damage(self, damage):
-        weapons_list = []
-        defense = 0
-        for weapon in self.weapons_use:
-            if isinstance(weapon, MeleeWeapons):
-                defense += weapon.defense
-                weapons_list.append(weapon)
-        for weapon in weapons_list:
-            self.weapon_absorbed_damage(weapon, damage * weapon.defense / defense)
-    
-    
-    def all_shields_absorbed_damage(self, damage):
-        weapons_list = []
-        defense = 0
-        for weapon in self.weapons_use:
-            if isinstance(weapon, Shields):
-                defense += weapon.defense
-                weapons_list.append(weapon)
-        for weapon in weapons_list:
-            self.weapon_absorbed_damage(weapon, damage * weapon.defense / defense)
-                    
-
-    def weapon_absorbed_damage(self, weapon, damage):
-        if weapon.decrease(damage) == 0:
-            print("Your weapon \\ID:", weapon.get_id(), "\\Name:", weapon.name, \
-                "has been broken!")
-            self.weapons_use.remove(weapon)
-        
-
-######################### CALCULATE FUNCTIONS ########################
     def calculate_load_ratios(self):
         load = 0.0
         use_load = 0.0
         for weapon in self.weapons_stored:
             load += weapon.load
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             load += weapon.load
             use_load += weapon.load
             if isinstance(weapon, RangedWeapons) and weapon.current_ammo:
@@ -521,7 +272,7 @@ class Characters:
         use_bulk = 0.0
         for weapon in self.weapons_stored:
             bulk += weapon.bulk
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             bulk += weapon.bulk
             use_bulk += weapon.bulk
             if isinstance(weapon, Bows) and weapon.current_ammo:
@@ -544,7 +295,7 @@ class Characters:
         ranged_weapons_accuracy = 0.0
         melee_weapons_nb = 0.0
         ranged_weapons_nb = 0.0
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             if isinstance(weapon, MeleeWeapons):
                 melee_weapons_handiness += weapon.melee_handiness * self.body.weapon_ratio(weapon)
                 melee_weapons_nb += 1
@@ -583,7 +334,7 @@ class Characters:
         #Calculate weapons melee_range
         melee_range = 0.0
         melee_weapons_nb = 0.0
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             if isinstance(weapon, Weapons):
                 melee_range += weapon.melee_range
                 melee_weapons_nb += 1
@@ -603,7 +354,7 @@ class Characters:
         self.resis_dim_rate = 0.0
         self.ranged_power = 0.0
         nb_of_weapons = 0.0
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             nb_of_weapons += 1
             self.melee_power += weapon.melee_power * self.body.weapon_ratio(weapon)
             #Do not divide if 2 hands are used. Divide by 2 if only 1 hand is used
@@ -647,7 +398,7 @@ class Characters:
         melee_defense = 0.0
         ranged_defense = 0.0
         shield_magic_defense = 0.0  # Where shield can be used against magic attacks
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             if isinstance(weapon, Shields):
                 melee_defense += weapon.defense * self.body.weapon_ratio(weapon)
                 ranged_defense += weapon.defense * self.body.weapon_ratio(weapon)
@@ -789,7 +540,7 @@ class Characters:
         
     def has_range(self):
         max_range = 10000
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             if isinstance(weapon, RangedWeapons):
                 max_range = min(max_range, weapon.get_max_range())
         
@@ -820,7 +571,7 @@ class Characters:
         return math.sqrt(max(0, math.pow(ac_length, 2) - math.pow(ah_length, 2)))
     
     def has_ammo(self):
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             if isinstance(weapon, RangedWeapons):
                 if self.ranged_weapon_has_ammo(weapon):
                     return True
@@ -853,7 +604,7 @@ class Characters:
 
 
     def has_reloaded(self):
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             if isinstance(weapon, RangedWeapons) and not weapon.is_reloaded():
                 return False
         return True
@@ -866,13 +617,13 @@ class Characters:
     
     
     def get_current_ammo(self):
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             if isinstance(weapon, RangedWeapons):
                 return weapon.current_ammo
     
     
     def use_ammo(self):
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             if isinstance(weapon, RangedWeapons):
                 ammo_used = weapon.unload()
                 break
@@ -881,7 +632,7 @@ class Characters:
         
     def loose_reloaded_ammo(self):
         has_lost = False
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             if isinstance(weapon, Bows) and weapon.is_reloaded():
                 has_lost = True
                 weapon.unload()
@@ -889,14 +640,14 @@ class Characters:
         
         
     def is_using_a_crossbow(self):
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             if isinstance(weapon, Crossbows):
                 return True
         return False
     
             
     def is_using_a_bow(self):
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             if isinstance(weapon, Bows):
                 return True
         return False
@@ -910,7 +661,7 @@ class Characters:
         print("")
         print("EQUIPMENTS:")
         self.body.print_full_armors()
-        self.print_weapons_use()
+        self.print_weapons_in_use()
         self.print_weapons_stored()
         self.print_ammo()
 
@@ -964,19 +715,17 @@ class Characters:
 
     def print_ranged_info(self):
         use_ranged_weapon = False
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             if isinstance(weapon, RangedWeapons):
                 use_ranged_weapon = True
                 break
         if use_ranged_weapon:
             max_range = 10000
-            reload_left = -10000
-            for weapon in self.weapons_use:
+            for weapon in self.weapons_in_use:
                 if isinstance(weapon, RangedWeapons):
                     max_range = min(max_range, weapon.get_max_range())
-                    reload_left = max(reload_left, weapon.reload_time - weapon.current_reload)
             print(", MaxRange:", max_range, ", AmmoLeft:", len(self.ammo),
-                ", ReloadLeft:", reload_left)
+                ", CurrentAmmo:", weapon.current_ammo)
                  
     def print_time_state(self):
         print(", SpeedRatio:", round(self.speed_ratio, 2),
@@ -993,13 +742,13 @@ class Characters:
             weapon.print_obj()
         return True
 
-    def print_weapons_use(self):
+    def print_weapons_in_use(self):
         print("")
         print("Weapons used:")
-        if len(self.weapons_use) <= 0:
+        if len(self.weapons_in_use) <= 0:
             print("\\No weapon used")
             return False
-        for weapon in self.weapons_use:
+        for weapon in self.weapons_in_use:
             print("\\", end=' ')
             weapon.print_obj()
         return True
