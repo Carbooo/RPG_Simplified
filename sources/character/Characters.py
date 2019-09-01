@@ -1,11 +1,9 @@
-import copy as copy
 import math as math
 import random as random
 import time as time
 import sources.miscellaneous.global_variables as global_variables
-from sources.character.Equipments import Weapons, Shields, AttackWeapons, \
-    MeleeWeapons, RangedWeapons, Bows, Crossbows
 from sources.character.Bodies import Bodies
+from sources.character.CharEquipments import CharEquipments
 from sources.character.Feelings import Feelings
 
 
@@ -17,18 +15,18 @@ class Characters:
     
     # Characters constants
     list = []
-    max_position_area = 6 # Max range for characters positions
-    variance = 0.1 # Gauss variance
-    high_variance = 0.25 # Gauss variance
-    max_bonus = 1.35 # Max load bonus
-    load_mean = 50.0 # Load reference for characters characteristics
-    bulk_mean = 6.0 # Bulk reference for characters characteristics
-    use_load_mean = 15.0 # Weapons use load reference for characters
-    use_bulk_mean = 3.5 # Weapons use bulk reference for characters
-    min_speed = 1.0 / 6.0 # Minimum speed for char (necessary for hurt char)
-    accuracy_mean = 100.0 # Accuracy reference for characters
-    critical_hit_chance = 0.083 # Chances to hit the head or other key areas (1 / 12)
-    critical_hit_boost = 6.0
+    max_position_area = 6  # Max range for characters positions
+    variance = 0.1  # Gauss variance
+    high_variance = 0.25  # Gauss variance
+    max_bonus = 1.5  # Max load bonus
+    load_mean = 50.0  # Load reference for characters characteristics
+    bulk_mean = 6.0  # Bulk reference for characters characteristics
+    use_load_mean = 15.0  # Weapons use load reference for characters
+    use_bulk_mean = 3.5  # Weapons use bulk reference for characters
+    min_speed = 1.0 / 6.0  # Minimum speed for char (necessary for hurt char)
+    accuracy_mean = 100.0  # Accuracy reference for characters
+    critical_hit_chance = 0.083  # Chances to hit the head or other key areas (1 / 12)
+    critical_hit_boost = 6.0  # Coef boost when doing a critical hit
     max_magic_distance = 100.0  # Around 200 meters
     
     # A turn is around 6 seconds
@@ -66,13 +64,13 @@ class Characters:
     wrath_improve_strength = {
         "description" : "Improve your strength",
         "code" : "STR",
-        "type" : "wrath"
+        "type" : "Wrath"
     }
     wrath_spells["list"].append(wrath_improve_strength)
     wrath_fireball = {
         "description" : "Throw a fireball",
         "code" : "FBL",
-        "type" : "wrath"
+        "type" : "Wrath"
     }
     wrath_spells["list"].append(wrath_fireball)
     
@@ -135,10 +133,18 @@ class Characters:
         self.original_empathy = float(empathy)
         self.empathy = float(empathy)
         self.empathy_ratio = float(empathy) / 10.0
+        
         self.body = Bodies(
+            self,
             float(self.constitution) * 10.0, 
             (float(self.constitution) + float(self.willpower)/3 + float(self.agility)/2 + float(self.force)/2) 
             / (1.0 + 1.0/3 + 2.0/2) * 10.0
+        )
+        
+        self.equipments = CharEquipments(
+            self, armor, 
+            weapon1, weapon2, weapon3, weapon4,
+            ammo_type1, ammo_number1, ammo_type2, ammo_number2
         )
         
         # Set characters parameters
@@ -148,24 +154,39 @@ class Characters:
         self.previous_attacks = []
         self.active_spells = []
         
-        # Set weapons
-        self.body.set_equipments(
-            armor, weapon1, weapon2, weapon3, weapon4,
-            ammo_type1, ammo_number1, ammo_type2, ammo_number2
-        )
-        
         # Set feelings
         self.nb_of_concentrate = 0
         self.feelings = {
-            "wrath" : Feelings("wrath", wrath_sensibility, wrath_mastering),
-            "joy": Feelings("joy", joy_sensibility, joy_mastering),
-            "love": Feelings("love", love_sensibility, love_mastering),
-            "hate": Feelings("hate", hate_sensibility, hate_mastering),
-            "fear": Feelings("fear", fear_sensibility, fear_mastering),
-            "sadness": Feelings("sadness", sadness_sensibility, sadness_mastering)
+            "Wrath" : Feelings("Wrath", wrath_sensibility, wrath_mastering),
+            "Joy": Feelings("Joy", joy_sensibility, joy_mastering),
+            "Love": Feelings("Love", love_sensibility, love_mastering),
+            "Hate": Feelings("Hate", hate_sensibility, hate_mastering),
+            "Fear": Feelings("Fear", fear_sensibility, fear_mastering),
+            "Sadness": Feelings("Sadness", sadness_sensibility, sadness_mastering)
         }
         
-        #Calculate character characteristics
+        # Calculate character characteristics
+        self.load_ratio = 0.0
+        self.use_load_ratio = 0.0
+        self.bulk_ratio = 0.0
+        self.use_bulk_ratio = 0.0
+        self.speed_ratio = 0.0
+        self.melee_handiness = 0.0
+        self.melee_handiness_ratio = 0.0
+        self.ranged_accuracy = 0.0
+        self.ranged_accuracy_ratio = 0.0
+        self.melee_range = 0.0
+        self.pen_rate = 0.0
+        self.resis_dim_rate = 0.0
+        self.melee_power = 0.0
+        self.ranged_power = 0.0
+        self.magic_power = 0.0
+        self.magic_power_ratio = 0.0
+        self.melee_defense = 0.0
+        self.ranged_defense = 0.0
+        self.magic_defense = 0.0
+        self.magic_defense_with_shields = 0.0
+        self.dodging = 0.0
         self.calculate_characteristic()
         
     def get_id(self):
@@ -178,39 +199,6 @@ class Characters:
             if self.feelings[key].die_of_exceeded_energy(self):
                 has_exceeded = True
         return has_exceeded
-    
-    def calculate_state(self):
-        old_state = self.body.state
-        self.body.calculate_states()
-        new_state = self.body.state
-        
-        if new_state != old_state:
-            txt = "ID: " + str(self.get_id()) + ", Name: " + self.name + \
-                " state is now:"
-            print(txt, new_state)
-            time.sleep(3)
-        
-        self.calculate_characteristic()
-
-    def is_shape_k_o(self):
-        if self.body.shape == "KO":
-            return True
-        return False
-
-    def is_active(self):
-        if self.body.state != "KO" and self.body.state != "Dead" and self.body.shape != "KO":
-            return True
-        return False
-
-    def is_life_active(self):
-        if self.body.state != "KO" and self.body.state != "Dead":
-            return True
-        return False
-
-    def is_alive(self):
-        if self.body.state != "Dead":
-            return True
-        return False
 
     def spend_time(self, time_spent):
         self.spend_absolute_time(time_spent / self.speed_ratio)
@@ -218,7 +206,12 @@ class Characters:
     def spend_absolute_time(self, time_spent):
         self.timeline += time_spent
 
-################## POSITIONS FUNCTIONS ######################
+    def spend_stamina(self, coefficient, ignore=False):
+        self.body.spend_stamina(coefficient * self.load_ratio, ignore)
+
+    def check_stamina(self, coefficient):
+        return self.body.check_stamina(coefficient * self.load_ratio)
+
     def check_position(self):
         if self.abscissa not in range(Characters.max_position_area):
             print("(Characters) Abscissa must be included in [0:", Characters.max_position_area, "]")
@@ -243,204 +236,6 @@ class Characters:
             self.ordinate = -1
             return False
 
-######################### CALCULATE FUNCTIONS ########################
-    def movement_handicap_ratio(self):
-        return math.sqrt(
-            (math.pow(self.load_ratio, 2) * math.pow(self.use_load_ratio, 1.0/2)) * \
-            (math.pow(self.bulk_ratio, 1.0/2) * math.pow(self.use_bulk_ratio, 2)))
-    
-    def calculate_load_ratios(self):
-        load = 0.0
-        use_load = 0.0
-        for weapon in self.weapons_stored:
-            load += weapon.load
-        for weapon in self.weapons_in_use:
-            load += weapon.load
-            use_load += weapon.load
-            if isinstance(weapon, RangedWeapons) and weapon.current_ammo:
-                use_load += weapon.current_ammo.load 
-        for ammo in self.ammo:
-            load += ammo.load
-        load += self.body.armors_load()
-        
-        self.load_ratio =  min(Characters.max_bonus, Characters.load_mean / max(1, load) * self.force_ratio)
-        self.body.load_ratio = math.pow(self.load_ratio, 0.5)
-        self.use_load_ratio = min(Characters.max_bonus, Characters.use_load_mean / max(1, use_load) * self.force_ratio)
-
-    def calculate_bulk_ratios(self):
-        bulk = 0.0
-        use_bulk = 0.0
-        for weapon in self.weapons_stored:
-            bulk += weapon.bulk
-        for weapon in self.weapons_in_use:
-            bulk += weapon.bulk
-            use_bulk += weapon.bulk
-            if isinstance(weapon, Bows) and weapon.current_ammo:
-                use_bulk += weapon.current_ammo.bulk * 10 #Arrow being used is bulkier
-        for ammo in self.ammo:
-            bulk += ammo.load
-        bulk += self.body.armors_bulk()
-        
-        self.bulk_ratio =  min(Characters.max_bonus, \
-            Characters.load_mean / max(1, bulk) * self.force_ratio)
-        self.use_bulk_ratio = min(Characters.max_bonus, \
-            Characters.use_bulk_mean / max(1, use_bulk) * self.force_ratio)
-
-    def calculate_agility(self):
-        self.agility = max(1, self.original_agility * self.load_ratio * self.bulk_ratio)
-     
-    def calculate_accuracies(self):
-        #Calculate weapons accuracies
-        melee_weapons_handiness = 0.0
-        ranged_weapons_accuracy = 0.0
-        melee_weapons_nb = 0.0
-        ranged_weapons_nb = 0.0
-        for weapon in self.weapons_in_use:
-            if isinstance(weapon, MeleeWeapons):
-                melee_weapons_handiness += weapon.melee_handiness * self.body.weapon_ratio(weapon)
-                melee_weapons_nb += 1
-            elif isinstance(weapon, RangedWeapons):
-                ranged_weapons_accuracy += weapon.accuracy * self.body.weapon_ratio(weapon)
-                ranged_weapons_nb += 1
-        
-        #Free hands melee accuracy
-        if self.body.left_arm.is_not_weapon_equiped():
-            melee_weapons_handiness += 15.0 * self.body.left_arm_global_ratio()
-            melee_weapons_nb += 1
-        if self.body.right_arm.is_not_weapon_equiped():
-            melee_weapons_handiness += 15.0 * self.body.right_arm_global_ratio()
-            melee_weapons_nb += 1
-            
-        #Avoid 0 division
-        melee_weapons_nb = max(1.0, melee_weapons_nb)
-        ranged_weapons_nb = max(1.0, ranged_weapons_nb)
-        
-        #Calculate accuracy coefs
-        melee_coef = (self.dexterity + self.agility/2 + self.force/3) / (1 + 1.0/2 + 1.0/3)
-        if self.is_using_a_crossbow():
-            ranged_coef = (self.dexterity + self.agility/3 + self.reflex/3) / (1 + 2.0/3)
-        else:
-            ranged_coef = (self.dexterity + self.force/2 + self.agility/3 + self.reflex/3) / (1 + 1.0/2 + 2.0/3)
-        
-        #Set accuracies
-        self.melee_handiness = max(1, self.body.melee_attack_global_ratio() * \
-            melee_coef * melee_weapons_handiness / melee_weapons_nb)
-        self.melee_handiness_ratio = self.melee_handiness / Characters.accuracy_mean
-        self.ranged_accuracy = max(1, self.body.ranged_attack_global_ratio() * \
-            ranged_coef * ranged_weapons_accuracy / ranged_weapons_nb)
-        self.ranged_accuracy_ratio = self.ranged_accuracy / Characters.accuracy_mean
-         
-    def calculate_melee_range(self):
-        #Calculate weapons melee_range
-        melee_range = 0.0
-        melee_weapons_nb = 0.0
-        for weapon in self.weapons_in_use:
-            if isinstance(weapon, Weapons):
-                melee_range += weapon.melee_range
-                melee_weapons_nb += 1
-        
-        #Free hands melee range
-        if self.body.left_arm.is_not_weapon_equiped() and self.body.right_arm.is_not_weapon_equiped():
-            melee_range = 5.0
-            melee_weapons_nb = 1
-
-        #Set range
-        self.melee_range = max(1, melee_range / melee_weapons_nb)    
-     
-    def calculate_attack_power(self):
-        #Calculate weapons damages
-        self.melee_power = 0.0
-        self.pen_rate = 0.0
-        self.resis_dim_rate = 0.0
-        self.ranged_power = 0.0
-        nb_of_weapons = 0.0
-        for weapon in self.weapons_in_use:
-            nb_of_weapons += 1
-            self.melee_power += weapon.melee_power * self.body.weapon_ratio(weapon)
-            #Do not divide if 2 hands are used. Divide by 2 if only 1 hand is used
-            self.pen_rate += weapon.pen_rate
-            self.resis_dim_rate += weapon.resis_dim_rate
-            if isinstance(weapon, RangedWeapons) and self.ranged_weapon_has_ammo(weapon):
-                if isinstance(weapon, Crossbows):
-                    self.ranged_power += weapon.range_power
-                else:
-                    self.ranged_power += weapon.range_power * self.body.weapon_ratio(weapon)
-        
-        #Free hands melee attack power
-        if self.body.left_arm.is_not_weapon_equiped():
-            self.melee_power += 0.75 * self.body.left_arm_global_ratio()
-            #Only one hand, divide by 2
-            self.pen_rate += 0.015 / 2.0
-            self.resis_dim_rate += 0.01 / 2.0
-        if self.body.right_arm.is_not_weapon_equiped():
-            self.melee_power += 0.75 * self.body.right_arm_global_ratio()
-            #Only one hand, divide by 2
-            self.pen_rate += 0.015 / 2.0
-            self.resis_dim_rate += 0.01 / 2.0
-            
-        #Calculate power coefs
-        melee_coef = (self.force + self.agility/2 + self.willpower/3) / (1 + 1.0/2 + 1.0/3)
-        ranged_coef = (self.force + self.dexterity/2 + self.willpower/3) / (1 + 1.0/2 + 1.0/3)
-            
-        #Set attack powers
-        self.pen_rate /= max(1.0, nb_of_weapons)
-        self.resis_dim_rate /= max(1.0, nb_of_weapons)
-        self.melee_power = max(1.0, melee_coef * self.melee_power * self.body.melee_attack_global_ratio())
-        if self.is_using_a_crossbow():
-            self.ranged_power *= 10 #Default power
-        else:
-            self.ranged_power *= max(1.0, ranged_coef * self.body.ranged_attack_global_ratio())
-        self.magic_power_ratio = self.body.global_ratio() * (self.spirit + self.willpower/2) / (1 + 1.0/2) / 10.0
-        self.magic_power = self.magic_power_ratio * 100
-    
-    def calculate_defense(self):
-        #Calculate equipments defense
-        melee_defense = 0.0
-        ranged_defense = 0.0
-        shield_magic_defense = 0.0  # Where shield can be used against magic attacks
-        for weapon in self.weapons_in_use:
-            if isinstance(weapon, Shields):
-                melee_defense += weapon.defense * self.body.weapon_ratio(weapon)
-                ranged_defense += weapon.defense * self.body.weapon_ratio(weapon)
-                shield_magic_defense += weapon.defense * self.body.weapon_ratio(weapon)
-            elif isinstance(weapon, AttackWeapons):
-                melee_defense += weapon.defense * self.body.weapon_ratio(weapon)
-        
-        #Free hands melee defense
-        if self.body.left_arm.is_not_weapon_equiped():
-            melee_defense += 0.75 * self.body.left_arm_global_ratio()
-        if self.body.right_arm.is_not_weapon_equiped():
-            melee_defense += 0.75 * self.body.right_arm_global_ratio()
-        
-        #Calculate defense coefs
-        melee_coef = self.body.defense_global_ratio() * \
-            (self.reflex + self.agility/2 + self.force/2) / (1 + 2.0/2)
-        #Skills do not really matter for ranged defense
-        #The bigger you are, the harder it is to defend
-        ranged_coef = math.sqrt((self.reflex + self.agility/2) / (1 + 1.0/2)) / self.constitution_ratio
-        
-        #Set defenses
-        self.armor_resistance = self.body.armors_resistance()
-        self.armor_defense = self.body.armors_defense()
-        self.melee_defense = melee_defense * melee_coef
-        self.ranged_defense = ranged_defense * ranged_coef
-        self.magic_defense = max(1, (self.spirit + self.willpower/2 + self.constitution/3) \
-             * 10 / (1 + 1.0/2 + 1.0/3) * self.body.global_ratio())
-        self.magic_defense_with_shields = self.magic_defense + shield_magic_defense
-        
-    def calculate_dodging(self):
-        #More equipment used, lower dodge ratio
-        #The bigger you are, the harder is to dodge
-        self.dodging = max(1, self.body.defense_global_ratio() * 10 * \
-            (self.reflex + self.agility) / (1.0 + 1.0) / self.constitution_ratio)
-
-    @staticmethod
-    def get_speed_ratio_by_coef(coefficient):
-        return max(Characters.min_speed, coefficient)
-        
-    def calculate_speed_ratio(self): 
-        self.speed_ratio = Characters.get_speed_ratio_by_coef(self.body.global_ratio())
-
     def get_fighting_availability(self, timeline):
         char_defense_time = global_variables.defense_time * self.speed_ratio
         total_time = 0
@@ -449,8 +244,100 @@ class Characters:
             if time > 0:
                 total_time += time
         return 1.0 / (1.0 + total_time / char_defense_time)
+
+######################### CHARACTERISTICS FUNCTIONS ########################
+    def calculate_load_ratios(self):
+        self.load_ratio = min(Characters.max_bonus,
+                              Characters.load_mean
+                              / max(1.0, self.equipments.get_full_load())
+                              * self.force_ratio)
+        
+        self.use_load_ratio = min(Characters.max_bonus, 
+                                  Characters.use_load_mean 
+                                  / max(1.0, self.equipments.get_in_use_load()) 
+                                  * self.force_ratio)
+
+    def calculate_bulk_ratios(self):
+        self.bulk_ratio = min(Characters.max_bonus,
+                              Characters.bulk_mean
+                              / max(1.0, self.equipments.get_full_bulk())
+                              * self.force_ratio)
+
+        self.use_bulk_ratio = min(Characters.max_bonus,
+                                  Characters.use_bulk_mean
+                                  / max(1.0, self.equipments.get_in_use_bulk())
+                                  * self.force_ratio)
+
+    def calculate_agility(self):
+        self.agility = self.original_agility \
+                       * math.pow(self.load_ratio, 1.0 / 3.0) \
+                       * math.pow(self.use_load_ratio, 1.0 / 2.0)
+
+    def calculate_speed_ratio(self):
+        self.speed_ratio = max(Characters.min_speed, self.body.global_ratio())
+
+    def calculate_accuracies(self):
+        weapons_accuracies = self.equipments.calculate_accuracies()
+        
+        # Calculate accuracy coefs
+        melee_coef = (self.dexterity + self.agility/2 + self.force/3) / (1 + 1.0/2 + 1.0/3)
+        if self.equipments.is_using_a_crossbow():
+            ranged_coef = (self.dexterity + self.agility/3 + self.reflex/3) / (1 + 2.0/3)
+        else:
+            ranged_coef = (self.dexterity + self.force/2 + self.agility/3 + self.reflex/3) / (1 + 1.0/2 + 2.0/3)
+        
+        # Set accuracies
+        self.melee_handiness = self.body.global_ratio() * melee_coef * weapons_accuracies["melee_weapons"]
+        self.melee_handiness_ratio = self.melee_handiness / Characters.accuracy_mean
+        self.ranged_accuracy = self.body.global_ratio() * ranged_coef * weapons_accuracies["ranged_weapons"]
+        self.ranged_accuracy_ratio = self.ranged_accuracy / Characters.accuracy_mean
+         
+    def calculate_melee_range(self):
+        self.melee_range = self.equipments.calculate_melee_range()
+     
+    def calculate_attack_power(self):
+        attack_powers = self.equipments.calculate_attack_power()
+            
+        # Calculate power coefs
+        melee_coef = (self.force + self.agility/2 + self.willpower/3) / (1 + 1.0/2 + 1.0/3)
+        ranged_coef = (self.force + self.dexterity/2 + self.willpower/3) / (1 + 1.0/2 + 1.0/3)
+        magical_coef = (self.spirit + self.willpower/2) / (1 + 1.0/2)
+            
+        # Set attack powers
+        self.pen_rate = attack_powers["pen_rate"]
+        self.resis_dim_rate = attack_powers["resis_dim_rate"]
+        self.melee_power = self.body.global_ratio() * melee_coef * attack_powers["melee_power"]
+        if self.equipments.is_using_a_crossbow():
+            self.ranged_power = 10.0 * attack_powers["ranged_power"]  # Physical state doesn't influence crossbow power
+        else:
+            self.ranged_power = self.body.global_ratio() * ranged_coef * attack_powers["ranged_power"]
+        self.magic_power = self.body.global_ratio() * magical_coef * 10.0
+        self.magic_power_ratio = self.magic_power / 100.0
+    
+    def calculate_defense(self):
+        weapons_defense = self.equipments.calculate_defense()
+        
+        # Calculate defense coefs
+        melee_coef = (self.reflex + self.agility/2 + self.force/2) / (1 + 2.0/2)
+        # Skills do not really matter for ranged defense, the bigger you are, the harder it is to defend
+        ranged_coef = math.sqrt((self.reflex + self.agility/2) / (1 + 1.0/2)) / self.constitution_ratio
+        magic_coef = (self.spirit + self.willpower/2 + self.constitution/3) / (1 + 1.0/2 + 1.0/3)
+        
+        # Set defenses
+        self.melee_defense = self.body.global_ratio() * melee_coef * weapons_defense["melee_defense"]
+        self.ranged_defense = self.body.global_ratio() * ranged_coef * weapons_defense["ranged_defense"]
+        self.magic_defense = self.body.global_ratio() * magic_coef * 10.0
+        self.magic_defense_with_shields = self.magic_defense + weapons_defense["magic_defense"]
+        
+    def calculate_dodging(self):
+        # The bigger you are, the harder is to dodge
+        dodging_coef = (self.reflex + self.agility) / (1.0 + 1.0) / self.constitution_ratio
+        # More bulky equipment, lower dodge ratio (load ratio already included in agility stat)
+        dodging_coef *= math.sqrt(math.pow(self.bulk_ratio, 1.0 / 3) * math.pow(self.use_bulk_ratio, 1.0 / 2))
+        self.dodging = self.body.global_ratio() * dodging_coef
     
     def calculate_characteristic(self):
+        # Must respect the order of the 3 first items
         self.calculate_load_ratios()
         self.calculate_bulk_ratios()
         self.calculate_agility()
@@ -461,9 +348,12 @@ class Characters:
 
         self.calculate_defense()
         self.calculate_dodging()
-        
         self.calculate_speed_ratio()
-        
+
+    def movement_handicap_ratio(self):
+        return math.sqrt(
+            (math.pow(self.load_ratio, 1.0 / 2) * math.pow(self.use_load_ratio, 1.0 / 3)) * \
+            (math.pow(self.bulk_ratio, 1.0 / 3) * math.pow(self.use_bulk_ratio, 1.0 / 2)))
 
 ###################### MELEE FUNCTIONS ########################
     @staticmethod
@@ -475,19 +365,18 @@ class Characters:
         return math.pow(melee_power * math.pow(melee_handiness, 1.0/3), 0.75)    
         
     def can_melee_attack(self, enemy):
-        if enemy.is_alive() and self.is_active() and \
-        enemy.abscissa in range(self.abscissa - 1, self.abscissa + 2) and \
-        enemy.ordinate in range(self.ordinate - 1, self.ordinate + 2):
+        if enemy.body.is_alive() and \
+                enemy.abscissa in range(self.abscissa - 1, self.abscissa + 2) and \
+                enemy.ordinate in range(self.ordinate - 1, self.ordinate + 2):
             return True
         return False
     
-    
 ###################### DAMAGE FUNCTIONS ########################
     def get_armor_coef(self, accuracy_ratio):
-        cover_ratio = self.body.member_cover_ratio(1)
+        cover_ratio = self.equipments.get_armor_cover_ratio()
         avoid_armor_chances = (1 - random.gauss(1, Characters.high_variance) * cover_ratio) * accuracy_ratio
         
-        if cover_ratio <= 0:
+        if cover_ratio == 0:
             print("The player has no armor!")
             time.sleep(2)
             return 0
@@ -507,51 +396,35 @@ class Characters:
         print("-- with a power of", int(round(attack_value)))
         time.sleep(2)        
         
-        damage_result = self.body.armor_damage_absorbed(attack_value, 1, armor_coef, resis_dim_rate, pen_rate)
+        damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, resis_dim_rate, pen_rate)
         
         if random.random() * accuracy_ratio < Characters.critical_hit_chance:
             print("The damages are amplified, because they hit a critical area!")
             damage_result *= Characters.critical_hit_boost
         
         if damage_result > 0:
-            life_ratio = self.body.loose_life(damage_result, 1)
+            life_ratio = self.body.loose_life(damage_result)
             # Damages received diminish the defender
             life_ratio = math.pow(2 - life_ratio, 2) - 1
             print("The shock of the attack delays the player of", round(life_ratio,2), "turn(s) and consume stamina")
             time.sleep(3)
             self.spend_time(life_ratio)
-            self.spend_stamina(life_ratio * 10, ignore=True)
+            self.body.spend_stamina(life_ratio * 10, ignore=True)
             
 ###################### RANGED FUNCTIONS ########################
     def calculate_point_distance(self, abscissa, ordinate):
-        return math.sqrt( \
-            math.pow(self.abscissa - abscissa, 2) + \
-            math.pow(self.ordinate - ordinate, 2))
+        return math.sqrt(math.pow(self.abscissa - abscissa, 2) + math.pow(self.ordinate - ordinate, 2))
         
-    
     def power_distance_ratio(self, enemy):
-        return max(0.25, 1 - \
-            self.calculate_point_distance(enemy.abscissa, enemy.ordinate) / self.has_range())
-    
-    
-    def power_hit_chance_ratio(self, hit_chance):
+        return max(0.25,
+                   1 - self.calculate_point_distance(enemy.abscissa, enemy.ordinate) / self.equipments.get_range())
+
+    @staticmethod
+    def power_hit_chance_ratio(hit_chance):
         return math.sqrt(hit_chance / 0.5)
     
-        
-    def has_range(self):
-        max_range = 10000
-        for weapon in self.weapons_in_use:
-            if isinstance(weapon, RangedWeapons):
-                max_range = min(max_range, weapon.get_max_range())
-        
-        if max_range == 10000:
-            return 0
-        else:
-            return max_range
-    
     def is_distance_reachable(self, enemy):        
-        if self.calculate_point_distance(enemy.abscissa, enemy.ordinate) \
-        <= self.has_range():
+        if self.calculate_point_distance(enemy.abscissa, enemy.ordinate) <= self.equipments.get_range():
             return True
         return False
     
@@ -569,13 +442,6 @@ class Characters:
         ac_length = self.calculate_point_distance(abscissa, ordinate)
         ah_length = ac_length * self.calculate_point_to_enemy_path_cos_angle(enemy, abscissa, ordinate)
         return math.sqrt(max(0, math.pow(ac_length, 2) - math.pow(ah_length, 2)))
-    
-    def has_ammo(self):
-        for weapon in self.weapons_in_use:
-            if isinstance(weapon, RangedWeapons):
-                if self.ranged_weapon_has_ammo(weapon):
-                    return True
-        return False
 
     def calculate_point_to_enemy_path_cos_angle(self, enemy, abscissa, ordinate):
         u_abs = enemy.abscissa - self.abscissa
@@ -596,74 +462,9 @@ class Characters:
 
         return angle
 
-    def ranged_weapon_has_ammo(self, ranged_weapon):  
-        for ammo in self.ammo:
-            if ranged_weapon.__class__ == ammo.ranged_weapon_type:
-                return True
-        return False        
-
-
-    def has_reloaded(self):
-        for weapon in self.weapons_in_use:
-            if isinstance(weapon, RangedWeapons) and not weapon.is_reloaded():
-                return False
-        return True
-    
-    
-    def reload(self, weapon, ammo):
-        weapon.print_obj()
-        weapon.reload(ammo)
-        self.ammo.remove(ammo)
-    
-    
-    def get_current_ammo(self):
-        for weapon in self.weapons_in_use:
-            if isinstance(weapon, RangedWeapons):
-                return weapon.current_ammo
-    
-    
-    def use_ammo(self):
-        for weapon in self.weapons_in_use:
-            if isinstance(weapon, RangedWeapons):
-                ammo_used = weapon.unload()
-                break
-        return ammo_used
-        
-        
-    def loose_reloaded_ammo(self):
-        has_lost = False
-        for weapon in self.weapons_in_use:
-            if isinstance(weapon, Bows) and weapon.is_reloaded():
-                has_lost = True
-                weapon.unload()
-        return has_lost
-        
-        
-    def is_using_a_crossbow(self):
-        for weapon in self.weapons_in_use:
-            if isinstance(weapon, Crossbows):
-                return True
-        return False
-    
-            
-    def is_using_a_bow(self):
-        for weapon in self.weapons_in_use:
-            if isinstance(weapon, Bows):
-                return True
-        return False
-        
-
 ##################### PRINTING FUNCTIONS ########################
     def print_basic(self):
         print("ID:", self.get_id(), ", Name:", self.name, end=' ')
-        
-    def print_equipments(self):
-        print("")
-        print("EQUIPMENTS:")
-        self.body.print_full_armors()
-        self.print_weapons_in_use()
-        self.print_weapons_stored()
-        self.print_ammo()
 
     def print_characteristics(self):
         print("")
@@ -676,7 +477,7 @@ class Characters:
             ", Willpower:", int(round(self.willpower)),
             ", Spirit:", int(round(self.spirit)),
             ", Moral:", int(round(self.moral)),
-            ", Empathy:", int(round(self.Empathy)))
+            ", Empathy:", int(round(self.empathy)))
 
     def print_spells_and_feelings(self):
         print("")
@@ -690,9 +491,7 @@ class Characters:
     def print_defense(self):
         print("")
         print("DEFENSE:")
-        print("    ArmorResistance:", int(round(self.armor_resistance)),
-            ", ArmorDefense:", int(round(self.armor_defense)),
-            ", Dodging:", int(round(self.dodging)),
+        print("    Dodging:", int(round(self.dodging)),
             ", MeleeDefense:", int(round(self.melee_defense)),
             ", RangedDefense:", int(round(self.ranged_defense)),
             ", MagicDefense:", int(round(self.magic_defense)))
@@ -708,90 +507,42 @@ class Characters:
             ", MagicPower:", int(round(self.magic_power)), end=' ')
         if self.ranged_power > 1:
             print(", RangedAccuracy:", int(round(self.ranged_accuracy)),
-                ", RangedPower:", int(round(self.ranged_power)), end=' ')
-            self.print_ranged_info()
+                ", RangedPower:", int(round(self.ranged_power)),
+                ", RangedRange:", int(round(self.equipments.get_range())))
         else:
             print("")
-
-    def print_ranged_info(self):
-        use_ranged_weapon = False
-        for weapon in self.weapons_in_use:
-            if isinstance(weapon, RangedWeapons):
-                use_ranged_weapon = True
-                break
-        if use_ranged_weapon:
-            max_range = 10000
-            for weapon in self.weapons_in_use:
-                if isinstance(weapon, RangedWeapons):
-                    max_range = min(max_range, weapon.get_max_range())
-            print(", MaxRange:", max_range, ", AmmoLeft:", len(self.ammo),
-                ", CurrentAmmo:", weapon.current_ammo)
                  
     def print_time_state(self):
         print(", SpeedRatio:", round(self.speed_ratio, 2),
             ", Timeline:", round(self.timeline, 2),
             ", CurrentAction:", self.last_action)
 
-    def print_weapons_stored(self):
-        print("Weapons stored:")
-        if len(self.weapons_stored) <= 0:
-            print("\\No weapon stored")
-            return False
-        for weapon in self.weapons_stored:
-            print("\\", end=' ')
-            weapon.print_obj()
-        return True
-
-    def print_weapons_in_use(self):
-        print("")
-        print("Weapons used:")
-        if len(self.weapons_in_use) <= 0:
-            print("\\No weapon used")
-            return False
-        for weapon in self.weapons_in_use:
-            print("\\", end=' ')
-            weapon.print_obj()
-        return True
-
-    def print_ammo(self):
-        print("Ammo available:")
-        if len(self.ammo) <= 0:
-            print("\\No ammo")
-            return False
-        for weapon in self.ammo:
-            print("\\", end=' ')
-            weapon.print_obj()
-        return True
-
     def print_state(self):
         self.print_basic()
-        self.body.print_basic()
+        self.body.print_obj()
         self.print_time_state()
-        self.print_defense()
-        self.print_attack()
-        self.print_spells_and_feelings()
 
     def print_detailed_state(self):
         self.print_basic()
         print("")
-        self.body.print_detailed_basic()
+        self.body.print_obj()
         self.print_time_state()
         self.print_defense()
         self.print_attack()
         self.print_spells_and_feelings()
+        self.equipments.print_obj()
 
     def print_defense_state(self):
         self.print_basic()
-        self.body.print_basic()
+        self.body.print_obj()
         self.print_time_state()
         self.print_defense()
 
     def print_attack_state(self):
         self.print_basic()
-        self.body.print_basic()
+        self.body.print_obj()
         self.print_time_state()
         self.print_attack()
   
     def print_obj(self):
         self.print_detailed_state()
-        self.print_equipments()

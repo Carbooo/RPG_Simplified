@@ -22,21 +22,21 @@ class ReloadChar(ActiveActions):
             print("You do not have enough stamina (",
                   self.initiator.body.return_current_stamina(), ") to reload, action cancelled!")
             return False
-        elif self.initiator.is_using_a_ranged_weapon() is False:
+        elif self.initiator.equipments.is_using_a_ranged_weapon() is False:
             print("You are not using a ranged weapon, action cancelled!")
             return False
-        elif self.initiator.has_reloaded():
+        elif self.initiator.equipments.has_reloaded():
             print("You have already reloaded your ranged weapons, action cancelled!")
             return False
-        elif self.initiator.has_ammo() is False:
+        elif self.initiator.equipments.has_ammo() is False:
             print("You do not have ammo anymore, action cancelled!")
             return False
 
-        for weapon in self.initiator.weapons_use:
+        for weapon in self.initiator.equipments.weapons_in_use:
             if isinstance(weapon, RangedWeapons):
                 self.weapon_to_reload = weapon
                 ammo_available = []
-                for ammo in self.initiator.ammo:
+                for ammo in self.initiator.equipments.ammo:
                     if ammo.ranged_weapon_type == weapon.__class__:
                         ammo_found = False
                         for ammo_bis in ammo_available:
@@ -47,7 +47,7 @@ class ReloadChar(ActiveActions):
                             ammo_available.append(ammo)
 
                 if len(ammo_available) == 1:
-                    self.ammo_to_load = ammo_available[0]
+                    self.ammo_to_load  = ammo_available[0]
                     
                 elif len(ammo_available) > 1:
                     print("Choose the ammo to reload:")
@@ -66,7 +66,7 @@ class ReloadChar(ActiveActions):
                             continue
                         for ammo in ammo_available:
                             if ammo.get_id() == read:
-                                self.ammo_to_load = ammo
+                                self.ammo_to_load  = ammo
                                 ammo_chosen = True
                                 break
                         print("ID:", read, "is not available")
@@ -83,6 +83,6 @@ class ReloadChar(ActiveActions):
         return True
     
     def execute(self):
-        self.initiator.reload(self.weapon_to_reload, self.ammo_to_load)
+        self.initiator.equipments.reload(self.weapon_to_reload, self.ammo_to_load )
         self.initiator.last_action = None  # To remove it from the scheduler
         return True

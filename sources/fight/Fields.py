@@ -126,13 +126,13 @@ class Fields:
         return True
 
     def is_target_reachable(self, attacker, target):
-        if target.is_alive() and attacker.is_distance_reachable(target) and \
+        if target.body.is_alive() and attacker.is_distance_reachable(target) and \
                 self.calculate_ranged_obstacle_ratio(attacker, target) > 0:
             return True
         return False
         
     def is_target_magically_reachable(self, attacker, target):
-        if target.is_alive() and attacker.is_distance_magically_reachable(target) and \
+        if target.body.is_alive() and attacker.is_distance_magically_reachable(target) and \
                 self.calculate_ranged_obstacle_ratio(attacker, target) > 0:
             return True
         return False
@@ -190,7 +190,7 @@ class Fields:
 
         # Calculate shoot length
         length = attacker.calculate_point_distance(target.abscissa, target.ordinate)
-        length += (attacker.has_range() - length) / 3  # shoot length depend of target distance
+        length += (attacker.equipments.get_range() - length) / 3  # shoot length depend of target distance
         length *= max(0, random.gauss(1, Characters.variance))
 
         # Browse shoot path
@@ -219,12 +219,9 @@ class Fields:
         return False
 
     ###################### SET AND MOVE FUNCTIONS #####################
-    def calculate_state(self, character):
-        old_state = character.body.state
-        character.calculate_state()
-        new_state = character.body.state
-
-        if new_state != old_state and new_state == "Dead":
+    def remove_dead_char(self, character):
+        if character.body.state == "Dead" and \
+                character == self.characters_array[character.abscissa, character.ordinate]:
             self.characters_array[character.abscissa, character.ordinate] = None
 
     def reset_characters_array(self):

@@ -53,7 +53,7 @@ class MeleeAttackChar(ActiveActions):
             self.target = char
             if self.initiator.can_melee_attack(self.target):
                 print("----------------------------")
-                print("----- Fighting availability: ",
+                print("----- FIGHTING AVAILABILITY: ",
                     self.target.get_fighting_availability(self.timeline),
                     " -----")
                 self.target.print_state()
@@ -106,10 +106,6 @@ class MeleeAttackChar(ActiveActions):
                     time.sleep(2)
                 
         self.end_update([self.initiator, self.target], Characters.MeleeAttack[3], Characters.MeleeAttack[2])
-        
-        # State result
-        self.fight.field.calculate_state(self.target)
-        self.fight.field.calculate_state(self.initiator)
         return True
 
     def melee_defense_result(self):
@@ -140,15 +136,15 @@ class MeleeAttackChar(ActiveActions):
         # Calculate final result
         if self.actual_defense == "Dodge":
             attack_result = dodge_result + defense_result / 3
-            self.target.all_weapons_absorbed_damage(min(attack_power, defense_level) / 3)
-            self.initiator.all_melee_weapons_absorbed_damage(min(attack_power, defense_level) / 9)
+            self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level) / 3)
+            self.initiator.equipments.all_melee_weapons_absorbed_damage(min(attack_power, defense_level) / 9)
         elif self.actual_defense == "Defense":
             attack_result = defense_result + dodge_result / 3
-            self.target.all_weapons_absorbed_damage(min(attack_power, defense_level))
-            self.initiator.all_melee_weapons_absorbed_damage(min(attack_power, defense_level) / 3)
+            self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level))
+            self.initiator.equipments.all_melee_weapons_absorbed_damage(min(attack_power, defense_level) / 3)
         else:
             attack_result = attack_power
-            self.initiator.all_melee_weapons_absorbed_damage(min(attack_power, defense_level) / 3)
+            self.initiator.equipments.all_melee_weapons_absorbed_damage(min(attack_power, defense_level) / 3)
 
         return attack_result
 

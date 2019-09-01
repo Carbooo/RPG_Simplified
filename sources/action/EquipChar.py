@@ -25,12 +25,12 @@ class EquipChar(ActiveActions):
                   self.initiator.body.get_current_stamina(), ") to modify your equipment")
             return False
         
-        if self.initiator.nb_of_hands_used() == 2 or (
-        self.initiator.nb_of_hands_used() == 1 and not self.initiator.weapons_stored):
+        if self.initiator.equipments.free_hands == 0 or (
+                self.initiator.equipments.free_hands == 1 and not self.initiator.equipments.weapons_stored):
             return self.unequip_spec_weapons()
-        elif self.initiator.nb_of_hands_used() == 0 and self.initiator.weapons_stored:
+        elif self.initiator.equipments.free_hands == 2 and self.initiator.equipments.weapons_stored:
             return self.equip_spec_weapons()
-        elif self.initiator.nb_of_hands_used() == 1 and self.initiator.weapons_stored:
+        elif self.initiator.equipments.free_hands == 1 and self.initiator.equipments.weapons_stored:
             while 1:
                 print("Do you want to equip (EQP) or unequip (UQP) weapons?")            
                 read = input('--> Action (0 = Cancel): ')
@@ -61,7 +61,7 @@ class EquipChar(ActiveActions):
         return self.result()
 
     def unequip_spec_weapons(self):
-        equipped_list = copy.copy(self.initiator.weapons_in_use)
+        equipped_list = copy.copy(self.initiator.equipments.weapons_in_use)
         equipment_to_remove = []
         while 1:
             print("Current weapons:")
@@ -114,11 +114,11 @@ class EquipChar(ActiveActions):
         return self.result()
 
     def equip_spec_weapons(self):
-        equipped_list = copy.copy(self.initiator.weapons_in_use)
+        equipped_list = copy.copy(self.initiator.equipments.weapons_in_use)
         not_equipped_list = []
         new_equipment = []
-        for weapon in self.initiator.weapons_stored:
-            if weapon not in self.initiator.weapons_in_use:
+        for weapon in self.initiator.equipments.weapons_stored:
+            if weapon not in self.initiator.equipments.weapons_in_use:
                 not_equipped_list.append(weapon)
                 
         while 1:
@@ -180,11 +180,11 @@ class EquipChar(ActiveActions):
     def result(self):
         if self.next_equipment:
             for weapon in self.next_equipment:
-                if not self.initiator.add_weapon_in_use(weapon):
+                if not self.initiator.equipments.set_weapon_in_use(weapon):
                     return False
         else:
             for weapon in self.next_unequipment:
-                if not self.initiator.remove_weapon_in_use(weapon):
+                if not self.initiator.equipments.remove_weapon(weapon):
                     return False
        
         self.end_update([self.initiator], self.equip_time * Characters.Equip[3], self.equip_time)

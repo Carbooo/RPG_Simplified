@@ -26,8 +26,8 @@ class Fights:
     def __init__(self, field, team1, team2):
         Fights.list.append(self)
         self.field = field
-        self.team1 = team1.copy()
-        self.team2 = team2.copy()
+        self.team1 = team1
+        self.team2 = team2
         
         self.nb_of_turn = 1
         self.timeline = 1
@@ -106,9 +106,9 @@ class Fights:
                     if not next_event.last_action.execute():
                         next_event.last_action = None  # Stop action if error encounter
                     
-                elif next_event.is_shape_k_o():
+                elif next_event.body.is_shape_ko():
                     # Rest if too exhausted for any actions
-                    self.print_k_o_state_rest(next_event)
+                    self.print_ko_state_rest(next_event)
                     next_event.body.global_rest(1)
                     next_event.spend_absolute_time(1)
                     
@@ -145,7 +145,7 @@ class Fights:
         
         for char in self.char_order:
             if char.exceeded_feelings_check():
-                self.field.calculate_state(char)
+                self.field.remove_dead_char(char)
         
     def print_new_turn(self):
         print("")
@@ -175,13 +175,13 @@ class Fights:
             print("******************** OPPONENT TEAM ALIVE STATE ******************")
             self.team1.print_alive_states()
         
-        print("")                
-        self.field.print_obj()
         print("")
-        self.scheduler[0].print_state()
-        self.scheduler[0].print_weapons_in_use()
+        print("******************** CURRENT CHARACTER STATE ******************")
+        self.scheduler[0].print_detailed_state()
+        print("")
+        self.field.print_obj()
         
-    def print_k_o_state_rest(self, character):
+    def print_ko_state_rest(self, character):
         print("")
         print("*********************************************************************")
         character.print_basic()
@@ -192,11 +192,10 @@ class Fights:
         print("")
         time.sleep(3)
         
-        
     def order_scheduler(self):
         scheduler_list = [self.scheduler[0]]
         for event in self.scheduler[1::]:
-            if isinstance(event, Characters) and not event.is_life_active():
+            if isinstance(event, Characters) and not event.body.is_life_active():
                 continue
             for j in range(len(scheduler_list)):
                 if event.timeline < scheduler_list[j].timeline:
@@ -209,7 +208,7 @@ class Fights:
                     break                        
                 elif j == len(scheduler_list) - 1:
                     scheduler_list.append(event)
-        if isinstance(self.scheduler[0], Characters) and not self.scheduler[0].is_life_active():
+        if isinstance(self.scheduler[0], Characters) and not self.scheduler[0].body.is_life_active():
             #First event has not been tested
             scheduler_list.remove(self.scheduler[0])
         self.scheduler = scheduler_list
@@ -218,7 +217,7 @@ class Fights:
         time_diff = self.current_timeline - self.last_timeline
         for char in self.char_order:
             char.body.turn_rest(time_diff)
-            self.field.calculate_state(char)
+            self.field.remove_dead_char(char)
             
             for type in char.feelings:
                 char.feelings[type].natural_energy_update(time_diff)
@@ -447,5 +446,5 @@ class Fights:
                 print("You loose the ammo used for reloading!")
                 char.ammo.remove(char.last_action.ammo_to_load)
 
-        if char.loose_reloaded_ammo():
+        if char.equipments.loose_reloaded_ammo():
             print("Your bow has lost its loaded arrow!")

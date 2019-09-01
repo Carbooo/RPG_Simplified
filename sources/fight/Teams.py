@@ -8,13 +8,12 @@ from sources.character.Characters import Characters
 class Teams:
     """Common base class for all teams"""
     list = []
-    instances_count = 0
 
     def __init__(self, name, characters_name_list):
         for team in Teams.list:
             if team.name == name:
                 print("(Teams) Team creation failed because the name:", name, "is already used !")
-                return False
+                exit(0)
         self.name = name
 
         self.characters_list = []
@@ -27,41 +26,24 @@ class Teams:
                     break
             if not char_found:
                 print("(Teams) Team creation failed because the character name:", name, "cannot be found !")
-                return False
+                exit(0)
 
-        self.ID = Teams.instances_count
-        Teams.instances_count += 1
-        self.original_i_d = len(Teams.list)
+        self.ID = len(Teams.list)
         Teams.list.append(self)
 
     def get_id(self):
         return self.ID
 
-    def copy(self):
-        # Copy team settings
-        team = copy.copy(self)
-        if team.ID != 0:
-            team.ID = Characters.instances_count
-            Teams.instances_count += 1
-
-        # Copy characters
-        new_list = []
-        for char in team.characters_list:
-            new_list.append(char.copy())
-        team.list = new_list
-
-        return team
-
     #################### BASIC FUNCTIONS ########################
     def is_life_active(self):
         for char in self.characters_list:
-            if char.is_life_active():
+            if char.body.is_life_active():
                 return True
         return False
 
     def is_alive(self):
         for char in self.characters_list:
-            if char.is_alive():
+            if char.body.is_alive():
                 return True
         return False
 

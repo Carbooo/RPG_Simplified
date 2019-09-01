@@ -22,7 +22,7 @@ class RangedAttackChar(ActiveActions):
         super().__init__(fight, initiator)
         self.name = "Ranged attacking"
         self.target = None
-        self.ammo_used = self.initiator.get_current_ammo()
+        self.ammo_used = self.initiator.equipments.get_current_ammo()
         self.shooting_time = 1
         self.is_a_success = self.start()
 
@@ -31,7 +31,7 @@ class RangedAttackChar(ActiveActions):
             print("You do not have enough stamina (",
                   self.initiator.body.get_current_stamina(), ") for a ranged attack")
             return False
-        elif self.initiator.is_using_a_ranged_weapon() is False:
+        elif self.initiator.equipments.is_using_a_ranged_weapon() is False:
             print("You are not using a ranged weapon")
             return False
         elif self.can_ranged_attack() is False:
@@ -69,9 +69,8 @@ class RangedAttackChar(ActiveActions):
                     hit_chance = hit_chance_list_bis[j]
                     hit_number = j
             self.target = enemy_list_bis.pop(hit_number)
-            print("----- HIT CHANCE:", round(hit_chance_list_bis.pop(hit_number), 2))
-            print("----- Fighting availability: ",
-                  self.target.get_fighting_availability(self.timeline),
+            print("----- HIT CHANCE:", round(hit_chance_list_bis.pop(hit_number), 2),
+                  "-- FIGHTING AVAILABILITY:", self.target.get_fighting_availability(self.timeline),
                   " -----")
             self.target.print_state()
 
@@ -122,7 +121,6 @@ class RangedAttackChar(ActiveActions):
         elif target is True:
             print("The shoot has hit its target!")
             self.range_defend(hit_chance)
-            self.fight.field.calculate_state(self.target)
 
         else:
             print("The shoot has hit the WRONG target! It has hit:")
@@ -131,10 +129,9 @@ class RangedAttackChar(ActiveActions):
             self.target = target
             time.sleep(3)
             self.range_defend(math.sqrt(1 - hit_chance))
-            self.fight.field.calculate_state(self.target)
 
-        self.initiator.use_ammo()
-        if self.initiator.is_using_a_crossbow():
+        self.initiator.equipments.use_ammo()
+        if self.initiator.equipments.is_using_a_crossbow():
             stamina = Characters.RangedAttack[3] * self.shooting_time / 10
         else:
             stamina = Characters.RangedAttack[3] * self.shooting_time
@@ -144,7 +141,7 @@ class RangedAttackChar(ActiveActions):
     def range_defend(self, hit_chance):
         # Calculate att coef
         att_coef = self.initiator.power_distance_ratio(self.target) \
-                   * self.initiator.power_hit_chance_ratio(hit_chance) \
+                   * Characters.power_hit_chance_ratio(hit_chance) \
                    * self.get_attack_coef(self.initiator)
         print("ranged_att_coef:", att_coef)
 
@@ -171,7 +168,7 @@ class RangedAttackChar(ActiveActions):
     def shoot_hit_chance(self):
         # Distance = -a*(x-1) + b --> distance min = 1.0, distance max = 0.0
         h_dist = max(0, (self.initiator.calculate_point_distance(self.target.abscissa,
-                                                                 self.target.ordinate) - 1) / self.initiator.has_range() * -1 + 1)
+                                                                 self.target.ordinate) - 1) / self.initiator.equipments.get_range() * -1 + 1)
 
         h_obs = self.fight.field.calculate_ranged_obstacle_ratio(self.initiator, self.target)
 
@@ -196,11 +193,11 @@ class RangedAttackChar(ActiveActions):
         return coef
 
     def can_ranged_attack(self):
-        if self.initiator.has_ammo() is False:
+        if self.initiator.equipments.has_ammo() is False:
             print("No ammo for a ranged attack")
             return False
 
-        if self.initiator.has_reloaded() is False:
+        if self.initiator.equipments.has_reloaded() is False:
             print("Ranged weapons are not reloaded")
             return False
 

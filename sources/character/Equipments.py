@@ -324,8 +324,8 @@ class RangedWeapons(AttackWeapons):
 
     def print_obj(self):
         AttackWeapons.print_obj(self)
-        print(", Range power:", round(self.range_power, 1), ", Accuracy:", round(self.accuracy, 1),
-              ", Reload time:", round(self.reload_time, 1), ", Ammo:", end=' ')
+        print(", RangePower:", round(self.range_power, 1), ", Accuracy:", round(self.accuracy, 1),
+              ", MaxRange:", self.get_max_range(), ", ReloadTime:", round(self.reload_time, 1), ", Ammo:", end=' ')
         if self.current_ammo:
             print(self.current_ammo.name, end=' ')
         else:
@@ -335,14 +335,12 @@ class RangedWeapons(AttackWeapons):
         ratio = AttackWeapons.decrease(self, damage)
         self.accuracy = self.original_accuracy * math.pow(ratio, 1.0/3)
         return ratio
-     
-    
+
     def is_reloaded(self):
         if self.current_ammo:
             return True
         else:
             return False
-
 
     def reload(self, ammo):
         self.current_reload = self.reload_time
@@ -351,32 +349,28 @@ class RangedWeapons(AttackWeapons):
         else:
             print("(Equipments) Error, parameter (", ammo, ") is not an ammo")
 
-
     def unload(self):
         self.current_reload = 0
         ammo_used = self.current_ammo 
-        self.current_ammo = False
+        self.current_ammo = None
         return ammo_used
-    
         
     def get_accuracy(self):
-        if self.current_ammo is False:
+        if not self.current_ammo:
             return 0.0
         else:
             return self.accuracy * self.current_ammo.stability_ratio()
-    
         
     def get_accuracy_ratio(self):
         return self.get_accuracy() / 10.0
-            
-    
+
     def get_max_range(self):
-        if self.current_ammo is False:
+        if not self.current_ammo:
             return 0.0
         else:
             return math.pow(self.current_ammo.stability_ratio(), 1.0 / 1.75) * 10 \
                 * self.get_accuracy_ratio() 
-        
+
 
 #############################################################
 ####################### BOW CLASS ###########################

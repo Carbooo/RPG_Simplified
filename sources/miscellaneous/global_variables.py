@@ -4,4 +4,4 @@ high_variance = 0.25 # Gauss variance
 
 defense_time = 0.5  # Turn time before having a fully operational defense
 
-feelings_list = ["wrath", "joy", "love", "hate", "fear", "sadness"]
+feelings_list = ["Wrath", "Joy", "Love", "Hate", "Fear", "Sadness"]

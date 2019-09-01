@@ -38,7 +38,7 @@ class WrathSpells(Spells):
     }
  
     def __init__(self, fight, initiator, spell_code):
-        super().__init__(fight, initiator, "wrath", spell_code)
+        super().__init__(fight, initiator, "Wrath", spell_code)
         self.spell_stamina = WrathSpells.spells_stamina[self.spell_code]
         self.spell_time = WrathSpells.spells_time[self.spell_code]
         self.spell_energy = WrathSpells.spells_energy[self.spell_code]

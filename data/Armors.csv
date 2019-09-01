@@ -1,13 +1,4 @@
-Name;Load;Bulk;Resistance;DefCover;Defense;Member
-Leather coif;1.5;0.5;0.5;4;5;Head
-Mail coif;6;1;2.5;6;20;Head
-Full helmet;9;3;5;9;40;Head
-Breast leather;4;0.5;1.5;9;9;Chest
-Breast mail;16;1;5;9;45;Chest
-Breast plate;24;2;10;9;90;Chest
-Arms leather;3;0.5;1;9;7;Arms
-Arms mail;12;1;4;9;35;Arms
-Arms plate;18;2;8;9;70;Arms
-Legs leather;3;0.5;1;7;7;Legs
-Legs mail;12;1;4;7;35;Legs
-Legs plate;18;2;8;7;70;Legs
+Name;Load;Bulk;Resistance;DefCover;Defense
+Leather armor;20;3;5;7;40
+Mail armor;60;6;25;8;200
+Plate armor;100;12;50;9;400
