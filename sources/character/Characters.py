@@ -18,7 +18,7 @@ class Characters:
     max_position_area = 6  # Max range for characters positions
     variance = 0.1  # Gauss variance
     high_variance = 0.25  # Gauss variance
-    max_bonus = 1.5  # Max load bonus
+    max_bonus = 1.5  # Max load and bulk bonus
     load_mean = 50.0  # Load reference for characters characteristics
     bulk_mean = 6.0  # Bulk reference for characters characteristics
     use_load_mean = 15.0  # Weapons use load reference for characters
@@ -207,10 +207,10 @@ class Characters:
         self.timeline += time_spent
 
     def spend_stamina(self, coefficient, ignore=False):
-        self.body.spend_stamina(coefficient * self.load_ratio, ignore)
+        self.body.spend_stamina(coefficient / self.load_ratio, ignore)
 
     def check_stamina(self, coefficient):
-        return self.body.check_stamina(coefficient * self.load_ratio)
+        return self.body.check_stamina(coefficient / self.load_ratio)
 
     def check_position(self):
         if self.abscissa not in range(Characters.max_position_area):
@@ -398,7 +398,7 @@ class Characters:
         
         damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, resis_dim_rate, pen_rate)
         
-        if random.random() * accuracy_ratio < Characters.critical_hit_chance:
+        if accuracy_ratio != 0 and random.random() / accuracy_ratio < Characters.critical_hit_chance:
             print("The damages are amplified, because they hit a critical area!")
             damage_result *= Characters.critical_hit_boost
         
@@ -409,7 +409,7 @@ class Characters:
             print("The shock of the attack delays the player of", round(life_ratio,2), "turn(s) and consume stamina")
             time.sleep(3)
             self.spend_time(life_ratio)
-            self.body.spend_stamina(life_ratio * 10, ignore=True)
+            self.spend_stamina(life_ratio * 10, ignore=True)
             
 ###################### RANGED FUNCTIONS ########################
     def calculate_point_distance(self, abscissa, ordinate):
@@ -524,7 +524,6 @@ class Characters:
 
     def print_detailed_state(self):
         self.print_basic()
-        print("")
         self.body.print_obj()
         self.print_time_state()
         self.print_defense()

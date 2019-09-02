@@ -47,7 +47,7 @@ class Spells(ActiveActions):
             print("You don't have enough stamina (", self.spell_stamina, ") to cast this spell")
             return False
 
-        if self.initiator.body.free_hands < free_hands_required:
+        if self.initiator.equipments.free_hands < free_hands_required:
             print("You don't have enough free hands (", free_hands_required, ") to cast this spell")
             return False
 
@@ -66,32 +66,39 @@ class Spells(ActiveActions):
                     distance_ratio = (max_distance - char.calculate_point_distance(abscissa, ordinate)) / max_distance
                     if distance_ratio > 0:
                         char_list.append((char, distance_ratio))
+
+        if self.initiator in char_list:
+            # Put the initiator in last, so the self damages made are not influencing the damages made to others
+            char_list.remove(self.initiator)
+            char_list.append(self.initiator)
+
         return char_list
 
-    def magical_attack_received(self, attack_value, accuracy_ratio, is_localized, can_use_shield, resis_dim_rate,
-                                pen_rate):
-        self.fight.stop_action(self.target, self.initiator.timeline)
+    def magical_attack_received(self, target, attack_value, accuracy_ratio, is_localized, can_use_shield, 
+                                resis_dim_rate, pen_rate):
+        if target != self.initiator:
+            self.fight.stop_action(target, self.initiator.timeline)
 
         if can_use_shield:
-            attack_value -= self.target.magic_defense_with_shields * self.get_attack_coef(self.target)
-            self.target.all_shields_absorbed_damage(attack_value)
+            attack_value -= target.magic_defense_with_shields * self.get_attack_coef(target)
+            target.equipments.all_shields_absorbed_damage(attack_value)
         else:
-            attack_value -= self.target.magic_defense * self.get_attack_coef(self.target)
+            attack_value -= target.magic_defense * self.get_attack_coef(target)
 
         if attack_value <= 0:
-            self.target.print_basic()
+            target.print_basic()
             print("-- has BLOCKED the attack of --", end=' ')
             self.initiator.print_basic()
             time.sleep(4)
         else:
             if is_localized:
-                armor_coef = self.target.get_armor_coef(accuracy_ratio)
+                armor_coef = target.get_armor_coef(accuracy_ratio)
+                target.damages_received(self.initiator, attack_value, accuracy_ratio, armor_coef, resis_dim_rate,
+                                             pen_rate)
             else:
-                armor_coef = self.target.body.member_cover_ratio(1)
-            self.target.damages_received(self.initiator, attack_value, accuracy_ratio, armor_coef, resis_dim_rate,
-                                         pen_rate)
+                target.damages_received(self.initiator, attack_value, 0, 0, resis_dim_rate, pen_rate)
 
-        self.target.previous_attacks.append((self.initiator.timeline, self))
+        target.previous_attacks.append((self.initiator.timeline, self))
 
     def choose_enemy_target(self):
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:

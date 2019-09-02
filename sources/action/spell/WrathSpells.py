@@ -137,7 +137,17 @@ class WrathSpells(Spells):
         for char, distance_ratio in self.get_all_spread_targets(
                 self.spell_power["spread_distance"] * self.magical_coef
         ):
+            print("")
+            print("*********************************************************************")
+            self.initiator.print_basic()
+            print("is sending a fireball to (", end=' ')
+            char.print_basic()
+            print(")")
+            print("*********************************************************************")
+            print("")
+
             self.magical_attack_received(
+                char,
                 attack_value * distance_ratio,
                 self.fight.field.get_magical_accuracy(self.initiator, char),
                 False,  # is_localized
