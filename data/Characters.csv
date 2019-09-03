@@ -1,4 +1,4 @@
-Name;Constitution;Force;Agility;Dexterity;Reflex;Willpower;Spirit;Moral;Empathy;Armor;Weapon1;Weapon2;Weapon3;Weapon4;Ammo1;Ammo1Number;Ammo2;Ammo2Number;WrathSensibility;WrathMastering;JoyMastering;JoySensibility;LoveMastering;LoveSensibility;HateMastering;HateSensibility;FearMastering;FearSensibility;SadnessMastering;SadnessSensibility;abscissa;ordinate
+Name;Constitution;Force;Agility;Dexterity;Reflex;Willpower;Spirit;morale;Empathy;Armor;Weapon1;Weapon2;Weapon3;Weapon4;Ammo1;Ammo1Number;Ammo2;Ammo2Number;WrathSensibility;WrathMastering;JoyMastering;JoySensibility;LoveMastering;LoveSensibility;HateMastering;HateSensibility;FearMastering;FearSensibility;SadnessMastering;SadnessSensibility;abscissa;ordinate
 a0;10;10;15;10;15;5;5;10;10;Mail armor;Light axe;Large wooden shield;;;;0;;0;10;10;10;10;10;10;10;10;10;10;10;10;3;0
 a1;10;10;15;10;15;5;5;10;10;Mail armor;Light sword;Small steel shield;;;Bodkin arrow;20;;0;10;10;10;10;10;10;10;10;10;10;10;10;1;1
 a2;10;10;15;10;15;5;5;10;10;Plate armor;Spear;;;;;0;;0;10;10;10;10;10;10;10;10;10;10;10;10;3;2

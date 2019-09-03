@@ -88,7 +88,7 @@ class Characters:
     Actions.append(Spell)
     Actions.append(Concentrate)
     
-    def __init__(self, name, constitution, force, agility, dexterity, reflex, willpower, spirit, moral, empathy,
+    def __init__(self, name, constitution, force, agility, dexterity, reflex, willpower, spirit, morale, empathy,
                  armor, weapon1, weapon2, weapon3, weapon4, ammo_type1, ammo_number1, ammo_type2, ammo_number2,
                  wrath_sensibility, wrath_mastering, joy_sensibility, joy_mastering, 
                  love_sensibility, love_mastering, hate_sensibility, hate_mastering, 
@@ -112,6 +112,7 @@ class Characters:
         self.original_force = float(force)
         self.force = float(force)
         self.force_ratio = float(force) / 10.0
+        self.true_original_agility = float(agility)  # To handle the fact that bulk/load influences agility
         self.original_agility = float(agility)
         self.agility = float(agility)
         self.agility_ratio = float(agility) / 10.0
@@ -127,9 +128,9 @@ class Characters:
         self.original_spirit = float(spirit)
         self.spirit = float(spirit)
         self.spirit_ratio = float(spirit) / 10.0
-        self.original_moral = float(moral)
-        self.moral = float(moral)
-        self.moral_ratio = float(moral) / 10.0
+        self.original_morale = float(morale)
+        self.morale = float(morale)
+        self.morale_ratio = float(morale) / 10.0
         self.original_empathy = float(empathy)
         self.empathy = float(empathy)
         self.empathy_ratio = float(empathy) / 10.0
@@ -192,58 +193,38 @@ class Characters:
     def get_id(self):
         return self.ID
 
-################### RESET & STATE FUNCTIONS ######################
-    def exceeded_feelings_check(self):
-        has_exceeded = False
-        for key in self.feelings:
-            if self.feelings[key].die_of_exceeded_energy(self):
-                has_exceeded = True
-        return has_exceeded
+################### UPDATE STAT FUNCTIONS ######################
+    def update_constitution(self, difference):
+        self.constitution += difference
+        self.constitution_ratio = self.constitution / 10.0
 
-    def spend_time(self, time_spent):
-        self.spend_absolute_time(time_spent / self.speed_ratio)
-    
-    def spend_absolute_time(self, time_spent):
-        self.timeline += time_spent
+    def update_force(self, difference):
+        self.force += difference
+        self.force_ratio = self.force / 10.0
 
-    def spend_stamina(self, coefficient, ignore=False):
-        self.body.spend_stamina(coefficient / self.load_ratio, ignore)
+    def update_agility(self, difference):
+        self.agility += difference
+        self.agility_ratio = self.agility / 10.0
 
-    def check_stamina(self, coefficient):
-        return self.body.check_stamina(coefficient / self.load_ratio)
+    def update_dexterity(self, difference):
+        self.dexterity += difference
+        self.dexterity_ratio = self.dexterity / 10.0
 
-    def check_position(self):
-        if self.abscissa not in range(Characters.max_position_area):
-            print("(Characters) Abscissa must be included in [0:", Characters.max_position_area, "]")
-            return False
-        if self.ordinate not in range(Characters.max_position_area):
-            print("(Characters) Ordinate must be included in [0:", Characters.max_position_area, "]")
-            return False
-        return True
+    def update_reflex(self, difference):
+        self.reflex += difference
+        self.reflex_ratio = self.reflex / 10.0
 
-    def set_position(self, abscissa, ordinate):
-        self.abscissa = abscissa
-        self.ordinate = ordinate
-        
-    def set_initial_position(self, abscissa, ordinate):
-        self.abscissa = abscissa
-        self.ordinate = ordinate
-        
-        if self.check_position():
-            return True
-        else:
-            self.abscissa = -1
-            self.ordinate = -1
-            return False
+    def update_willpower(self, difference):
+        self.willpower += difference
+        self.willpower_ratio = self.willpower / 10.0
 
-    def get_fighting_availability(self, timeline):
-        char_defense_time = global_variables.defense_time * self.speed_ratio
-        total_time = 0
-        for attack_timeline, attack in self.previous_attacks:
-            time = attack_timeline + char_defense_time - timeline
-            if time > 0:
-                total_time += time
-        return 1.0 / (1.0 + total_time / char_defense_time)
+    def update_spirit(self, difference):
+        self.spirit += difference
+        self.spirit_ratio = self.spirit / 10.0
+
+    def update_morale(self, difference):
+        self.morale += difference
+        self.morale_ratio = self.morale / 10.0
 
 ######################### CHARACTERISTICS FUNCTIONS ########################
     def calculate_load_ratios(self):
@@ -269,9 +250,12 @@ class Characters:
                                   * self.force_ratio)
 
     def calculate_agility(self):
-        self.agility = self.original_agility \
-                       * math.pow(self.load_ratio, 1.0 / 3.0) \
-                       * math.pow(self.use_load_ratio, 1.0 / 2.0)
+        previous_agility = self.original_agility
+        self.original_agility = self.true_original_agility \
+                                * math.pow(self.load_ratio, 1.0 / 3.0) \
+                                * math.pow(self.use_load_ratio, 1.0 / 2.0)
+        new_agility = self.original_agility
+        self.agility *= new_agility / previous_agility
 
     def calculate_speed_ratio(self):
         self.speed_ratio = max(Characters.min_speed, self.body.global_ratio())
@@ -354,6 +338,59 @@ class Characters:
         return math.sqrt(
             (math.pow(self.load_ratio, 1.0 / 2) * math.pow(self.use_load_ratio, 1.0 / 3)) * \
             (math.pow(self.bulk_ratio, 1.0 / 3) * math.pow(self.use_bulk_ratio, 1.0 / 2)))
+
+################### VARIOUS KEY FUNCTIONS ######################
+    def exceeded_feelings_check(self):
+        has_exceeded = False
+        for key in self.feelings:
+            if self.feelings[key].die_of_exceeded_energy(self):
+                has_exceeded = True
+        return has_exceeded
+
+    def spend_time(self, time_spent):
+        self.spend_absolute_time(time_spent / self.speed_ratio)
+
+    def spend_absolute_time(self, time_spent):
+        self.timeline += time_spent
+
+    def spend_stamina(self, coefficient, ignore=False):
+        self.body.spend_stamina(coefficient / self.load_ratio, ignore)
+
+    def check_stamina(self, coefficient):
+        return self.body.check_stamina(coefficient / self.load_ratio)
+
+    def check_position(self):
+        if self.abscissa not in range(Characters.max_position_area):
+            print("(Characters) Abscissa must be included in [0:", Characters.max_position_area, "]")
+            return False
+        if self.ordinate not in range(Characters.max_position_area):
+            print("(Characters) Ordinate must be included in [0:", Characters.max_position_area, "]")
+            return False
+        return True
+
+    def set_position(self, abscissa, ordinate):
+        self.abscissa = abscissa
+        self.ordinate = ordinate
+
+    def set_initial_position(self, abscissa, ordinate):
+        self.abscissa = abscissa
+        self.ordinate = ordinate
+
+        if self.check_position():
+            return True
+        else:
+            self.abscissa = -1
+            self.ordinate = -1
+            return False
+
+    def get_fighting_availability(self, timeline):
+        char_defense_time = global_variables.defense_time * self.speed_ratio
+        total_time = 0
+        for attack_timeline, attack in self.previous_attacks:
+            time = attack_timeline + char_defense_time - timeline
+            if time > 0:
+                total_time += time
+        return 1.0 / (1.0 + total_time / char_defense_time)
 
 ###################### MELEE FUNCTIONS ########################
     @staticmethod
@@ -476,7 +513,7 @@ class Characters:
             ", Reflex:", int(round(self.reflex)),
             ", Willpower:", int(round(self.willpower)),
             ", Spirit:", int(round(self.spirit)),
-            ", Moral:", int(round(self.moral)),
+            ", morale:", int(round(self.morale)),
             ", Empathy:", int(round(self.empathy)))
 
     def print_spells_and_feelings(self):

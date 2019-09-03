@@ -11,29 +11,29 @@ class WrathSpells(Spells):
     """Class to cast wrath spells"""
     
     spells_energy = {
-        "STR" : 10.0,
-        "FBL" : 30.0
+        "STR": 10.0,
+        "FBL": 30.0
     }
     spells_time = {
-        "STR" : 1.0,
-        "FBL" : 2.5
+        "STR": 1.0,
+        "FBL": 2.5
     }
     spells_stamina = {
-        "STR" : 1.0,
-        "FBL" : 7.5
+        "STR": 1.0,
+        "FBL": 7.5
     }
     spells_power = {
-        "STR" : {
-            "force" : 2.0,
-            "reflex" : 0.8,
-            "dexterity" : 0.6,
-            "duration" : 5.0
+        "STR": {
+            "force": 2.0,
+            "reflex": 0.8,
+            "dexterity": 0.6,
+            "duration": 5.0
         },
-        "FBL" : {
-            "attack_value" : 50.0,
-            "spread_distance" : 1,
-            "resis_dim_rate" : 0.5,
-            "pen_rate" : 0.25
+        "FBL": {
+            "attack_value": 50.0,
+            "spread_distance": 1,
+            "resis_dim_rate": 0.5,
+            "pen_rate": 0.25
         }
     }
  
@@ -84,26 +84,37 @@ class WrathSpells(Spells):
         self.remove_identical_active_spell(self.initiator)
         self.magical_coef *= self.initiator.magic_power_ratio
         
-        self.target.force += (math.pow(self.spell_power["force"], self.magical_coef) - 1) \
-                             * self.target.original_force
-        self.target.reflex += (math.pow(self.spell_power["reflex"], self.magical_coef) - 1) \
-                              * self.target.original_reflex
-        self.target.dexterity += (math.pow(self.spell_power["dexterity"], self.magical_coef) - 1) \
-                                 * self.target.original_dexterity
-        
+        self.target.update_force(
+            (math.pow(self.spell_power["force"], self.magical_coef) - 1)
+            * self.target.original_force
+        )
+        self.target.update_reflex(
+            (math.pow(self.spell_power["reflex"], self.magical_coef) - 1)
+            * self.target.original_reflex
+        )
+        self.target.update_dexterity(
+            (math.pow(self.spell_power["dexterity"], self.magical_coef) - 1)
+            * self.target.original_dexterity
+        )
         self.target.calculate_characteristic()
+
         self.add_active_spell(self.initiator, self.spell_power["duration"] * math.sqrt(self.magical_coef))
         self.initiator.last_action = None  # To remove it from the scheduler
         return True
     
     def end_improve_strength(self):
-        self.target.force -= (math.pow(self.spell_power["force"], self.magical_coef) - 1) \
-                             * self.target.original_force
-        self.target.reflex -= (math.pow(self.spell_power["reflex"], self.magical_coef) - 1) \
-                              * self.target.original_reflex
-        self.target.dexterity -= (math.pow(self.spell_power["dexterity"], self.magical_coef) - 1) \
-                                 * self.target.original_dexterity
-        
+        self.target.update_force(
+            (1 - math.pow(self.spell_power["force"], self.magical_coef))
+            * self.target.original_force
+        )
+        self.target.update_reflex(
+            (1 - math.pow(self.spell_power["reflex"], self.magical_coef))
+            * self.target.original_reflex
+        )
+        self.target.update_dexterity(
+            (1 - math.pow(self.spell_power["dexterity"], self.magical_coef))
+            * self.target.original_dexterity
+        )
         self.target.calculate_characteristic()
         return True
         
