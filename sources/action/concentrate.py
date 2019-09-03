@@ -1,19 +1,19 @@
 import time as time
 import math as math
-from sources.action.Actions import ActiveActions
+from sources.action.actions import ActiveActions
 import sources.miscellaneous.global_variables as global_variables
+
+min_turn = 3
+max_turn = 10
+concentration_rate = 1.0 / 3.0
+deconcentration_rate = 1.5
 
 
 #############################################################
 ###################### CONCENTRATE CLASS ####################
 #############################################################
-class ConcentrateChar(ActiveActions):
-    'Class to make a character concentrate'
-
-    min_turn = 3
-    max_turn = 10
-    concentration_rate = 1.0/3.0
-    deconcentration_rate = 1.5
+class Concentrate(ActiveActions):
+    """Class to make a character concentrate"""
     
     def __init__(self, fight, initiator):
         super().__init__(fight, initiator)
@@ -63,10 +63,10 @@ class ConcentrateChar(ActiveActions):
                 self.nb_of_turns = int(input(txt))
                 if self.fight.cancel_action(self.nb_of_turns):
                     return False
-                elif self.nb_of_turns < ConcentrateChar.min_turn:
-                    print("You cannot rest less than", ConcentrateChar.min_turn, "turns")
-                elif self.nb_of_turns > ConcentrateChar.max_turn:
-                    print("You cannot rest more than", ConcentrateChar.max_turn, "turns")
+                elif self.nb_of_turns < min_turn:
+                    print("You cannot rest less than", min_turn, "turns")
+                elif self.nb_of_turns > max_turn:
+                    print("You cannot rest more than", max_turn, "turns")
                 else:
                     break
             except:
@@ -76,14 +76,14 @@ class ConcentrateChar(ActiveActions):
         print("You have decided to", self.action, "your", self.feeling, "for", self.nb_of_turns, "turns")
         time.sleep(3)
         
-        self.concentration_ratio = math.pow(self.nb_of_turns, ConcentrateChar.concentration_rate)
+        self.concentration_ratio = math.pow(self.nb_of_turns, concentration_rate)
         self.initiator.nb_of_concentrate += 1
         self.end_update([], 0, 1, True)
         return True
 
     def execute(self):
-        self.initiator.feelings[self.feeling].concentrate_energy_update(self.action, 
-            self.concentration_ratio * min(1.0, ConcentrateChar.deconcentration_rate / self.initiator.nb_of_concentrate))
+        self.initiator.feelings[self.feeling].concentrate_energy_update(self.action,
+                                                                        self.concentration_ratio * min(1.0, deconcentration_rate / self.initiator.nb_of_concentrate))
         self.nb_of_turns -= 1
         if self.nb_of_turns > 0:
             self.end_update([], 0, 1, True)

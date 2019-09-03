@@ -1,4 +1,4 @@
-from sources.character.Equipments import Equipments, Armors, Weapons, AttackWeapons, MeleeWeapons, \
+from sources.character.equipments import Equipments, Armors, Weapons, AttackWeapons, MeleeWeapons, \
     Shields, RangedWeapons, Bows, Crossbows, Ammo
 
 
@@ -394,14 +394,14 @@ class CharEquipments:
 
     ########################## PRINTING FUNCTIONS #########################
     def print_armor(self):
-        print("ArmorID:", self.armor.get_id(), ", Armor:", self.armor.name, ", Defense:", self.armor.defense, end=' ')
+        print("   ArmorID:", self.armor.get_id(), ", Armor:", self.armor.name, ", Defense:", self.armor.defense, end=' ')
 
     def print_full_armor(self):
         self.armor.print_obj()
         
     @staticmethod
     def print_weapon(weapon):
-        print(", WeaponID:", weapon.get_id(), ", Weapon:", weapon.name, ", Defense:", weapon.defense,
+        print("   WeaponID:", weapon.get_id(), ", Weapon:", weapon.name, ", Defense:", weapon.defense,
               ", MeleePower:", weapon.melee_power, ", NbOfHand(s):", weapon.hand, end=' ')
         
         if isinstance(weapon, RangedWeapons):
@@ -417,7 +417,7 @@ class CharEquipments:
     def print_weapons_stored(self):
         print("Weapons stored:")
         if len(self.weapons_stored) <= 0:
-            print("\\No weapon stored")
+            print("   \\No weapon stored")
             return False
         for weapon in self.weapons_stored:
             print("\\", end=' ')
@@ -427,7 +427,7 @@ class CharEquipments:
     def print_full_weapons_stored(self):
         print("Weapons stored:")
         if len(self.weapons_stored) <= 0:
-            print("\\No weapon stored")
+            print("   \\No weapon stored")
             return False
         for weapon in self.weapons_stored:
             print("\\", end=' ')
@@ -438,7 +438,7 @@ class CharEquipments:
         print("")
         print("Weapons used:")
         if len(self.weapons_in_use) <= 0:
-            print("\\No weapon used")
+            print("   \\No weapon used")
             return False
         for weapon in self.weapons_in_use:
             print("\\", end=' ')
@@ -449,7 +449,7 @@ class CharEquipments:
         print("")
         print("Weapons used:")
         if len(self.weapons_in_use) <= 0:
-            print("\\No weapon used")
+            print("   \\No weapon used")
             return False
         for weapon in self.weapons_in_use:
             print("\\", end=' ')
@@ -459,15 +459,25 @@ class CharEquipments:
     def print_ammo(self):
         print("Ammo available:")
         if len(self.ammo) <= 0:
-            print("\\No ammo")
+            print("   \\No ammo")
             return False
-        for weapon in self.ammo:
-            print("\\", end=' ')
-            weapon.print_obj()
+
+        ammo_type_list = {}
+        for ammo in self.ammo:
+            if ammo.name in ammo_type_list:
+                ammo_type_list[ammo.name]["number"] += 1
+            else:
+                ammo_type_list[ammo.name] = {}
+                ammo_type_list[ammo.name]["number"] = 1
+                ammo_type_list[ammo.name]["ammo_type"] = ammo
+
+        for key in ammo_type_list:
+            print("   \\", ammo_type_list[key]["number"], "arrow(s) of ...")
+            print("      ", end=' ')
+            ammo_type_list[key]["ammo_type"].print_obj()
         return True
 
     def print_equipments(self):
-        print("")
         print("EQUIPMENTS:")
         self.print_armor()
         self.print_weapons_in_use()
@@ -475,7 +485,6 @@ class CharEquipments:
         self.print_ammo()
 
     def print_full_equipments(self):
-        print("")
         print("EQUIPMENTS:")
         self.print_full_armor()
         self.print_full_weapons_in_use()

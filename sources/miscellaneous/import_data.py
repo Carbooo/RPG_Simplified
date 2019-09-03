@@ -1,11 +1,11 @@
 import csv as csv
 import numpy as np
-from sources.character.Equipments import Equipments, Armors, Shields, MeleeWeapons, RangedWeapons, Bows, Crossbows, \
+from sources.character.equipments import Equipments, Armors, Shields, MeleeWeapons, RangedWeapons, Bows, Crossbows, \
     Ammo
-from sources.character.Characters import Characters
-from sources.fight.Teams import Teams
-from sources.fight.Fields import Fields
-
+from sources.character.character import Character
+from sources.fight.team import Team
+from sources.fight.field import Field
+import sources.miscellaneous.global_variables as global_variables
 
 ###########################################################
 ##################### IMPORT CLASS ########################
@@ -109,12 +109,12 @@ class ImportData:
                 print("Characters import does not contain the right number of columns")
                 return False
             else:
-                Characters(row[0], int(row[1]), int(row[2]), int(row[3]), int(row[4]),
-                           int(row[5]), int(row[6]), int(row[7]), int(row[8]), int(row[9]),
-                           row[10], row[11], row[12], row[13], row[14], row[15], int(row[16]), row[17], int(row[18]),
-                           int(row[19]), int(row[20]), int(row[21]), int(row[22]), int(row[23]), int(row[24]),
-                           int(row[25]), int(row[26]), int(row[27]), int(row[28]), int(row[29]), int(row[30]),
-                           int(row[31]), int(row[32]))
+                Character(row[0], int(row[1]), int(row[2]), int(row[3]), int(row[4]),
+                          int(row[5]), int(row[6]), int(row[7]), int(row[8]), int(row[9]),
+                          row[10], row[11], row[12], row[13], row[14], row[15], int(row[16]), row[17], int(row[18]),
+                          int(row[19]), int(row[20]), int(row[21]), int(row[22]), int(row[23]), int(row[24]),
+                          int(row[25]), int(row[26]), int(row[27]), int(row[28]), int(row[29]), int(row[30]),
+                          int(row[31]), int(row[32]))
         return True
 
     def import_teams(self):
@@ -126,7 +126,7 @@ class ImportData:
                 characters_name_list = []
                 for name in row[1::]:
                     characters_name_list.append(name)
-                Teams(row[0], characters_name_list)
+                Team(row[0], characters_name_list)
         return True
 
     def import_obstacles_field(self):
@@ -152,15 +152,15 @@ class ImportData:
             ordinate_size += 1
 
         # Verify minimum abscissa size
-        if abscissa_size < Characters.max_position_area * 2:
+        if abscissa_size < global_variables.max_position_area * 2:
             print("Field import is not large enough (min:",
-                  Characters.max_position_area * 2, ")")
+                  global_variables.max_position_area * 2, ")")
             return False
 
         # Verify minimum ordinate size
-        if ordinate_size < Characters.max_position_area:
+        if ordinate_size < global_variables.max_position_area:
             print("Field import is not long enough (min:",
-                  Characters.max_position_area, ")")
+                  global_variables.max_position_area, ")")
             return False
 
         # Convert a list into an array
@@ -170,18 +170,18 @@ class ImportData:
         # Convert string into fields number
         for i in range(abscissa_size):
             for j in range(ordinate_size):
-                for k in range(len(Fields.obstacle_types_list)):
+                for k in range(len(Field.obstacle_types_list)):
                     if obstacle_array[i, j] == \
-                            Fields.obstacle_types_list[k]:
+                            Field.obstacle_types_list[k]:
                         break
-                    if k == len(Fields.obstacle_types_list) - 1:
+                    if k == len(Field.obstacle_types_list) - 1:
                         print("Obstacle field import contains ",
                               "non-supported obstacle type:",
                               obstacle_array[i, j])
                         return False
 
         # Create Field object (no reliefs_array for now)
-        Fields(self.name, obstacle_array, obstacle_array)
+        Field(self.name, obstacle_array, obstacle_array)
         return True
 
 
@@ -251,15 +251,15 @@ class PrintData:
 
     def print_characters(self):
         print("All characters:")
-        for i in range(len(Characters.list)):
-            Characters.list[i].print_obj()
+        for i in range(len(global_variables.char_list)):
+            global_variables.char_list[i].print_obj()
 
     def print_characteristics(self):
         print("All characters state:")
-        for i in range(len(Characters.list)):
-            Characters.list[i].print_characteristics()
+        for i in range(len(global_variables.char_list)):
+            global_variables.char_list[i].print_characteristics()
 
     def print_teams(self):
         print("All teams:")
-        for i in range(len(Teams.list)):
-            Teams.list[i].print_obj()
+        for i in range(len(Team.list)):
+            Team.list[i].print_obj()

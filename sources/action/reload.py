@@ -1,13 +1,12 @@
 import time as time
-from sources.character.Equipments import RangedWeapons, Crossbows
-from sources.character.Characters import Characters
-from sources.action.Actions import ActiveActions
+from sources.character.equipments import RangedWeapons, Crossbows
+from sources.action.actions import ActiveActions, actions
 
 
 #############################################################
 ###################### RELOAD CHAR CLASS ####################
 #############################################################
-class ReloadChar(ActiveActions):
+class Reload(ActiveActions):
     """Class to reload a range weapon"""
 
     def __init__(self, fight, initiator):
@@ -18,7 +17,7 @@ class ReloadChar(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):
-        if self.initiator.check_stamina(Characters.Reload[3]) is False:
+        if self.initiator.check_stamina(actions["reload"]["stamina"]) is False:
             print("You do not have enough stamina (",
                   self.initiator.body.return_current_stamina(), ") to reload, action cancelled!")
             return False
@@ -76,9 +75,9 @@ class ReloadChar(ActiveActions):
         time.sleep(3)
         
         if isinstance(self.weapon_to_reload, Crossbows):
-            stamina = self.weapon_to_reload.reload_time * Characters.Reload[3] * 10
+            stamina = self.weapon_to_reload.reload_time * actions["reload"]["stamina"] * 10
         else:
-            stamina = self.weapon_to_reload.reload_time * Characters.Reload[3]
+            stamina = self.weapon_to_reload.reload_time * actions["reload"]["stamina"]
         self.end_update([], stamina, self.weapon_to_reload.reload_time)
         return True
     

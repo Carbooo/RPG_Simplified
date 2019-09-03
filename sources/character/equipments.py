@@ -8,19 +8,19 @@ import time as time
 ################## EQUIPMENTS CLASS #########################
 #############################################################
 class Equipments:
-    'Common base class for all equipments'
+    """Common base class for all equipments"""
     list = []
     instances_count = 0
-    armor_def_malus_rate = 0.1 #Armor def lost when being hit
-    shield_def_malus_rate = 0.01 #Armor def lost when defending
-    attack_weapon_def_malus_rate = 0.01 #Attack weapon def lost when defending
-    variance = 0.5 #Gauss variance for equipment to break
+    armor_def_malus_rate = 0.1  # Armor def lost when being hit
+    shield_def_malus_rate = 0.01  # Armor def lost when defending
+    attack_weapon_def_malus_rate = 0.01  # Attack weapon def lost when defending
+    variance = 0.5  # Gauss variance for equipment to break
 
     def __init__(self, name, load, bulk, resistance):
         for equip in Equipments.list:
             if equip.name == name:
                 print("(Equipments) Equipment creation failed because the name:", name, "is already used !")
-                return False
+                exit(0)
     
         self.name = name
         self.type = "None"

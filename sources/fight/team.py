@@ -1,16 +1,15 @@
-import copy as copy
-from sources.character.Characters import Characters
+import sources.miscellaneous.global_variables as global_variables
 
 
 #############################################################
 ##################### TEAMS CLASS ###########################
 #############################################################
-class Teams:
+class Team:
     """Common base class for all teams"""
     list = []
 
     def __init__(self, name, characters_name_list):
-        for team in Teams.list:
+        for team in Team.list:
             if team.name == name:
                 print("(Teams) Team creation failed because the name:", name, "is already used !")
                 exit(0)
@@ -19,7 +18,7 @@ class Teams:
         self.characters_list = []
         for name in characters_name_list:
             char_found = False
-            for char in Characters.list:
+            for char in global_variables.char_list:
                 if name == char.name:
                     self.characters_list.append(char)
                     char_found = True
@@ -28,8 +27,8 @@ class Teams:
                 print("(Teams) Team creation failed because the character name:", name, "cannot be found !")
                 exit(0)
 
-        self.ID = len(Teams.list)
-        Teams.list.append(self)
+        self.ID = len(Team.list)
+        Team.list.append(self)
 
     def get_id(self):
         return self.ID

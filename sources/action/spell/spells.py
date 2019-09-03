@@ -1,7 +1,7 @@
 import math as math
 import time as time
 import random as random
-from sources.action.Actions import ActiveActions
+from sources.action.actions import ActiveActions
 import sources.miscellaneous.global_variables as global_variables
 
 
@@ -13,6 +13,7 @@ class Spells(ActiveActions):
 
     def __init__(self, fight, initiator, type, spell_code):
         super().__init__(fight, initiator)
+        self.name = "Generic spell action"
         self.target = None
         self.type = type
         self.spell_code = spell_code

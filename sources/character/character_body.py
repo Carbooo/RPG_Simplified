@@ -5,8 +5,8 @@ import time as time
 #############################################################
 ###################### BODIES CLASS #########################
 #############################################################
-class Bodies:
-    """Common base class for all body of characters"""
+class CharBody:
+    """Common base class for bodies of characters"""
 
     life_resting_coef = 14400.0  # Rest coefficient
     stamina_resting_coef = 200.0  # Rest coefficient
@@ -31,7 +31,7 @@ class Bodies:
     def update_life(self, life, initial=False):
         self.life = min(self.original_life, max(0.0, self.life + life))
         self.life_ratio = self.life / self.original_life
-        self.life_ratio_adjusted = Bodies.life_ratio_adjustment(self.life_ratio)
+        self.life_ratio_adjusted = CharBody.life_ratio_adjustment(self.life_ratio)
         if not initial:
             self.calculate_states()
     
@@ -48,7 +48,7 @@ class Bodies:
             return math.pow(coefficient * 1.26, 1.5)
 
     def life_rest(self, coefficient):
-        self.update_life(self.original_life * self.get_rest_coef(coefficient) / Bodies.life_resting_coef)
+        self.update_life(self.original_life * self.get_rest_coef(coefficient) / CharBody.life_resting_coef)
         
     def loose_life(self, damage):
         previous_life = self.life
@@ -77,7 +77,7 @@ class Bodies:
     def update_stamina(self, stamina, initial=False):
         self.stamina = min(self.original_stamina, max(0.0, self.stamina + stamina))
         self.stamina_ratio = self.stamina / self.original_stamina
-        self.stamina_ratio_adjusted = Bodies.stamina_ratio_adjustment(self.stamina_ratio)
+        self.stamina_ratio_adjusted = CharBody.stamina_ratio_adjustment(self.stamina_ratio)
         if not initial:
             self.calculate_states()
 
@@ -91,15 +91,15 @@ class Bodies:
     def spend_stamina(self, coefficient, ignore=False):
         if not ignore and not self.check_stamina(coefficient):
             print("Error: Stamina below 0")
-        self.update_stamina(coefficient * Bodies.turn_stamina)
+        self.update_stamina(coefficient * CharBody.turn_stamina)
 
     def check_stamina(self, coefficient):
-        if self.stamina >= Bodies.turn_stamina * coefficient:
+        if self.stamina >= CharBody.turn_stamina * coefficient:
             return True
         return False
 
     def stamina_rest(self, coefficient):
-        self.update_stamina(self.original_stamina * self.get_rest_coef(coefficient) / Bodies.stamina_resting_coef)
+        self.update_stamina(self.original_stamina * self.get_rest_coef(coefficient) / CharBody.stamina_resting_coef)
 
     ############################# REST FUNCTIONS ##########################
     def get_rest_coef(self, coefficient):

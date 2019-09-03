@@ -1,11 +1,11 @@
-from sources.action.Actions import Actions
+from sources.action.actions import Actions
 
 
 #############################################################
 ################## GET CHAR INFORMATION CLASS ###############
 #############################################################
 class GetCharInformation(Actions):
-    'Class to get information on a character'
+    """Class to get information on a character"""
     
     def __init__(self, fight):
         super().__init__(fight)

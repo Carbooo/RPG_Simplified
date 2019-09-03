@@ -1,7 +1,7 @@
-from sources.miscellaneous.ImportData import ImportData
-from sources.fight.Fields import Fields
-from sources.fight.Teams import Teams
-from sources.fight.Fights import Fights
+from sources.miscellaneous.import_data import ImportData
+from sources.fight.field import Field
+from sources.fight.team import Team
+from sources.fight.fight import Fight
 
 ImportData("Armors", "data/Armors.csv")
 # PrintData("Armors")
@@ -44,4 +44,4 @@ ImportData("ObstaclesField", "data/LongObstacles.csv")
 print("")
 # Fights(Fields.list[3], Teams.list[0], Teams.list[1])
 # Fights(Fields.list[0], Teams.list[8], Teams.list[9])
-Fights(Fields.list[0], Teams.list[10], Teams.list[11])
+Fight(Field.list[0], Team.list[10], Team.list[11])

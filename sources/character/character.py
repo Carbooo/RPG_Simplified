@@ -2,91 +2,45 @@ import math as math
 import random as random
 import time as time
 import sources.miscellaneous.global_variables as global_variables
-from sources.character.Bodies import Bodies
-from sources.character.CharEquipments import CharEquipments
-from sources.character.Feelings import Feelings
+from sources.character.character_body import CharBody
+from sources.character.character_equipments import CharEquipments
+from sources.character.feeling import Feeling
+
+# Characters constants
+max_bonus = 1.5  # Max load and bulk bonus
+min_speed = 1.0 / 6.0  # Minimum speed for char (necessary for hurt char)
+accuracy_mean = 100.0  # Accuracy reference for characters
+critical_hit_chance = 0.083  # Chances to hit the head or other key areas (1 / 12)
+critical_hit_boost = 6.0  # Coef boost when doing a critical hit
+max_magic_distance = 100.0  # Around 200 meters
+
+# Spells
+spells = []
+wrath_spells = {
+    "description": "Wrath spell",
+    "code": "WRA",
+    "list": []
+}
+spells.append(wrath_spells)
+wrath_improve_strength = {
+    "description": "Improve your strength",
+    "code": "STR",
+    "type": "Wrath"
+}
+wrath_spells["list"].append(wrath_improve_strength)
+wrath_fireball = {
+    "description": "Throw a fireball",
+    "code": "FBL",
+    "type": "Wrath"
+}
+wrath_spells["list"].append(wrath_fireball)
 
 
 #############################################################
 ############# CHARACTERS INSTANCES CLASS ####################
 #############################################################
-class Characters:
-    'Common base class for all characters'
-    
-    # Characters constants
-    list = []
-    max_position_area = 6  # Max range for characters positions
-    variance = 0.1  # Gauss variance
-    high_variance = 0.25  # Gauss variance
-    max_bonus = 1.5  # Max load and bulk bonus
-    load_mean = 50.0  # Load reference for characters characteristics
-    bulk_mean = 6.0  # Bulk reference for characters characteristics
-    use_load_mean = 15.0  # Weapons use load reference for characters
-    use_bulk_mean = 3.5  # Weapons use bulk reference for characters
-    min_speed = 1.0 / 6.0  # Minimum speed for char (necessary for hurt char)
-    accuracy_mean = 100.0  # Accuracy reference for characters
-    critical_hit_chance = 0.083  # Chances to hit the head or other key areas (1 / 12)
-    critical_hit_boost = 6.0  # Coef boost when doing a critical hit
-    max_magic_distance = 100.0  # Around 200 meters
-    
-    # A turn is around 6 seconds
-    # [Action choices, action command, time spend, stamina spend, action description]
-    Pass = ["Wait a little", "PAS", 0.1, 0.0, "Passing time"]
-    Rest = ["Rest a little", "RES", 1.0, 0.0, "Resting"]
-    Concentrate = ["Concentrate on your mind and feelings", "CON", 1.0, 0.0, "Concentrating"]
-    
-    Defending = ["Is defending against an attack", "DEF", 0.0, 0.0, "Defending"]
-    MeleeAttack = ["Melee attack an enemy character", "MAT", 0.5, 1.0, "Melee attacking"]
-    RangedAttack = ["Ranged attack an enemy character", "RAT", 0.5, 0.75, "Ranged attacking"]
-    Reload = ["Reload your ranged weapon", "REL", 0.0, 0.1, "Reloading"]  # Reload time is defined on the weapon
-    
-    # Between each case, there are approximatively 2 meters
-    # Normal run is around 2.7 meters --> around 1 case per second
-    # Time of reflexion and other handicaps increase time per cases
-    Move = ["Move to an adjacent case", "MOV", 0.15, 0.1, "Moving"]
-
-    Equip = ["Equip / Unequip weapons", "EQP", 0.5, 0.1, "Equiping"]
-    
-    Information = ["Information on a character state", "INF", 0.0, 0.0, "Information"]
-    Save = ["Save the current game state", "SAV", 0.0, 0.0, "Saving"]
-    Load = ["Load a previous game state", "LOA", 0.0, 0.0, "Loading"]
-    
-    # Spells
-    Spell = ["Cast a spell", "SPL", 0.0, 0.0, "Casting"]
-    spells = []
-    
-    wrath_spells = {
-        "description" : "Wrath spell",
-        "code" : "WRA",
-        "list" : []
-    }
-    spells.append(wrath_spells)
-    wrath_improve_strength = {
-        "description" : "Improve your strength",
-        "code" : "STR",
-        "type" : "Wrath"
-    }
-    wrath_spells["list"].append(wrath_improve_strength)
-    wrath_fireball = {
-        "description" : "Throw a fireball",
-        "code" : "FBL",
-        "type" : "Wrath"
-    }
-    wrath_spells["list"].append(wrath_fireball)
-    
-    Actions = []
-    Actions.append(Pass)
-    Actions.append(Rest)
-    Actions.append(MeleeAttack)
-    Actions.append(RangedAttack)
-    Actions.append(Reload)
-    Actions.append(Move)
-    Actions.append(Equip)
-    Actions.append(Information)
-    Actions.append(Save)
-    Actions.append(Load)
-    Actions.append(Spell)
-    Actions.append(Concentrate)
+class Character:
+    """Common base class for all characters"""
     
     def __init__(self, name, constitution, force, agility, dexterity, reflex, willpower, spirit, morale, empathy,
                  armor, weapon1, weapon2, weapon3, weapon4, ammo_type1, ammo_number1, ammo_type2, ammo_number2,
@@ -95,15 +49,15 @@ class Characters:
                  fear_sensibility, fear_mastering, sadness_sensibility, sadness_mastering,
                  abscissa, ordinate):
         # Check name availability
-        for char in Characters.list:
+        for char in global_variables.char_list:
             if char.name == name:
                 print("(Characters) Character creation failed because the name:", name, "is already used !")
                 exit(0)
         self.name = name
         
         # Set ID
-        self.ID = len(Characters.list)
-        Characters.list.append(self)
+        self.ID = len(global_variables.char_list)
+        global_variables.char_list.append(self)
         
         # Set characteristics
         self.original_constitution = float(constitution)
@@ -135,7 +89,7 @@ class Characters:
         self.empathy = float(empathy)
         self.empathy_ratio = float(empathy) / 10.0
         
-        self.body = Bodies(
+        self.body = CharBody(
             self,
             float(self.constitution) * 10.0, 
             (float(self.constitution) + float(self.willpower)/3 + float(self.agility)/2 + float(self.force)/2) 
@@ -158,12 +112,12 @@ class Characters:
         # Set feelings
         self.nb_of_concentrate = 0
         self.feelings = {
-            "Wrath" : Feelings("Wrath", wrath_sensibility, wrath_mastering),
-            "Joy": Feelings("Joy", joy_sensibility, joy_mastering),
-            "Love": Feelings("Love", love_sensibility, love_mastering),
-            "Hate": Feelings("Hate", hate_sensibility, hate_mastering),
-            "Fear": Feelings("Fear", fear_sensibility, fear_mastering),
-            "Sadness": Feelings("Sadness", sadness_sensibility, sadness_mastering)
+            "Wrath" : Feeling("Wrath", wrath_sensibility, wrath_mastering),
+            "Joy": Feeling("Joy", joy_sensibility, joy_mastering),
+            "Love": Feeling("Love", love_sensibility, love_mastering),
+            "Hate": Feeling("Hate", hate_sensibility, hate_mastering),
+            "Fear": Feeling("Fear", fear_sensibility, fear_mastering),
+            "Sadness": Feeling("Sadness", sadness_sensibility, sadness_mastering)
         }
         
         # Calculate character characteristics
@@ -228,24 +182,24 @@ class Characters:
 
 ######################### CHARACTERISTICS FUNCTIONS ########################
     def calculate_load_ratios(self):
-        self.load_ratio = min(Characters.max_bonus,
-                              Characters.load_mean
+        self.load_ratio = min(max_bonus,
+                              global_variables.load_mean
                               / max(1.0, self.equipments.get_full_load())
                               * self.force_ratio)
         
-        self.use_load_ratio = min(Characters.max_bonus, 
-                                  Characters.use_load_mean 
-                                  / max(1.0, self.equipments.get_in_use_load()) 
+        self.use_load_ratio = min(max_bonus,
+                                  global_variables.use_load_mean
+                                  / max(1.0, self.equipments.get_in_use_load())
                                   * self.force_ratio)
 
     def calculate_bulk_ratios(self):
-        self.bulk_ratio = min(Characters.max_bonus,
-                              Characters.bulk_mean
+        self.bulk_ratio = min(max_bonus,
+                              global_variables.bulk_mean
                               / max(1.0, self.equipments.get_full_bulk())
                               * self.force_ratio)
 
-        self.use_bulk_ratio = min(Characters.max_bonus,
-                                  Characters.use_bulk_mean
+        self.use_bulk_ratio = min(max_bonus,
+                                  global_variables.use_bulk_mean
                                   / max(1.0, self.equipments.get_in_use_bulk())
                                   * self.force_ratio)
 
@@ -258,7 +212,7 @@ class Characters:
         self.agility *= new_agility / previous_agility
 
     def calculate_speed_ratio(self):
-        self.speed_ratio = max(Characters.min_speed, self.body.global_ratio())
+        self.speed_ratio = max(min_speed, self.body.global_ratio())
 
     def calculate_accuracies(self):
         weapons_accuracies = self.equipments.calculate_accuracies()
@@ -272,9 +226,9 @@ class Characters:
         
         # Set accuracies
         self.melee_handiness = self.body.global_ratio() * melee_coef * weapons_accuracies["melee_weapons"]
-        self.melee_handiness_ratio = self.melee_handiness / Characters.accuracy_mean
+        self.melee_handiness_ratio = self.melee_handiness / accuracy_mean
         self.ranged_accuracy = self.body.global_ratio() * ranged_coef * weapons_accuracies["ranged_weapons"]
-        self.ranged_accuracy_ratio = self.ranged_accuracy / Characters.accuracy_mean
+        self.ranged_accuracy_ratio = self.ranged_accuracy / accuracy_mean
          
     def calculate_melee_range(self):
         self.melee_range = self.equipments.calculate_melee_range()
@@ -360,11 +314,11 @@ class Characters:
         return self.body.check_stamina(coefficient / self.load_ratio)
 
     def check_position(self):
-        if self.abscissa not in range(Characters.max_position_area):
-            print("(Characters) Abscissa must be included in [0:", Characters.max_position_area, "]")
+        if self.abscissa not in range(global_variables.max_position_area):
+            print("(Characters) Abscissa must be included in [0:", global_variables.max_position_area, "]")
             return False
-        if self.ordinate not in range(Characters.max_position_area):
-            print("(Characters) Ordinate must be included in [0:", Characters.max_position_area, "]")
+        if self.ordinate not in range(global_variables.max_position_area):
+            print("(Characters) Ordinate must be included in [0:", global_variables.max_position_area, "]")
             return False
         return True
 
@@ -411,7 +365,7 @@ class Characters:
 ###################### DAMAGE FUNCTIONS ########################
     def get_armor_coef(self, accuracy_ratio):
         cover_ratio = self.equipments.get_armor_cover_ratio()
-        avoid_armor_chances = (1 - random.gauss(1, Characters.high_variance) * cover_ratio) * accuracy_ratio
+        avoid_armor_chances = (1 - random.gauss(1, global_variables.high_variance) * cover_ratio) * accuracy_ratio
         
         if cover_ratio == 0:
             print("The player has no armor!")
@@ -435,9 +389,9 @@ class Characters:
         
         damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, resis_dim_rate, pen_rate)
         
-        if accuracy_ratio != 0 and random.random() / accuracy_ratio < Characters.critical_hit_chance:
+        if accuracy_ratio != 0 and random.random() / accuracy_ratio < critical_hit_chance:
             print("The damages are amplified, because they hit a critical area!")
-            damage_result *= Characters.critical_hit_boost
+            damage_result *= critical_hit_boost
         
         if damage_result > 0:
             life_ratio = self.body.loose_life(damage_result)
@@ -466,12 +420,12 @@ class Characters:
         return False
     
     def is_distance_magically_reachable(self, enemy):        
-        if self.calculate_point_distance(enemy.abscissa, enemy.ordinate) <= Characters.max_magic_distance:
+        if self.calculate_point_distance(enemy.abscissa, enemy.ordinate) <= max_magic_distance:
             return True
         return False
 
     def get_magic_distance_ratio(self, enemy):
-        return 1 - self.calculate_point_distance(enemy.abscissa, enemy.ordinate) / Characters.max_magic_distance
+        return 1 - self.calculate_point_distance(enemy.abscissa, enemy.ordinate) / max_magic_distance
     
     def calculate_point_to_enemy_path_distance(self, enemy, abscissa, ordinate):
         # Only work if abscissa & ordinate are in the segment path
@@ -504,7 +458,6 @@ class Characters:
         print("ID:", self.get_id(), ", Name:", self.name, end=' ')
 
     def print_characteristics(self):
-        print("")
         print("CHARACTERISTICS:")
         print("    Constitution:", int(round(self.constitution)),
             ", Force:", int(round(self.force)),
@@ -517,7 +470,6 @@ class Characters:
             ", Empathy:", int(round(self.empathy)))
 
     def print_spells_and_feelings(self):
-        print("")
         print("FEELINGS:")
         for key in self.feelings:
             print("-", end=' ')
@@ -526,7 +478,6 @@ class Characters:
         print("Active spells:", self.active_spells)
 
     def print_defense(self):
-        print("")
         print("DEFENSE:")
         print("    Dodging:", int(round(self.dodging)),
             ", MeleeDefense:", int(round(self.melee_defense)),
@@ -534,7 +485,6 @@ class Characters:
             ", MagicDefense:", int(round(self.magic_defense)))
 
     def print_attack(self):
-        print("")
         print("ATTACK:")
         print("    MeleeHandiness:", int(round(self.melee_handiness)),
             ", MeleePower:", int(round(self.melee_power)),
@@ -550,9 +500,14 @@ class Characters:
             print("")
                  
     def print_time_state(self):
+        if self.last_action:
+            last_action = self.last_action.name
+        else:
+            last_action = None
+
         print(", SpeedRatio:", round(self.speed_ratio, 2),
             ", Timeline:", round(self.timeline, 2),
-            ", CurrentAction:", self.last_action)
+            ", CurrentAction:", last_action)
 
     def print_state(self):
         self.print_basic()
@@ -560,13 +515,15 @@ class Characters:
         self.print_time_state()
 
     def print_detailed_state(self):
+        print("BASIC INFO:")
+        print("   ", end=' ')
         self.print_basic()
         self.body.print_obj()
         self.print_time_state()
         self.print_defense()
         self.print_attack()
-        self.print_spells_and_feelings()
         self.equipments.print_obj()
+        self.print_spells_and_feelings()
 
     def print_defense_state(self):
         self.print_basic()

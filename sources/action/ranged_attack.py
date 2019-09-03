@@ -3,15 +3,15 @@ import math as math
 import random as random
 import time as time
 import sources.miscellaneous.global_variables as global_variables
-from sources.character.Characters import Characters
-from sources.action.Actions import ActiveActions
-from sources.action.MoveChar import MoveChar
+from sources.character.character import Character
+from sources.action.actions import ActiveActions, actions
+from sources.action.move import Move
 
 
 #############################################################
 ################### RANGED ATTACK CHAR CLASS ################
 #############################################################
-class RangedAttackChar(ActiveActions):
+class RangedAttack(ActiveActions):
     """Class to ranged attack a character"""
 
     attack_effect = [25, 50]  # [Blocked", "Hit", "Hit & stopped"]
@@ -27,7 +27,7 @@ class RangedAttackChar(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):  # Choose ranged target and shoot mode
-        if self.initiator.check_stamina(Characters.RangedAttack[3]) is False:
+        if self.initiator.check_stamina(actions["ranged_attack"]["stamina"]) is False:
             print("You do not have enough stamina (",
                   self.initiator.body.get_current_stamina(), ") for a ranged attack")
             return False
@@ -132,16 +132,17 @@ class RangedAttackChar(ActiveActions):
 
         self.initiator.equipments.use_ammo()
         if self.initiator.equipments.is_using_a_crossbow():
-            stamina = Characters.RangedAttack[3] * self.shooting_time / 10
+            stamina = actions["ranged_attack"]["stamina"] * self.shooting_time / 10
         else:
-            stamina = Characters.RangedAttack[3] * self.shooting_time
-        self.end_update([self.initiator, self.target], stamina, Characters.RangedAttack[2] * self.shooting_time)
+            stamina = actions["ranged_attack"]["stamina"] * self.shooting_time
+        self.end_update([self.initiator, self.target], stamina,
+                        actions["ranged_attack"]["duration"] * self.shooting_time)
         return True
 
     def range_defend(self, hit_chance):
         # Calculate att coef
         att_coef = self.initiator.power_distance_ratio(self.target) \
-                   * Characters.power_hit_chance_ratio(hit_chance) \
+                   * Character.power_hit_chance_ratio(hit_chance) \
                    * self.get_attack_coef(self.initiator)
         print("ranged_att_coef:", att_coef)
 
@@ -153,7 +154,7 @@ class RangedAttackChar(ActiveActions):
         print("attack_result:", attack_result)
 
         # Attack result --> Either block or be fully hit
-        if attack_result <= RangedAttackChar.attack_effect[0]:
+        if attack_result <= RangedAttack.attack_effect[0]:
             self.target.all_shields_absorbed_damage(attack_power)
             print("The attack has been fully blocked / avoided by the defender")
             time.sleep(5)
@@ -183,12 +184,12 @@ class RangedAttackChar(ActiveActions):
                 nb_of_attacks += 1
 
         if nb_of_attacks > 0:
-            coef = math.pow(RangedAttackChar.melee_fight_handicap, nb_of_attacks)
+            coef = math.pow(RangedAttack.melee_fight_handicap, nb_of_attacks)
         else:
             coef = 1
 
-        if isinstance(self.target.last_action, MoveChar):
-            coef *= RangedAttackChar.move_char_handicap
+        if isinstance(self.target.last_action, Move):
+            coef *= RangedAttack.move_char_handicap
 
         return coef
 

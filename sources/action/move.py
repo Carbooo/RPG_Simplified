@@ -1,14 +1,13 @@
 import math as math
 import time as time
-from sources.character.Characters import Characters
-from sources.action.Actions import ActiveActions
+from sources.action.actions import ActiveActions, actions
 
 
 #############################################################
 ######################## MOVE CHAR CLASS ####################
 #############################################################
-class MoveChar(ActiveActions):
-    """Class to move a self.initiator"""
+class Move(ActiveActions):
+    """Class to move a character"""
 
     nb_of_move_before_recalculating_path = 2  # Ratio when the path will be recalculated
 
@@ -18,7 +17,7 @@ class MoveChar(ActiveActions):
         self.target_abs = -1
         self.target_ord = -1
         self.path = []
-        self.nb_of_move_left = MoveChar.nb_of_move_before_recalculating_path
+        self.nb_of_move_left = Move.nb_of_move_before_recalculating_path
         self.is_a_success = self.start()
 
     ####################### MOVE ACTIONS ########################
@@ -74,7 +73,9 @@ class MoveChar(ActiveActions):
                                                                                 self.target_ord):
             return self.cancel_move()
 
-        self.end_update([], self.get_move_coef() * Characters.Move[3], self.get_move_coef() * Characters.Move[2])
+        self.end_update([],
+                        self.get_move_coef() * actions["move"]["stamina"],
+                        self.get_move_coef() * actions["move"]["duration"])
 
         print("")
         print("*********************************************************************")
@@ -116,7 +117,7 @@ class MoveChar(ActiveActions):
             path = self.fight.field.choose_path_move(self.initiator, coord[0], coord[1])
             if path:
                 self.path = path
-                self.nb_of_move_left = MoveChar.nb_of_move_before_recalculating_path
+                self.nb_of_move_left = Move.nb_of_move_before_recalculating_path
             else:
                 return self.cancel_move()
         else:
@@ -138,7 +139,7 @@ class MoveChar(ActiveActions):
         return True
 
     def check_move_stamina(self):
-        if not self.initiator.check_stamina(self.get_move_coef() * Characters.Move[3]):
+        if not self.initiator.check_stamina(self.get_move_coef() * actions["move"]["stamina"]):
             print("You do not have enough stamina (",
                   self.initiator.body.return_current_stamina(),
                   ") to move in that position (abs:",

@@ -1,17 +1,17 @@
 import time as time
 import math as math
-from sources.action.Actions import ActiveActions
+from sources.action.actions import ActiveActions
+
+min_turn = 1
+max_turn = 10
+resting_ratio = 1.0 / 3.0
 
 
 #############################################################
 ########################## REST CLASS #######################
 #############################################################
-class RestChar(ActiveActions):
+class Rest(ActiveActions):
     """Class to make a character rest"""
-
-    min_turn = 1
-    max_turn = 10
-    resting_ratio = 1.0/3.0
     
     def __init__(self, fight, initiator):
         super().__init__(fight, initiator)
@@ -28,10 +28,10 @@ class RestChar(ActiveActions):
                 self.nb_of_turns = int(input(txt))
                 if self.fight.cancel_action(self.nb_of_turns):
                     return False
-                elif self.nb_of_turns < RestChar.min_turn:
-                    print("You cannot rest less than ", RestChar.min_turn, " turns")
-                elif self.nb_of_turns > RestChar.max_turn:
-                    print("You cannot rest more than ", RestChar.max_turn, " turns")
+                elif self.nb_of_turns < min_turn:
+                    print("You cannot rest less than ", min_turn, " turns")
+                elif self.nb_of_turns > max_turn:
+                    print("You cannot rest more than ", max_turn, " turns")
                 else:
                     break
             except:
@@ -40,7 +40,7 @@ class RestChar(ActiveActions):
         print("You have decided to rest for ", self.nb_of_turns, " turn(s)")
         time.sleep(3)
         
-        self.resting_ratio = math.pow(self.nb_of_turns, RestChar.resting_ratio)
+        self.resting_ratio = math.pow(self.nb_of_turns, resting_ratio)
         self.end_update([], 0, 1, True)
         return True
 

@@ -1,14 +1,14 @@
 import copy as copy
 import math as math
 import time as time
-from sources.character.Characters import Characters
-from sources.action.Actions import ActiveActions
+from sources.action.actions import ActiveActions, actions
+import sources.miscellaneous.global_variables as global_variables
 
 
 #############################################################
 ###################### EQUIP CHAR CLASS #####################
 #############################################################
-class EquipChar(ActiveActions):
+class ModifyEquipments(ActiveActions):
     """Class to equip a character"""
     
     def __init__(self, fight, initiator):
@@ -20,7 +20,7 @@ class EquipChar(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):
-        if not self.initiator.check_stamina(Characters.Equip[3]):
+        if not self.initiator.check_stamina(actions["modify_equip"]["stamina"]):
             print("You do not have enough stamina (",
                   self.initiator.body.get_current_stamina(), ") to modify your equipment")
             return False
@@ -187,10 +187,10 @@ class EquipChar(ActiveActions):
                 if not self.initiator.equipments.remove_weapon(weapon):
                     return False
        
-        self.end_update([self.initiator], self.equip_time * Characters.Equip[3], self.equip_time)
+        self.end_update([self.initiator], self.equip_time * actions["modify_equip"]["stamina"], self.equip_time)
         return True
     
     def calculate_timelines(self, weapons):
         self.equip_time = 0
         for weapon in weapons:
-            self.equip_time += Characters.Equip[2] * math.sqrt(weapon.bulk / Characters.use_bulk_mean)
+            self.equip_time += actions["modify_equip"]["duration"] * math.sqrt(weapon.bulk / global_variables.use_bulk_mean)

@@ -2,13 +2,13 @@ import copy as copy
 import math as math
 import numpy as np
 import random as random
-from sources.character.Characters import Characters
+import sources.miscellaneous.global_variables as global_variables
 
 
 #############################################################
 ##################### FIELDS CLASS ##########################
 #############################################################
-class Fields:
+class Field:
     """Common base class for all fields"""
     list = []
     melee_handicap_ratio = 0.5
@@ -38,23 +38,23 @@ class Fields:
         self.reset_characters_array()
         if self.validate_arrays_size():
             if self.validate_obstacles_array():
-                Fields.list.append(self)
+                Field.list.append(self)
 
     def get_id(self):
-        for i in range(len(Fields.list)):
-            if Fields.list[i] == self:
+        for i in range(len(Field.list)):
+            if Field.list[i] == self:
                 return i
 
     #################### CHECK FUNCTIONS ###########################
 
     def validate_arrays_size(self):
         # Check the minimum size of a field
-        if self.abscissa_size < Characters.max_position_area * 2 \
-                or self.ordinate_size < Characters.max_position_area:
+        if self.abscissa_size < global_variables.max_position_area * 2 \
+                or self.ordinate_size < global_variables.max_position_area:
             print("(Field) The field is too small.",
                   "It must be at least:",
-                  Characters.max_position_area * 2,
-                  "x", Characters.max_position_area)
+                  global_variables.max_position_area * 2,
+                  "x", global_variables.max_position_area)
 
         # Check the columns size
         for i in range(self.abscissa_size):
@@ -76,7 +76,7 @@ class Fields:
         # Check the obstacles value
         for i in range(self.abscissa_size):
             for j in range(self.ordinate_size):
-                if self.obstacles_array[i, j] not in Fields.obstacle_types_list:
+                if self.obstacles_array[i, j] not in Field.obstacle_types_list:
                     print("(Fields) The obstacle array contains illegal values")
                     return False
         return True
@@ -97,8 +97,8 @@ class Fields:
     def is_case_obstacle_free(self, abscissa, ordinate):
         if not self.is_a_case(abscissa, ordinate):
             return False
-        if self.obstacles_array[abscissa, ordinate] == Fields.melee_obstacle \
-                or self.obstacles_array[abscissa, ordinate] == Fields.full_obstacle:
+        if self.obstacles_array[abscissa, ordinate] == Field.melee_obstacle \
+                or self.obstacles_array[abscissa, ordinate] == Field.full_obstacle:
             return False
         return True
 
@@ -120,8 +120,8 @@ class Fields:
     def is_case_ranged_free(self, abscissa, ordinate):
         if not self.is_a_case(abscissa, ordinate):
             return False
-        if not self.obstacles_array[abscissa, ordinate] == Fields.ranged_obstacle \
-                or not self.obstacles_array[abscissa, ordinate] == Fields.full_obstacle:
+        if not self.obstacles_array[abscissa, ordinate] == Field.ranged_obstacle \
+                or not self.obstacles_array[abscissa, ordinate] == Field.full_obstacle:
             return False
         return True
 
@@ -154,14 +154,14 @@ class Fields:
                         (min_abs + i != target.abscissa or min_ord + j != target.ordinate) and \
                         attacker.calculate_point_to_enemy_path_distance(target, min_abs + i, min_ord + j) <= 0.5:
 
-                    if self.obstacles_array[min_abs + i, min_ord + j] == Fields.ranged_obstacle or \
-                            self.obstacles_array[min_abs + i, min_ord + j] == Fields.full_obstacle or \
+                    if self.obstacles_array[min_abs + i, min_ord + j] == Field.ranged_obstacle or \
+                            self.obstacles_array[min_abs + i, min_ord + j] == Field.full_obstacle or \
                             self.characters_array[min_abs + i, min_ord + j] is None is False:
                         return 0
 
-                    if self.obstacles_array[min_abs + i, min_ord + j] == Fields.ranged_handicap or \
-                            self.obstacles_array[min_abs + i, min_ord + j] == Fields.full_handicap:
-                        path_ratio *= Fields.ranged_handicap_ratio
+                    if self.obstacles_array[min_abs + i, min_ord + j] == Field.ranged_handicap or \
+                            self.obstacles_array[min_abs + i, min_ord + j] == Field.full_handicap:
+                        path_ratio *= Field.ranged_handicap_ratio
 
         return path_ratio
 
@@ -174,7 +174,7 @@ class Fields:
 
         # Test wrong direction of the arrow
         # Calculate target position at +/- variation angle
-        variation = random.gauss(0, Characters.variance) * 10
+        variation = random.gauss(0, global_variables.variance) * 10
         pos_p = copy.copy(target)
         attacker.set_target_pos_variation(pos_p, variation)
         min_abs_p = min(attacker.abscissa, pos_p.abscissa)
@@ -191,7 +191,7 @@ class Fields:
         # Calculate shoot length
         length = attacker.calculate_point_distance(target.abscissa, target.ordinate)
         length += (attacker.equipments.get_range() - length) / 3  # shoot length depend of target distance
-        length *= max(0, random.gauss(1, Characters.variance))
+        length *= max(0, random.gauss(1, global_variables.variance))
 
         # Browse shoot path
         for i in pos_p_abs_range:
@@ -209,7 +209,7 @@ class Fields:
                 # Shoot out of field or blocked by an obstacle
                 if not self.is_a_case(c_abs, c_ord) or \
                         not self.is_case_ranged_free(c_abs, c_ord) or \
-                        (self.obstacles_array[c_abs, c_ord] == Fields.ranged_handicap and random.random() < 0.5):
+                        (self.obstacles_array[c_abs, c_ord] == Field.ranged_handicap and random.random() < 0.5):
                     return False
 
                 # Shoot has hit another character
@@ -289,10 +289,10 @@ class Fields:
     def obstacle_movement_ratio(self, current_abs, current_ord, target_abs, target_ord):
         if self.is_a_case(target_abs, target_ord):
             ratio = 1
-            if self.obstacles_array[current_abs, current_ord] == Fields.melee_handicap:
-                ratio *= Fields.melee_handicap_ratio
-            if self.obstacles_array[target_abs, target_ord] == Fields.full_handicap:
-                ratio *= Fields.melee_handicap_ratio
+            if self.obstacles_array[current_abs, current_ord] == Field.melee_handicap:
+                ratio *= Field.melee_handicap_ratio
+            if self.obstacles_array[target_abs, target_ord] == Field.full_handicap:
+                ratio *= Field.melee_handicap_ratio
             return ratio
 
     def set_character(self, character):
@@ -312,14 +312,14 @@ class Fields:
 
         # Try random position around character position
         number_list = []
-        for i in range(len(Fields.MovementsVal)):
+        for i in range(len(Field.MovementsVal)):
             number_list.append(i)
 
-        for i in range(len(Fields.MovementsVal)):
+        for i in range(len(Field.MovementsVal)):
             num = number_list.pop(random.choice(range(len(number_list))))
 
-            abscissa = character.abscissa + Fields.MovementsVal[num][0]
-            ordinate = character.ordinate + Fields.MovementsVal[num][1]
+            abscissa = character.abscissa + Field.MovementsVal[num][0]
+            ordinate = character.ordinate + Field.MovementsVal[num][1]
 
             if self.is_case_free(abscissa, ordinate):
                 character.set_position(abscissa, ordinate)
@@ -331,7 +331,7 @@ class Fields:
     def set_team(self, team):
         # Set the team on the left of the field
         # Calculate the middle ordinate
-        zero_ordinate = int(round((self.ordinate_size - Characters.max_position_area) / 2))
+        zero_ordinate = int(round((self.ordinate_size - global_variables.max_position_area) / 2))
 
         for char in team.characters_list:
             # update the zero ordinate
