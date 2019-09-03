@@ -38,8 +38,6 @@ class ActiveActions(Actions):
             self.initiator.spend_absolute_time(time)
         else:
             self.initiator.spend_time(time)
-            
-        self.initiator.calculate_characteristic()
 
     def get_attack_coef(self, char):
         return random.gauss(1, global_variables.high_variance) \
