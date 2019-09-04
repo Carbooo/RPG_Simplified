@@ -1,7 +1,6 @@
 from sources.miscellaneous.import_data import ImportData
-from sources.fight.field import Field
-from sources.fight.team import Team
 from sources.fight.fight import Fight
+import sources.miscellaneous.configuration as cfg
 
 ImportData("Armors", "data/Armors.csv")
 # PrintData("Armors")
@@ -44,4 +43,4 @@ ImportData("ObstaclesField", "data/LongObstacles.csv")
 print("")
 # Fights(Fields.list[3], Teams.list[0], Teams.list[1])
 # Fights(Fields.list[0], Teams.list[8], Teams.list[9])
-Fight(Field.list[0], Team.list[10], Team.list[11])
+Fight(cfg.field_list[0], cfg.team_list[10], cfg.team_list[11])

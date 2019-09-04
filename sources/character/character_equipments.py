@@ -1,5 +1,6 @@
 from sources.character.equipments import Equipments, Armors, Weapons, AttackWeapons, MeleeWeapons, \
     Shields, RangedWeapons, Bows, Crossbows, Ammo
+import sources.miscellaneous.configuration as cfg
 
 
 #########################################################################
@@ -7,13 +8,6 @@ from sources.character.equipments import Equipments, Armors, Weapons, AttackWeap
 #########################################################################
 class CharEquipments:
     """Common base class for all equipments carried by a character"""
-
-    free_hand_melee_handiness = 15.0 # Melee handiness for each free hand
-    free_hand_melee_power = 0.75  # Melee power for each free hand
-    free_hand_melee_range = 5.0  # Melee range if no weapon
-    free_hand_pen_rate = 0.3  # Penetration of hits with free hands
-    free_hand_resis_dim_rate = 0.01  # Armor diminution of hits with free hands
-    free_hand_melee_defense = 0.75  # Melee defense for each free hand
 
     def __init__(self, char, armor, 
                  weapon1, weapon2, weapon3, weapon4, 
@@ -43,7 +37,7 @@ class CharEquipments:
     def set_armor(self, armor_name):
         # Find armor
         armor_found = False
-        for equip in Equipments.list:
+        for equip in cfg.equipments_list:
             if isinstance(equip, Armors) and equip.name == armor_name:
                 armor_found = equip.copy()
                 break
@@ -63,7 +57,7 @@ class CharEquipments:
     def set_weapon_in_stored(self, weapon_name):
         # Find weapon
         weapon_found = False
-        for equip in Equipments.list:
+        for equip in cfg.equipments_list:
             if isinstance(equip, Weapons) and equip.name == weapon_name:
                 weapon_found = equip.copy()
                 break
@@ -105,7 +99,7 @@ class CharEquipments:
     def set_ammo(self, ammo_type, ammo_number):
         # Find ammo
         ammo_found = False
-        for equip in Equipments.list:
+        for equip in cfg.equipments_list:
             if isinstance(equip, Ammo) and equip.name == ammo_type:
                 ammo_found = equip.copy()
                 break
@@ -324,7 +318,7 @@ class CharEquipments:
                 accuracies["ranged_weapons"] += weapon.accuracy
 
         # Free hands melee power
-        accuracies["melee_weapons"] += self.free_hands * CharEquipments.free_hand_melee_handiness
+        accuracies["melee_weapons"] += self.free_hands * cfg.free_hand_melee_handiness
         nb_of_weapon += self.free_hands
 
         accuracies["melee_weapons"] /= nb_of_weapon
@@ -340,7 +334,7 @@ class CharEquipments:
 
         # Free hands melee range
         if self.free_hands == 2:
-            melee_range = CharEquipments.free_hand_melee_range
+            melee_range = cfg.free_hand_melee_range
             nb_of_weapon = 1.0
 
         return melee_range / nb_of_weapon
@@ -363,9 +357,9 @@ class CharEquipments:
                 attack_powers["ranged_power"] += weapon.range_power
 
         # Free hands melee attack power
-        attack_powers["melee_power"] += self.free_hands * CharEquipments.free_hand_melee_power
-        attack_powers["pen_rate"] += self.free_hands * CharEquipments.free_hand_pen_rate
-        attack_powers["resis_dim_rate"] += self.free_hands * CharEquipments.free_hand_resis_dim_rate
+        attack_powers["melee_power"] += self.free_hands * cfg.free_hand_melee_power
+        attack_powers["pen_rate"] += self.free_hands * cfg.free_hand_pen_rate
+        attack_powers["resis_dim_rate"] += self.free_hands * cfg.free_hand_resis_dim_rate
         nb_of_weapons += self.free_hands
 
         attack_powers["pen_rate"] /= nb_of_weapons
@@ -388,7 +382,7 @@ class CharEquipments:
                 defenses["melee_defense"] += weapon.defense
 
         # Free hands melee defense
-        defenses["melee_defense"] += self.free_hands * CharEquipments.free_hand_melee_defense
+        defenses["melee_defense"] += self.free_hands * cfg.free_hand_melee_defense
 
         return defenses
 
@@ -401,12 +395,16 @@ class CharEquipments:
         
     @staticmethod
     def print_weapon(weapon):
-        print("   WeaponID:", weapon.get_id(), ", Weapon:", weapon.name, ", Defense:", weapon.defense,
+        print("WeaponID:", weapon.get_id(), ", Weapon:", weapon.name, ", Defense:", weapon.defense,
               ", MeleePower:", weapon.melee_power, ", NbOfHand(s):", weapon.hand, end=' ')
         
         if isinstance(weapon, RangedWeapons):
+            if weapon.current_ammo is not None:
+                ammo_name = weapon.current_ammo.name
+            else:
+                ammo_name = None
             print(", MaxRange:", weapon.get_max_range(), ", RangePower:", weapon.range_power,
-                  ", CurrentAmmo:", weapon.current_ammo)
+                  ", CurrentAmmo:", ammo_name)
         else:
             print("")
 
@@ -415,51 +413,51 @@ class CharEquipments:
         weapon.print_obj()
 
     def print_weapons_stored(self):
-        print("Weapons stored:")
+        print("   - Weapons stored:")
         if len(self.weapons_stored) <= 0:
-            print("   \\No weapon stored")
+            print("      \\No weapon stored")
             return False
         for weapon in self.weapons_stored:
-            print("\\", end=' ')
+            print("      \\", end=' ')
             CharEquipments.print_weapon(weapon)
         return True
 
     def print_full_weapons_stored(self):
-        print("Weapons stored:")
+        print("   - Weapons stored:")
         if len(self.weapons_stored) <= 0:
-            print("   \\No weapon stored")
+            print("      \\No weapon stored")
             return False
         for weapon in self.weapons_stored:
-            print("\\", end=' ')
+            print("      \\", end=' ')
             CharEquipments.print_full_weapon(weapon)
         return True
     
     def print_weapons_in_use(self):
         print("")
-        print("Weapons used:")
+        print("   - Weapons used:")
         if len(self.weapons_in_use) <= 0:
-            print("   \\No weapon used")
+            print("      \\No weapon used")
             return False
         for weapon in self.weapons_in_use:
-            print("\\", end=' ')
+            print("      \\", end=' ')
             CharEquipments.print_weapon(weapon)
         return True
 
     def print_full_weapons_in_use(self):
         print("")
-        print("Weapons used:")
+        print("   - Weapons used:")
         if len(self.weapons_in_use) <= 0:
-            print("   \\No weapon used")
+            print("      \\No weapon used")
             return False
         for weapon in self.weapons_in_use:
-            print("\\", end=' ')
+            print("      \\", end=' ')
             CharEquipments.print_full_weapon(weapon)
         return True
     
     def print_ammo(self):
-        print("Ammo available:")
+        print("   - Ammo available:")
         if len(self.ammo) <= 0:
-            print("   \\No ammo")
+            print("      \\No ammo")
             return False
 
         ammo_type_list = {}
@@ -472,20 +470,20 @@ class CharEquipments:
                 ammo_type_list[ammo.name]["ammo_type"] = ammo
 
         for key in ammo_type_list:
-            print("   \\", ammo_type_list[key]["number"], "arrow(s) of ...")
-            print("      ", end=' ')
+            print("      \\", ammo_type_list[key]["number"], "arrow(s) of ...")
+            print("       ", end=' ')
             ammo_type_list[key]["ammo_type"].print_obj()
         return True
 
     def print_equipments(self):
-        print("EQUIPMENTS:")
+        print("-- EQUIPMENTS --")
         self.print_armor()
         self.print_weapons_in_use()
         self.print_weapons_stored()
         self.print_ammo()
 
     def print_full_equipments(self):
-        print("EQUIPMENTS:")
+        print("-- EQUIPMENTS --")
         self.print_full_armor()
         self.print_full_weapons_in_use()
         self.print_full_weapons_stored()

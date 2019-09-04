@@ -1,5 +1,5 @@
 import time as time
-from sources.action.actions import ActiveActions
+from sources.action.actions import Actions, ActiveActions
 
 
 #############################################################
@@ -19,7 +19,7 @@ class PassTime(ActiveActions):
         while 1:
             try:
                 read = int(input(txt))
-                if self.fight.cancel_action(read):
+                if Actions.cancel_action(read):
                     return False
                 else:
                     break

@@ -1,8 +1,8 @@
 import math as math
 import time as time
 import random as random
-from sources.action.actions import ActiveActions
-import sources.miscellaneous.global_variables as global_variables
+from sources.action.actions import Actions, ActiveActions
+import sources.miscellaneous.configuration as cfg
 
 
 #############################################################
@@ -14,6 +14,7 @@ class Spells(ActiveActions):
     def __init__(self, fight, initiator, type, spell_code):
         super().__init__(fight, initiator)
         self.name = "Generic spell action"
+        self.surname = "Generic spell name"
         self.target = None
         self.type = type
         self.spell_code = spell_code
@@ -29,8 +30,43 @@ class Spells(ActiveActions):
     def end(self):
         pass  # Only for inheritance
 
+    @staticmethod
+    def choose_spell():
+        print("You have decided to cast a spell")
+        print("")
+        print("Which type of spell?")
+        for spell_type in cfg.spells:
+            print("-", spell_type["description"], "(" + spell_type["code"] + ")")
+
+        while 1:
+            read = input('--> Spell type (0 for cancel) : ')
+            if Actions.cancel_action(read):
+                return False
+
+            for spell_type in cfg.spells:
+                if read == spell_type["code"]:
+                    print("You chose to cast a " + spell_type["description"])
+                    print("")
+                    print("Which spell do you want to cast?")
+
+                    for spell in spell_type["list"]:
+                        print("- ", spell["description"] + " (" + spell["code"] + ")")
+
+                    while 1:
+                        read = input('--> Spell (0 for cancel) : ')
+                        if Actions.cancel_action(read):
+                            return False
+
+                        for spell in spell_type["list"]:
+                            if read == spell["code"]:
+                                return spell_type["code"], spell["code"]
+
+                        print("Spell:", read, "is not recognized")
+
+            print("Spell type:", read, "is not recognized")
+
     def set_magical_coef(self):
-        self.magical_coef = random.gauss(1, global_variables.high_variance) \
+        self.magical_coef = random.gauss(1, cfg.high_variance) \
                             * self.initiator.feelings[self.type].use_energy(self.spell_energy)
 
     def get_stamina_with_coef(self):
@@ -120,13 +156,13 @@ class Spells(ActiveActions):
         for char in team.characters_list:
             if self.fight.field.is_target_magically_reachable(self.initiator, char):
                 enemy_list.append(char)
-                char.print_state()
+                char.print_defense_state()
 
         while 1:
             try:
                 print("")
                 read = int(input('--> ID (0 = Cancel): '))
-                if self.fight.cancel_action(read):
+                if Actions.cancel_action(read):
                     return False
 
                 for enemy in enemy_list:
@@ -138,7 +174,8 @@ class Spells(ActiveActions):
             except:
                 print("The input is not an ID")
 
-    def add_active_spell(self, char, duration):
+    def add_active_spell(self, char, duration, surname):
+        self.surname = surname
         self.timeline = self.initiator.timeline + duration
         self.fight.scheduler.append(self)
         char.active_spells.append(self)

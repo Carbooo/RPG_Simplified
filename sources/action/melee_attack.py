@@ -1,8 +1,9 @@
 import math as math
 import random as random
 import time as time
+import sources.miscellaneous.configuration as cfg
 from sources.character.character import Character
-from sources.action.actions import ActiveActions, actions
+from sources.action.actions import Actions, ActiveActions
 
 
 #############################################################
@@ -10,10 +11,6 @@ from sources.action.actions import ActiveActions, actions
 #############################################################
 class MeleeAttack(ActiveActions):
     """Class to melee attack a character"""
-
-    attack_effect = [0, 25, 50, 75]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]
-    random_defenser_move_probability = 0.25
-    random_attacker_move_probability = 0.5
     
     def __init__(self, fight, initiator):
         super().__init__(fight, initiator)
@@ -23,7 +20,7 @@ class MeleeAttack(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):
-        if not self.initiator.check_stamina(actions["melee_attack"]["stamina"]):
+        if not self.initiator.check_stamina(cfg.actions["melee_attack"]["stamina"]):
             print("You do not have enough stamina (", self.initiator.body.get_current_stamina(), ") for a melee attack")
             return False
         elif not self.choose_target():
@@ -56,14 +53,14 @@ class MeleeAttack(ActiveActions):
                 print("----- FIGHTING AVAILABILITY: ",
                     self.target.get_fighting_availability(self.timeline),
                     " -----")
-                self.target.print_state()
+                self.target.print_defense_state()
                 enemy_list.append(self.target)
 
         while 1:
             try:
                 print("")
                 read = int(input('--> ID (0 = Cancel): '))
-                if self.fight.cancel_action(read):
+                if Actions.cancel_action(read):
                     return False
             except:
                 print("The input is not an ID")
@@ -88,26 +85,26 @@ class MeleeAttack(ActiveActions):
         abscissa = self.target.abscissa
         ordinate = self.target.ordinate
         if self.actual_defense == "Dodge" and \
-           self.fight.field.random_move(self.target, MeleeAttack.random_defenser_move_probability * 2):
+           self.fight.field.random_move(self.target, cfg.random_defenser_move_probability * 2):
                 print("The fight made the defenser move from their position!")
                 time.sleep(2)
-                if random.random() < MeleeAttack.random_attacker_move_probability:
+                if random.random() < cfg.random_attacker_move_probability:
                     self.fight.field.move_character(self.initiator, abscissa, ordinate)
                     print("And the attacker took the initial position of the defender!")
                     time.sleep(2)
                 
         elif self.actual_defense == "Defense" and \
-             self.fight.field.random_move(self.target, MeleeAttack.random_defenser_move_probability):
+             self.fight.field.random_move(self.target, cfg.random_defenser_move_probability):
                 print("The fight made the defenser move from their position!")
                 time.sleep(2)
-                if random.random() < MeleeAttack.random_attacker_move_probability:
+                if random.random() < cfg.random_attacker_move_probability:
                     self.fight.field.move_character(self.initiator, abscissa, ordinate)
                     print("And the attacker took the initial position of the defender!")
                     time.sleep(2)
                 
         self.end_update([self.initiator, self.target],
-                        actions["melee_attack"]["stamina"],
-                        actions["melee_attack"]["duration"])
+                        cfg.actions["melee_attack"]["stamina"],
+                        cfg.actions["melee_attack"]["duration"])
         return True
 
     def melee_defense_result(self):
@@ -115,7 +112,7 @@ class MeleeAttack(ActiveActions):
         dodge_result = self.initiator.melee_handiness - self.target.dodging
         defense_result = Character.get_melee_attack(self.initiator.melee_handiness, self.initiator.melee_power) \
                          - self.target.melee_defense
-        if not self.target.check_stamina(actions["melee_attack"]["stamina"]):
+        if not self.target.check_stamina(cfg.actions["melee_attack"]["stamina"]):
             print("Defender does not have enough stamina (", self.target.body.get_current_stamina(), ") to defend")
             self.actual_defense = "No defense"
         elif defense_result < dodge_result:
@@ -151,11 +148,11 @@ class MeleeAttack(ActiveActions):
         return attack_result
 
     def melee_attack_type(self, attack_value):
-        if attack_value < MeleeAttack.attack_effect[0]:
+        if attack_value < cfg.melee_attack_stage[0]:
             # Only block for very low damages
             self.block()
             time.sleep(3)
-        elif attack_value < MeleeAttack.attack_effect[1]:
+        elif attack_value < cfg.melee_attack_stage[1]:
             # Block or delay for low damages
             r = random.random()
             if r < 0.5:
@@ -163,7 +160,7 @@ class MeleeAttack(ActiveActions):
             else:
                 self.block()
             time.sleep(3)
-        elif attack_value < MeleeAttack.attack_effect[2]:
+        elif attack_value < cfg.melee_attack_stage[2]:
             # Hit or delay for medium damages
             r = random.random()
             if r < 0.5:
@@ -172,7 +169,7 @@ class MeleeAttack(ActiveActions):
             else:
                 print("The attack is a normal hit")
                 self.melee_attack_received(attack_value)
-        elif attack_value < MeleeAttack.attack_effect[3]:
+        elif attack_value < cfg.melee_attack_stage[3]:
             # Big hit or hit + delay for high damages
             r = random.random()
             if r < 0.5:
@@ -203,7 +200,7 @@ class MeleeAttack(ActiveActions):
         time.sleep(2)
 
     def delay(self, attack_value):
-        attack_value /= MeleeAttack.attack_effect[3] / 2
+        attack_value /= cfg.melee_attack_stage[3] / 2
         self.target.spend_time(attack_value)
         self.initiator.print_basic()
         print("-- has DELAYED --", end=' ')

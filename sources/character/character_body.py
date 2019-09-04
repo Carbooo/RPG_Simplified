@@ -1,16 +1,12 @@
 import math as math
 import time as time
-
+import sources.miscellaneous.configuration as cfg
 
 #############################################################
 ###################### BODIES CLASS #########################
 #############################################################
 class CharBody:
     """Common base class for bodies of characters"""
-
-    life_resting_coef = 14400.0  # Rest coefficient
-    stamina_resting_coef = 200.0  # Rest coefficient
-    turn_stamina = 1.0  # Stamina reference used
 
     def __init__(self, char, life, stamina):
         self.character = char
@@ -48,7 +44,7 @@ class CharBody:
             return math.pow(coefficient * 1.26, 1.5)
 
     def life_rest(self, coefficient):
-        self.update_life(self.original_life * self.get_rest_coef(coefficient) / CharBody.life_resting_coef)
+        self.update_life(self.original_life * self.get_rest_coef(coefficient) / cfg.life_resting_coef)
         
     def loose_life(self, damage):
         previous_life = self.life
@@ -91,15 +87,15 @@ class CharBody:
     def spend_stamina(self, coefficient, ignore=False):
         if not ignore and not self.check_stamina(coefficient):
             print("Error: Stamina below 0")
-        self.update_stamina(coefficient * CharBody.turn_stamina)
+        self.update_stamina(coefficient * cfg.turn_stamina)
 
     def check_stamina(self, coefficient):
-        if self.stamina >= CharBody.turn_stamina * coefficient:
+        if self.stamina >= cfg.turn_stamina * coefficient:
             return True
         return False
 
     def stamina_rest(self, coefficient):
-        self.update_stamina(self.original_stamina * self.get_rest_coef(coefficient) / CharBody.stamina_resting_coef)
+        self.update_stamina(self.original_stamina * self.get_rest_coef(coefficient) / cfg.stamina_resting_coef)
 
     ############################# REST FUNCTIONS ##########################
     def get_rest_coef(self, coefficient):

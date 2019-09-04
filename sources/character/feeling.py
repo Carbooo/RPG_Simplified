@@ -1,16 +1,13 @@
 import math as math
 import random as random
+import sources.miscellaneous.configuration as cfg
+
 
 #############################################################
 ##################### FEELINGS CLASS ########################
 #############################################################
 class Feeling:
     """Common base class to handle the six feelings"""
-    
-    natural_update_ratio = 50  # Energy ratio to naturally update feeling
-    concentrate_update_coef = 3  # Energy coef to update feeling with concentration
-    max_alive_energy = 1000
-    max_safe_energy = 200
     
     def __init__(self, type, sensibility, mastering):
         self.type = type
@@ -47,7 +44,7 @@ class Feeling:
             return False
             
     def natural_energy_update(self, time):
-        energy = abs(math.pow((self.energy - 100) / Feeling.natural_update_ratio, 3) * time)
+        energy = abs(math.pow((self.energy - 100) / cfg.natural_update_ratio, 3) * time)
         if self.energy > 100:
             self.gain_energy(energy)
         elif self.energy < 100 and self.energy > 0:
@@ -56,20 +53,20 @@ class Feeling:
     def concentrate_energy_update(self, action, ratio):
         ratio *= self.mastering_ratio
         if action == "increase":
-            self.gain_energy(Feeling.concentrate_update_coef * self.energy_ratio * ratio)
+            self.gain_energy(cfg.concentrate_update_coef * self.energy_ratio * ratio)
         elif action == "decrease":
-            self.loose_energy(Feeling.concentrate_update_coef / self.energy_ratio * ratio)
+            self.loose_energy(cfg.concentrate_update_coef / self.energy_ratio * ratio)
         else:
             print("Error: Wrong action for concentrate_energy_update")
             
     def die_of_exceeded_energy(self, char):
-        if self.energy <= Feeling.max_safe_energy:
+        if self.energy <= cfg.max_safe_energy:
             if self.warned_of_exceeded_energy:
                 print("Your ", self.type, " energy is now again under control!")
                 self.warned_of_exceeded_energy = False
             return False
         
-        energy_gap = (self.energy - Feeling.max_safe_energy) / (Feeling.max_alive_energy - Feeling.max_safe_energy)
+        energy_gap = (self.energy - cfg.max_safe_energy) / (cfg.max_alive_energy - cfg.max_safe_energy)
         if random.random() < energy_gap / char.willpower_ratio / self.mastering_ratio:
             if not self.warned_of_exceeded_energy: 
                 print("Your ", self.type, " energy is overwhelming you and may destroy you!")
@@ -81,5 +78,5 @@ class Feeling:
                 return True
 
     def print_obj(self):
-        print("Type:", self.type, ", Sensibility:", self.sensibility, ", Mastering:",
-              self.mastering, ", Energy:", self.energy)
+        print("Type:", self.type, ", Sensibility:", int(round(self.sensibility)), ", Mastering:",
+              int(round(self.mastering)), ", Energy:", int(round(self.energy)))

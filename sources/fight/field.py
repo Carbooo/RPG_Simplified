@@ -2,7 +2,7 @@ import copy as copy
 import math as math
 import numpy as np
 import random as random
-import sources.miscellaneous.global_variables as global_variables
+import sources.miscellaneous.configuration as cfg
 
 
 #############################################################
@@ -10,25 +10,10 @@ import sources.miscellaneous.global_variables as global_variables
 #############################################################
 class Field:
     """Common base class for all fields"""
-    list = []
-    melee_handicap_ratio = 0.5
-    ranged_handicap_ratio = 0.5
-
-    no_obstacle = " "
-    melee_handicap = "~"
-    melee_obstacle = "="
-    ranged_handicap = ":"
-    ranged_obstacle = "#"
-    full_handicap = "%"
-    full_obstacle = "X"
-    obstacle_types_list = [no_obstacle, melee_handicap, melee_obstacle, ranged_handicap, ranged_obstacle, full_handicap,
-                           full_obstacle]
-
-    MovementsVal = \
-        [[-1, 0], [-1, 1], [0, 1], [1, 1],
-         [1, 0], [1, -1], [0, -1], [-1, -1]]
 
     def __init__(self, name, obstacles_array, reliefs_array):
+        self.ID = len(cfg.field_list)
+        cfg.field_list.append(self)
         self.name = name
         self.abscissa_size = len(obstacles_array[0::, 0])
         self.ordinate_size = len(obstacles_array[0, 0::])
@@ -38,23 +23,20 @@ class Field:
         self.reset_characters_array()
         if self.validate_arrays_size():
             if self.validate_obstacles_array():
-                Field.list.append(self)
+                cfg.field_list.append(self)
 
     def get_id(self):
-        for i in range(len(Field.list)):
-            if Field.list[i] == self:
-                return i
+        return self.ID
 
-    #################### CHECK FUNCTIONS ###########################
-
+#################### CHECK FUNCTIONS ###########################
     def validate_arrays_size(self):
         # Check the minimum size of a field
-        if self.abscissa_size < global_variables.max_position_area * 2 \
-                or self.ordinate_size < global_variables.max_position_area:
+        if self.abscissa_size < cfg.max_position_area * 2 \
+                or self.ordinate_size < cfg.max_position_area:
             print("(Field) The field is too small.",
                   "It must be at least:",
-                  global_variables.max_position_area * 2,
-                  "x", global_variables.max_position_area)
+                  cfg.max_position_area * 2,
+                  "x", cfg.max_position_area)
 
         # Check the columns size
         for i in range(self.abscissa_size):
@@ -76,7 +58,7 @@ class Field:
         # Check the obstacles value
         for i in range(self.abscissa_size):
             for j in range(self.ordinate_size):
-                if self.obstacles_array[i, j] not in Field.obstacle_types_list:
+                if self.obstacles_array[i, j] not in cfg.obstacle_types_list:
                     print("(Fields) The obstacle array contains illegal values")
                     return False
         return True
@@ -97,8 +79,8 @@ class Field:
     def is_case_obstacle_free(self, abscissa, ordinate):
         if not self.is_a_case(abscissa, ordinate):
             return False
-        if self.obstacles_array[abscissa, ordinate] == Field.melee_obstacle \
-                or self.obstacles_array[abscissa, ordinate] == Field.full_obstacle:
+        if self.obstacles_array[abscissa, ordinate] == cfg.melee_obstacle \
+                or self.obstacles_array[abscissa, ordinate] == cfg.full_obstacle:
             return False
         return True
 
@@ -120,8 +102,8 @@ class Field:
     def is_case_ranged_free(self, abscissa, ordinate):
         if not self.is_a_case(abscissa, ordinate):
             return False
-        if not self.obstacles_array[abscissa, ordinate] == Field.ranged_obstacle \
-                or not self.obstacles_array[abscissa, ordinate] == Field.full_obstacle:
+        if not self.obstacles_array[abscissa, ordinate] == cfg.ranged_obstacle \
+                or not self.obstacles_array[abscissa, ordinate] == cfg.full_obstacle:
             return False
         return True
 
@@ -154,14 +136,14 @@ class Field:
                         (min_abs + i != target.abscissa or min_ord + j != target.ordinate) and \
                         attacker.calculate_point_to_enemy_path_distance(target, min_abs + i, min_ord + j) <= 0.5:
 
-                    if self.obstacles_array[min_abs + i, min_ord + j] == Field.ranged_obstacle or \
-                            self.obstacles_array[min_abs + i, min_ord + j] == Field.full_obstacle or \
+                    if self.obstacles_array[min_abs + i, min_ord + j] == cfg.ranged_obstacle or \
+                            self.obstacles_array[min_abs + i, min_ord + j] == cfg.full_obstacle or \
                             self.characters_array[min_abs + i, min_ord + j] is None is False:
                         return 0
 
-                    if self.obstacles_array[min_abs + i, min_ord + j] == Field.ranged_handicap or \
-                            self.obstacles_array[min_abs + i, min_ord + j] == Field.full_handicap:
-                        path_ratio *= Field.ranged_handicap_ratio
+                    if self.obstacles_array[min_abs + i, min_ord + j] == cfg.ranged_handicap or \
+                            self.obstacles_array[min_abs + i, min_ord + j] == cfg.full_handicap:
+                        path_ratio *= cfg.ranged_handicap_ratio
 
         return path_ratio
 
@@ -174,7 +156,7 @@ class Field:
 
         # Test wrong direction of the arrow
         # Calculate target position at +/- variation angle
-        variation = random.gauss(0, global_variables.variance) * 10
+        variation = random.gauss(0, cfg.variance) * 10
         pos_p = copy.copy(target)
         attacker.set_target_pos_variation(pos_p, variation)
         min_abs_p = min(attacker.abscissa, pos_p.abscissa)
@@ -191,7 +173,7 @@ class Field:
         # Calculate shoot length
         length = attacker.calculate_point_distance(target.abscissa, target.ordinate)
         length += (attacker.equipments.get_range() - length) / 3  # shoot length depend of target distance
-        length *= max(0, random.gauss(1, global_variables.variance))
+        length *= max(0, random.gauss(1, cfg.variance))
 
         # Browse shoot path
         for i in pos_p_abs_range:
@@ -209,7 +191,7 @@ class Field:
                 # Shoot out of field or blocked by an obstacle
                 if not self.is_a_case(c_abs, c_ord) or \
                         not self.is_case_ranged_free(c_abs, c_ord) or \
-                        (self.obstacles_array[c_abs, c_ord] == Field.ranged_handicap and random.random() < 0.5):
+                        (self.obstacles_array[c_abs, c_ord] == cfg.ranged_handicap and random.random() < 0.5):
                     return False
 
                 # Shoot has hit another character
@@ -289,10 +271,10 @@ class Field:
     def obstacle_movement_ratio(self, current_abs, current_ord, target_abs, target_ord):
         if self.is_a_case(target_abs, target_ord):
             ratio = 1
-            if self.obstacles_array[current_abs, current_ord] == Field.melee_handicap:
-                ratio *= Field.melee_handicap_ratio
-            if self.obstacles_array[target_abs, target_ord] == Field.full_handicap:
-                ratio *= Field.melee_handicap_ratio
+            if self.obstacles_array[current_abs, current_ord] == cfg.melee_handicap:
+                ratio *= cfg.melee_handicap_ratio
+            if self.obstacles_array[target_abs, target_ord] == cfg.full_handicap:
+                ratio *= cfg.melee_handicap_ratio
             return ratio
 
     def set_character(self, character):
@@ -310,16 +292,18 @@ class Field:
         if self.set_character(character):
             return True
 
-        # Try random position around character position
-        number_list = []
-        for i in range(len(Field.MovementsVal)):
-            number_list.append(i)
+        # If pos not available, try random position around character position
+        pos_list = []
+        for i in [-1, 0, 1]:
+            for j in [-1, 0, 1]:
+                pos_list.append((i, j))
 
-        for i in range(len(Field.MovementsVal)):
-            num = number_list.pop(random.choice(range(len(number_list))))
+        for _ in range(9):
+            i, j = random.choice(pos_list)
+            pos_list.remove((i, j))
 
-            abscissa = character.abscissa + Field.MovementsVal[num][0]
-            ordinate = character.ordinate + Field.MovementsVal[num][1]
+            abscissa = character.abscissa + i
+            ordinate = character.ordinate + j
 
             if self.is_case_free(abscissa, ordinate):
                 character.set_position(abscissa, ordinate)
@@ -331,7 +315,7 @@ class Field:
     def set_team(self, team):
         # Set the team on the left of the field
         # Calculate the middle ordinate
-        zero_ordinate = int(round((self.ordinate_size - global_variables.max_position_area) / 2))
+        zero_ordinate = int(round((self.ordinate_size - cfg.max_position_area) / 2))
 
         for char in team.characters_list:
             # update the zero ordinate
@@ -404,7 +388,8 @@ class Field:
 
         return False
 
-    def heuristic_value(self, source_abs, source_ord, target_abs, target_ord):
+    @staticmethod
+    def heuristic_value(source_abs, source_ord, target_abs, target_ord):
         return math.sqrt(math.pow(source_abs - target_abs, 2) + math.pow(source_ord - target_ord, 2))
 
     def movement_cost(self, current_abs, current_ord, target_abs, target_ord):
@@ -416,6 +401,7 @@ class Field:
             cost = 1
         return cost / self.obstacle_movement_ratio(current_abs, current_ord, target_abs, target_ord)
 
+    @staticmethod
     def is_a_browsed_pos(self, current_paths, new_abs, new_ord):
         for path in range(len(current_paths)):
             for i in range(len(current_paths[path][3])):
@@ -425,7 +411,7 @@ class Field:
         return False
 
     def choose_path_move(self, character, target_abs, target_ord):
-        # A* Algorythm
+        # A* Algorithm
         path_abs = character.abscissa
         path_ord = character.ordinate
         current_paths = []
@@ -450,7 +436,7 @@ class Field:
                         # Only browse new available case
                         if not self.is_case_free(new_abs, new_ord) or \
                                 (i == 0 and j == 0) or \
-                                self.is_a_browsed_pos(current_paths, new_abs, new_ord):
+                                Field.is_a_browsed_pos(current_paths, new_abs, new_ord):
                             continue
 
                         # Store information
@@ -463,7 +449,7 @@ class Field:
                         move_values.append(self.movement_cost(current_abs, current_ord, new_abs, new_ord))
 
                         # Calculate all heuristic values
-                        move_values.append(self.heuristic_value(new_abs, new_ord, target_abs, target_ord))
+                        move_values.append(Field.heuristic_value(new_abs, new_ord, target_abs, target_ord))
 
                 # Choose min (cost-heuristic) path
                 min_cost = 10000000
@@ -473,8 +459,7 @@ class Field:
                     if cost < min_cost:
                         min_cost = cost
                         new_path = copy.copy(current_path_browsed)
-                        new_path.append( \
-                            [possible_moves[i][0], possible_moves[i][1]])
+                        new_path.append([possible_moves[i][0], possible_moves[i][1]])
                         min_path = [possible_moves[i][0], possible_moves[i][1],
                                     current_cost + possible_moves[i][2], new_path,
                                     possible_moves[i][3]]
@@ -501,12 +486,7 @@ class Field:
 
         return current_paths[len(current_paths) - 1][3]
 
-    ################ MAP GENERATION FUNCTIONS ########################
-    def random_generation(self, param1, param2):
-        # to be defined
-        print("to be done")
-
-    ################ PRINTING FUNCTIONS ########################
+################ PRINTING FUNCTIONS ########################
     def print_line(self):
         stri = "----|"
         for _ in range(1, self.abscissa_size + 1):

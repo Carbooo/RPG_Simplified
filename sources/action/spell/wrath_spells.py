@@ -1,7 +1,7 @@
 import math as math
 import time as time
 from sources.action.spell.spells import Spells
-import sources.miscellaneous.global_variables as global_variables
+import sources.miscellaneous.configuration as cfg
 
 #############################################################
 ####################### WRATH SPELL CLASS ###################
@@ -9,41 +9,14 @@ import sources.miscellaneous.global_variables as global_variables
 
 class WrathSpells(Spells):
     """Class to cast wrath spells"""
-    
-    spells_energy = {
-        "STR": 10.0,
-        "FBL": 30.0
-    }
-    spells_time = {
-        "STR": 1.0,
-        "FBL": 2.5
-    }
-    spells_stamina = {
-        "STR": 1.0,
-        "FBL": 7.5
-    }
-    spells_power = {
-        "STR": {
-            "force": 2.0,
-            "reflex": 0.8,
-            "dexterity": 0.6,
-            "duration": 5.0
-        },
-        "FBL": {
-            "attack_value": 50.0,
-            "spread_distance": 1,
-            "resis_dim_rate": 0.5,
-            "pen_rate": 0.25
-        }
-    }
  
     def __init__(self, fight, initiator, spell_code):
         super().__init__(fight, initiator, "Wrath", spell_code)
         self.name = "Casting a Wrath spell"
-        self.spell_stamina = WrathSpells.spells_stamina[self.spell_code]
-        self.spell_time = WrathSpells.spells_time[self.spell_code]
-        self.spell_energy = WrathSpells.spells_energy[self.spell_code]
-        self.spell_power = WrathSpells.spells_power[self.spell_code]
+        self.spell_stamina = cfg.wrath_spells_stamina[self.spell_code]
+        self.spell_time = cfg.wrath_spells_time[self.spell_code]
+        self.spell_energy = cfg.wrath_spells_energy[self.spell_code]
+        self.spell_power = cfg.wrath_spells_power[self.spell_code]
         self.is_a_success = self.start()
         
     def start(self):
@@ -99,7 +72,8 @@ class WrathSpells(Spells):
         )
         self.target.calculate_characteristic()
 
-        self.add_active_spell(self.initiator, self.spell_power["duration"] * math.sqrt(self.magical_coef))
+        self.add_active_spell(self.initiator, self.spell_power["duration"] * math.sqrt(self.magical_coef),
+                              "Strength greatly increased")
         self.initiator.last_action = None  # To remove it from the scheduler
         return True
     
@@ -156,6 +130,7 @@ class WrathSpells(Spells):
             print(")")
             print("*********************************************************************")
             print("")
+            time.sleep(3)
 
             self.magical_attack_received(
                 char,
@@ -169,4 +144,3 @@ class WrathSpells(Spells):
 
         self.initiator.last_action = None  # To remove it from the scheduler
         return True
-

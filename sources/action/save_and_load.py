@@ -27,7 +27,7 @@ class Save(Actions):
             while 1:
                 self.filename = input('--> file name (0 = Cancel): ')
                 
-                if self.fight.cancel_action(self.filename):
+                if Actions.cancel_action(self.filename):
                     return False
                 
                 try:
@@ -56,7 +56,7 @@ class Load(Actions):
         while 1:
             filename = input('--> file name (0 = Cancel): ')
             
-            if self.fight.cancel_action(filename):
+            if Actions.cancel_action(filename):
                 return False           
             
             try:

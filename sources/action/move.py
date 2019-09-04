@@ -1,6 +1,7 @@
 import math as math
 import time as time
-from sources.action.actions import ActiveActions, actions
+import sources.miscellaneous.configuration as cfg
+from sources.action.actions import Actions, ActiveActions
 
 
 #############################################################
@@ -9,15 +10,13 @@ from sources.action.actions import ActiveActions, actions
 class Move(ActiveActions):
     """Class to move a character"""
 
-    nb_of_move_before_recalculating_path = 2  # Ratio when the path will be recalculated
-
     def __init__(self, fight, initiator):
         super().__init__(fight, initiator)
         self.name = "Moving"
         self.target_abs = -1
         self.target_ord = -1
         self.path = []
-        self.nb_of_move_left = Move.nb_of_move_before_recalculating_path
+        self.nb_of_move_left = cfg.nb_of_move_before_recalculating_path
         self.is_a_success = self.start()
 
     ####################### MOVE ACTIONS ########################
@@ -32,7 +31,7 @@ class Move(ActiveActions):
 
             read = input('--> Abscissa (-1 = Cancel): ')
             if read == "-1":
-                self.fight.cancel_action(0)
+                Actions.cancel_action(0)
                 return False
             try:
                 abscissa = int(read)
@@ -43,7 +42,7 @@ class Move(ActiveActions):
 
             read = input('--> Ordinate (-1 = Cancel): ')
             if read == "-1":
-                self.fight.cancel_action(0)
+                Actions.cancel_action(0)
                 return False
             try:
                 ordinate = int(read)
@@ -74,8 +73,8 @@ class Move(ActiveActions):
             return self.cancel_move()
 
         self.end_update([],
-                        self.get_move_coef() * actions["move"]["stamina"],
-                        self.get_move_coef() * actions["move"]["duration"])
+                        self.get_move_coef() * cfg.actions["move"]["stamina"],
+                        self.get_move_coef() * cfg.actions["move"]["duration"])
 
         print("")
         print("*********************************************************************")
@@ -117,7 +116,7 @@ class Move(ActiveActions):
             path = self.fight.field.choose_path_move(self.initiator, coord[0], coord[1])
             if path:
                 self.path = path
-                self.nb_of_move_left = Move.nb_of_move_before_recalculating_path
+                self.nb_of_move_left = cfg.nb_of_move_before_recalculating_path
             else:
                 return self.cancel_move()
         else:
@@ -139,7 +138,7 @@ class Move(ActiveActions):
         return True
 
     def check_move_stamina(self):
-        if not self.initiator.check_stamina(self.get_move_coef() * actions["move"]["stamina"]):
+        if not self.initiator.check_stamina(self.get_move_coef() * cfg.actions["move"]["stamina"]):
             print("You do not have enough stamina (",
                   self.initiator.body.return_current_stamina(),
                   ") to move in that position (abs:",

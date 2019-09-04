@@ -1,8 +1,8 @@
 import copy as copy
 import math as math
 import time as time
-from sources.action.actions import ActiveActions, actions
-import sources.miscellaneous.global_variables as global_variables
+import sources.miscellaneous.configuration as cfg
+from sources.action.actions import Actions, ActiveActions
 
 
 #############################################################
@@ -20,7 +20,7 @@ class ModifyEquipments(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):
-        if not self.initiator.check_stamina(actions["modify_equip"]["stamina"]):
+        if not self.initiator.check_stamina(cfg.actions["modify_equip"]["stamina"]):
             print("You do not have enough stamina (",
                   self.initiator.body.get_current_stamina(), ") to modify your equipment")
             return False
@@ -35,7 +35,7 @@ class ModifyEquipments(ActiveActions):
                 print("Do you want to equip (EQP) or unequip (UQP) weapons?")            
                 read = input('--> Action (0 = Cancel): ')
                 
-                if self.fight.cancel_action(read):
+                if Actions.cancel_action(read):
                     return False
                 
                 if read == "EQP":
@@ -84,7 +84,7 @@ class ModifyEquipments(ActiveActions):
                 print("You have stopped to unequip")
                 return self.unequip_weapons_list(equipment_to_remove)
             
-            elif self.fight.cancel_action(read):
+            elif Actions.cancel_action(read):
                 return False
 
             available_equipment = False
@@ -147,7 +147,7 @@ class ModifyEquipments(ActiveActions):
                 return self.equip_weapons_list(new_equipment)
             
             # Cannot cancel equip move
-            elif self.fight.cancel_action(read):
+            elif Actions.cancel_action(read):
                 return False 
 
             available_equipment = False
@@ -187,10 +187,10 @@ class ModifyEquipments(ActiveActions):
                 if not self.initiator.equipments.remove_weapon(weapon):
                     return False
        
-        self.end_update([self.initiator], self.equip_time * actions["modify_equip"]["stamina"], self.equip_time)
+        self.end_update([self.initiator], self.equip_time * cfg.actions["modify_equip"]["stamina"], self.equip_time)
         return True
     
     def calculate_timelines(self, weapons):
         self.equip_time = 0
         for weapon in weapons:
-            self.equip_time += actions["modify_equip"]["duration"] * math.sqrt(weapon.bulk / global_variables.use_bulk_mean)
+            self.equip_time += cfg.actions["modify_equip"]["duration"] * math.sqrt(weapon.bulk / cfg.use_bulk_mean)

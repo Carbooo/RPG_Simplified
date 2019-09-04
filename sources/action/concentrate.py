@@ -1,12 +1,7 @@
 import time as time
 import math as math
-from sources.action.actions import ActiveActions
-import sources.miscellaneous.global_variables as global_variables
-
-min_turn = 3
-max_turn = 10
-concentration_rate = 1.0 / 3.0
-deconcentration_rate = 1.5
+from sources.action.actions import Actions, ActiveActions
+import sources.miscellaneous.configuration as cfg
 
 
 #############################################################
@@ -26,14 +21,14 @@ class Concentrate(ActiveActions):
 
     def start(self):
         print("On which feeling do you want to concentrate?")
-        for feeling in global_variables.feelings_list:
+        for feeling in cfg.feelings_list:
             print("- ", feeling)
         txt = "--> Feeling (0 = Cancel): "
         while 1:
             self.feeling = input(txt)
-            if self.fight.cancel_action(self.feeling):
+            if Actions.cancel_action(self.feeling):
                 return False
-            elif self.feeling in global_variables.feelings_list:
+            elif self.feeling in cfg.feelings_list:
                 break
             else:
                 print("The feeling is not recognized")
@@ -43,7 +38,7 @@ class Concentrate(ActiveActions):
         txt = "--> INC / DEC (0 = Cancel): "
         while 1:
             self.action = input(txt)
-            if self.fight.cancel_action(self.action):
+            if Actions.cancel_action(self.action):
                 return False
             elif self.action == "INC":
                 self.action = "increase"
@@ -61,12 +56,12 @@ class Concentrate(ActiveActions):
         while 1:
             try:
                 self.nb_of_turns = int(input(txt))
-                if self.fight.cancel_action(self.nb_of_turns):
+                if Actions.cancel_action(self.nb_of_turns):
                     return False
-                elif self.nb_of_turns < min_turn:
-                    print("You cannot rest less than", min_turn, "turns")
-                elif self.nb_of_turns > max_turn:
-                    print("You cannot rest more than", max_turn, "turns")
+                elif self.nb_of_turns < cfg.min_concentration_turn:
+                    print("You cannot rest less than", cfg.min_concentration_turn, "turns")
+                elif self.nb_of_turns > cfg.max_concentration_turn:
+                    print("You cannot rest more than", cfg.max_concentration_turn, "turns")
                 else:
                     break
             except:
@@ -76,14 +71,18 @@ class Concentrate(ActiveActions):
         print("You have decided to", self.action, "your", self.feeling, "for", self.nb_of_turns, "turns")
         time.sleep(3)
         
-        self.concentration_ratio = math.pow(self.nb_of_turns, concentration_rate)
+        self.concentration_ratio = math.pow(self.nb_of_turns, cfg.concentration_rate)
         self.initiator.nb_of_concentrate += 1
         self.end_update([], 0, 1, True)
         return True
 
     def execute(self):
-        self.initiator.feelings[self.feeling].concentrate_energy_update(self.action,
-                                                                        self.concentration_ratio * min(1.0, deconcentration_rate / self.initiator.nb_of_concentrate))
+        self.initiator.feelings[self.feeling].concentrate_energy_update(self.action, self.concentration_ratio *
+                                                                        min(1.0,
+                                                                            cfg.deconcentration_rate /
+                                                                            self.initiator.nb_of_concentrate
+                                                                            )
+                                                                        )
         self.nb_of_turns -= 1
         if self.nb_of_turns > 0:
             self.end_update([], 0, 1, True)

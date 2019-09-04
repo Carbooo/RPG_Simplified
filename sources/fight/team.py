@@ -1,4 +1,4 @@
-import sources.miscellaneous.global_variables as global_variables
+import sources.miscellaneous.configuration as cfg
 
 
 #############################################################
@@ -6,10 +6,9 @@ import sources.miscellaneous.global_variables as global_variables
 #############################################################
 class Team:
     """Common base class for all teams"""
-    list = []
 
     def __init__(self, name, characters_name_list):
-        for team in Team.list:
+        for team in cfg.team_list:
             if team.name == name:
                 print("(Teams) Team creation failed because the name:", name, "is already used !")
                 exit(0)
@@ -18,7 +17,7 @@ class Team:
         self.characters_list = []
         for name in characters_name_list:
             char_found = False
-            for char in global_variables.char_list:
+            for char in cfg.char_list:
                 if name == char.name:
                     self.characters_list.append(char)
                     char_found = True
@@ -27,8 +26,8 @@ class Team:
                 print("(Teams) Team creation failed because the character name:", name, "cannot be found !")
                 exit(0)
 
-        self.ID = len(Team.list)
-        Team.list.append(self)
+        self.ID = len(cfg.team_list)
+        cfg.team_list.append(self)
 
     def get_id(self):
         return self.ID

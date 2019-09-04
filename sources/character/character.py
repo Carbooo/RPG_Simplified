@@ -1,57 +1,10 @@
 import math as math
 import random as random
 import time as time
-import sources.miscellaneous.global_variables as global_variables
+import sources.miscellaneous.configuration as cfg
 from sources.character.character_body import CharBody
 from sources.character.character_equipments import CharEquipments
 from sources.character.feeling import Feeling
-
-# Characters constants
-max_bonus = 1.5  # Max load and bulk bonus
-min_speed = 1.0 / 6.0  # Minimum speed for char (necessary for hurt char)
-accuracy_mean = 100.0  # Accuracy reference for characters
-critical_hit_chance = 0.083  # Chances to hit the head or other key areas (1 / 12)
-critical_hit_boost = 6.0  # Coef boost when doing a critical hit
-max_magic_distance = 100.0  # Around 200 meters
-
-# Spells
-spells = []
-wrath_spells = {
-    "description": "Wrath spells",
-    "code": "WRA",
-    "list": []
-}
-spells.append(wrath_spells)
-wrath_improve_strength = {
-    "description": "Improve your strength",
-    "code": "STR",
-    "type": "Wrath"
-}
-wrath_spells["list"].append(wrath_improve_strength)
-wrath_fireball = {
-    "description": "Throw a fireball",
-    "code": "FBL",
-    "type": "Wrath"
-}
-wrath_spells["list"].append(joy_fireball)
-joy_spells = {
-    "description": "joy spells",
-    "code": "JOY",
-    "list": []
-}
-spells.append(joy_spells)
-joy_energize = {
-    "description": "Boost all your attributes",
-    "code": "EGY",
-    "type": "Joy"
-}
-joy_spells["list"].append(joy_energize)
-joy_burning_light = {
-    "description": "Send a burning light",
-    "code": "LGT",
-    "type": "Joy"
-}
-joy_spells["list"].append(joy_burning_light)
 
 
 #############################################################
@@ -67,15 +20,15 @@ class Character:
                  fear_sensibility, fear_mastering, sadness_sensibility, sadness_mastering,
                  abscissa, ordinate):
         # Check name availability
-        for char in global_variables.char_list:
+        for char in cfg.char_list:
             if char.name == name:
                 print("(Characters) Character creation failed because the name:", name, "is already used !")
                 exit(0)
         self.name = name
         
         # Set ID
-        self.ID = len(global_variables.char_list)
-        global_variables.char_list.append(self)
+        self.ID = len(cfg.char_list)
+        cfg.char_list.append(self)
         
         # Set characteristics
         self.original_constitution = float(constitution)
@@ -200,24 +153,24 @@ class Character:
 
 ######################### CHARACTERISTICS FUNCTIONS ########################
     def calculate_load_ratios(self):
-        self.load_ratio = min(max_bonus,
-                              global_variables.load_mean
+        self.load_ratio = min(cfg.max_bonus,
+                              cfg.load_mean
                               / max(1.0, self.equipments.get_full_load())
                               * self.force_ratio)
         
-        self.use_load_ratio = min(max_bonus,
-                                  global_variables.use_load_mean
+        self.use_load_ratio = min(cfg.max_bonus,
+                                  cfg.use_load_mean
                                   / max(1.0, self.equipments.get_in_use_load())
                                   * self.force_ratio)
 
     def calculate_bulk_ratios(self):
-        self.bulk_ratio = min(max_bonus,
-                              global_variables.bulk_mean
+        self.bulk_ratio = min(cfg.max_bonus,
+                              cfg.bulk_mean
                               / max(1.0, self.equipments.get_full_bulk())
                               * self.force_ratio)
 
-        self.use_bulk_ratio = min(max_bonus,
-                                  global_variables.use_bulk_mean
+        self.use_bulk_ratio = min(cfg.max_bonus,
+                                  cfg.use_bulk_mean
                                   / max(1.0, self.equipments.get_in_use_bulk())
                                   * self.force_ratio)
 
@@ -230,7 +183,7 @@ class Character:
         self.agility *= new_agility / previous_agility
 
     def calculate_speed_ratio(self):
-        self.speed_ratio = max(min_speed, self.body.global_ratio())
+        self.speed_ratio = max(cfg.min_speed, self.body.global_ratio())
 
     def calculate_accuracies(self):
         weapons_accuracies = self.equipments.calculate_accuracies()
@@ -244,9 +197,9 @@ class Character:
         
         # Set accuracies
         self.melee_handiness = self.body.global_ratio() * melee_coef * weapons_accuracies["melee_weapons"]
-        self.melee_handiness_ratio = self.melee_handiness / accuracy_mean
+        self.melee_handiness_ratio = self.melee_handiness / cfg.accuracy_mean
         self.ranged_accuracy = self.body.global_ratio() * ranged_coef * weapons_accuracies["ranged_weapons"]
-        self.ranged_accuracy_ratio = self.ranged_accuracy / accuracy_mean
+        self.ranged_accuracy_ratio = self.ranged_accuracy / cfg.accuracy_mean
          
     def calculate_melee_range(self):
         self.melee_range = self.equipments.calculate_melee_range()
@@ -332,11 +285,11 @@ class Character:
         return self.body.check_stamina(coefficient / self.load_ratio)
 
     def check_position(self):
-        if self.abscissa not in range(global_variables.max_position_area):
-            print("(Characters) Abscissa must be included in [0:", global_variables.max_position_area, "]")
+        if self.abscissa not in range(cfg.max_position_area):
+            print("(Characters) Abscissa must be included in [0:", cfg.max_position_area, "]")
             return False
-        if self.ordinate not in range(global_variables.max_position_area):
-            print("(Characters) Ordinate must be included in [0:", global_variables.max_position_area, "]")
+        if self.ordinate not in range(cfg.max_position_area):
+            print("(Characters) Ordinate must be included in [0:", cfg.max_position_area, "]")
             return False
         return True
 
@@ -356,7 +309,7 @@ class Character:
             return False
 
     def get_fighting_availability(self, timeline):
-        char_defense_time = global_variables.defense_time * self.speed_ratio
+        char_defense_time = cfg.defense_time * self.speed_ratio
         total_time = 0
         for attack_timeline, attack in self.previous_attacks:
             time = attack_timeline + char_defense_time - timeline
@@ -382,8 +335,8 @@ class Character:
     
 ###################### DAMAGE FUNCTIONS ########################
     def get_armor_coef(self, accuracy_ratio):
-        cover_ratio = the 
-        avoid_armor_chances = (1 - random.gauss(1, global_variables.high_variance) * cover_ratio) * accuracy_ratio
+        cover_ratio = self.equipments.get_armor_cover_ratio()
+        avoid_armor_chances = (1 - random.gauss(1, cfg.high_variance) * cover_ratio) * accuracy_ratio
         
         if cover_ratio == 0:
             print("The player has no armor!")
@@ -392,11 +345,11 @@ class Character:
         elif random.random() < avoid_armor_chances:
             print("The hit will avoid the armor!")
             time.sleep(2)
-            return 1
+            return 0
         else:
             print("The hit will meet a full armor part")
             time.sleep(2)
-            return 0
+            return 1
             
     def damages_received(self, enemy, attack_value, accuracy_ratio, armor_coef, resis_dim_rate, pen_rate):
         enemy.print_basic()
@@ -407,18 +360,19 @@ class Character:
         
         damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, resis_dim_rate, pen_rate)
         
-        if accuracy_ratio != 0 and random.random() / accuracy_ratio < critical_hit_chance:
+        if accuracy_ratio != 0 and random.random() / accuracy_ratio < cfg.critical_hit_chance:
             print("The damages are amplified, because they hit a critical area!")
-            damage_result *= critical_hit_boost
+            damage_result *= cfg.critical_hit_boost
         
         if damage_result > 0:
             life_ratio = self.body.loose_life(damage_result)
             # Damages received diminish the defender
-            life_ratio = math.pow(2 - life_ratio, 2) - 1
-            print("The shock of the attack delays the player of", round(life_ratio,2), "turn(s) and consume stamina")
-            time.sleep(3)
-            self.spend_time(life_ratio)
-            self.spend_stamina(life_ratio * 10, ignore=True)
+            if self.body.is_alive():
+                life_ratio = math.pow(2 - life_ratio, 2) - 1
+                print("The shock of the attack delays the player of", round(life_ratio,2), "turn(s) and consume stamina")
+                time.sleep(3)
+                self.spend_time(life_ratio)
+                self.spend_stamina(life_ratio * 10, ignore=True)
         
         return max(0.0, damage_result)
             
@@ -440,12 +394,12 @@ class Character:
         return False
     
     def is_distance_magically_reachable(self, enemy):        
-        if self.calculate_point_distance(enemy.abscissa, enemy.ordinate) <= max_magic_distance:
+        if self.calculate_point_distance(enemy.abscissa, enemy.ordinate) <= cfg.max_magic_distance:
             return True
         return False
 
     def get_magic_distance_ratio(self, enemy):
-        return 1 - self.calculate_point_distance(enemy.abscissa, enemy.ordinate) / max_magic_distance
+        return 1 - self.calculate_point_distance(enemy.abscissa, enemy.ordinate) / cfg.max_magic_distance
     
     def calculate_point_to_enemy_path_distance(self, enemy, abscissa, ordinate):
         # Only work if abscissa & ordinate are in the segment path
@@ -478,35 +432,36 @@ class Character:
         print("ID:", self.get_id(), ", Name:", self.name, end=' ')
 
     def print_characteristics(self):
-        print("CHARACTERISTICS:")
-        print("    Constitution:", int(round(self.constitution)),
-            ", Force:", int(round(self.force)),
-            ", Agility:", int(round(self.agility)),
-            ", Dexterity:", int(round(self.dexterity)),
-            ", Reflex:", int(round(self.reflex)),
-            ", Willpower:", int(round(self.willpower)),
-            ", Spirit:", int(round(self.spirit)),
-            ", morale:", int(round(self.morale)),
-            ", Empathy:", int(round(self.empathy)))
+        print("-- CHARACTERISTICS --", end=' ')
+        print("Constitution:", int(round(self.constitution)),
+              ", Force:", int(round(self.force)),
+              ", Agility:", int(round(self.agility)),
+              ", Dexterity:", int(round(self.dexterity)),
+              ", Reflex:", int(round(self.reflex)),
+              ", Willpower:", int(round(self.willpower)),
+              ", Spirit:", int(round(self.spirit)),
+              ", morale:", int(round(self.morale)),
+              ", Empathy:", int(round(self.empathy)))
 
     def print_spells_and_feelings(self):
-        print("FEELINGS:")
+        print("--  FEELINGS  --")
         for key in self.feelings:
-            print("-", end=' ')
+            print("   -", end=' ')
             self.feelings[key].print_obj()
-        print("")
-        print("Active spells:", self.active_spells)
+        print("--  ACTIVE SPELLS --")
+        for spell in self.active_spells:
+            print("   -", spell.surname)
 
     def print_defense(self):
-        print("DEFENSE:")
-        print("    Dodging:", int(round(self.dodging)),
+        print("--   DEFENSE  --", end=' ')
+        print("Dodging:", int(round(self.dodging)),
             ", MeleeDefense:", int(round(self.melee_defense)),
             ", RangedDefense:", int(round(self.ranged_defense)),
             ", MagicDefense:", int(round(self.magic_defense)))
 
     def print_attack(self):
-        print("ATTACK:")
-        print("    MeleeHandiness:", int(round(self.melee_handiness)),
+        print("--   ATTACK   --", end=' ')
+        print("MeleeHandiness:", int(round(self.melee_handiness)),
             ", MeleePower:", int(round(self.melee_power)),
             ", MeleeRange:", int(round(self.melee_range)),
             ", PenetrationRate:", int(round(self.pen_rate, 2)),
@@ -535,8 +490,7 @@ class Character:
         self.print_time_state()
 
     def print_detailed_state(self):
-        print("BASIC INFO:")
-        print("   ", end=' ')
+        print("-- BASIC INFO --", end=' ')
         self.print_basic()
         self.body.print_obj()
         self.print_time_state()

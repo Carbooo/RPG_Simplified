@@ -1,10 +1,7 @@
 import time as time
 import math as math
-from sources.action.actions import ActiveActions
-
-min_turn = 1
-max_turn = 10
-resting_ratio = 1.0 / 3.0
+from sources.action.actions import Actions, ActiveActions
+import sources.miscellaneous.configuration as cfg
 
 
 #############################################################
@@ -26,12 +23,12 @@ class Rest(ActiveActions):
         while 1:
             try:
                 self.nb_of_turns = int(input(txt))
-                if self.fight.cancel_action(self.nb_of_turns):
+                if Actions.cancel_action(self.nb_of_turns):
                     return False
-                elif self.nb_of_turns < min_turn:
-                    print("You cannot rest less than ", min_turn, " turns")
-                elif self.nb_of_turns > max_turn:
-                    print("You cannot rest more than ", max_turn, " turns")
+                elif self.nb_of_turns < cfg.min_rest_turn:
+                    print("You cannot rest less than ", cfg.min_rest_turn, " turns")
+                elif self.nb_of_turns > cfg.max_rest_turn:
+                    print("You cannot rest more than ", cfg.max_rest_turn, " turns")
                 else:
                     break
             except:
@@ -40,7 +37,7 @@ class Rest(ActiveActions):
         print("You have decided to rest for ", self.nb_of_turns, " turn(s)")
         time.sleep(3)
         
-        self.resting_ratio = math.pow(self.nb_of_turns, resting_ratio)
+        self.resting_ratio = math.pow(self.nb_of_turns, cfg.resting_ratio)
         self.end_update([], 0, 1, True)
         return True
 

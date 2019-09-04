@@ -25,7 +25,7 @@ class GetCharInformation(Actions):
         while 1:
             try:
                 read = int(input('--> ID (0 = Cancel): '))
-                if self.fight.cancel_action(read):
+                if Actions.cancel_action(read):
                     return False
             except:
                 print("The input is not an ID")

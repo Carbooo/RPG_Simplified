@@ -1,11 +1,11 @@
 import csv as csv
 import numpy as np
-from sources.character.equipments import Equipments, Armors, Shields, MeleeWeapons, RangedWeapons, Bows, Crossbows, \
-    Ammo
+from sources.character.equipments import Armors, Shields, MeleeWeapons, RangedWeapons, Bows, Crossbows, Ammo
 from sources.character.character import Character
 from sources.fight.team import Team
 from sources.fight.field import Field
-import sources.miscellaneous.global_variables as global_variables
+import sources.miscellaneous.configuration as cfg
+
 
 ###########################################################
 ##################### IMPORT CLASS ########################
@@ -152,15 +152,15 @@ class ImportData:
             ordinate_size += 1
 
         # Verify minimum abscissa size
-        if abscissa_size < global_variables.max_position_area * 2:
+        if abscissa_size < cfg.max_position_area * 2:
             print("Field import is not large enough (min:",
-                  global_variables.max_position_area * 2, ")")
+                  cfg.max_position_area * 2, ")")
             return False
 
         # Verify minimum ordinate size
-        if ordinate_size < global_variables.max_position_area:
+        if ordinate_size < cfg.max_position_area:
             print("Field import is not long enough (min:",
-                  global_variables.max_position_area, ")")
+                  cfg.max_position_area, ")")
             return False
 
         # Convert a list into an array
@@ -170,11 +170,11 @@ class ImportData:
         # Convert string into fields number
         for i in range(abscissa_size):
             for j in range(ordinate_size):
-                for k in range(len(Field.obstacle_types_list)):
+                for k in range(len(cfg.obstacle_types_list)):
                     if obstacle_array[i, j] == \
-                            Field.obstacle_types_list[k]:
+                            cfg.obstacle_types_list[k]:
                         break
-                    if k == len(Field.obstacle_types_list) - 1:
+                    if k == len(cfg.obstacle_types_list) - 1:
                         print("Obstacle field import contains ",
                               "non-supported obstacle type:",
                               obstacle_array[i, j])
@@ -189,7 +189,7 @@ class ImportData:
 ###################### print(CLASS ########################
 ###########################################################
 class PrintData:
-    'Common base class for all data printing'
+    """Common base class for all data printing"""
 
     def __init__(self, data_type):
         if data_type == "Armors":
@@ -216,50 +216,50 @@ class PrintData:
 
     def print_equipments(self):
         print("All equipments:")
-        for i in range(len(Equipments.list)):
-            Equipments.list[i].print_obj()
+        for i in range(len(cfg.equipments_list)):
+            cfg.equipments_list[i].print_obj()
 
     def print_armors(self):
         print("All armors:")
-        for i in range(len(Equipments.list)):
-            if isinstance(Equipments.list[i], Armors):
-                Equipments.list[i].print_obj()
+        for i in range(len(cfg.equipments_list)):
+            if isinstance(cfg.equipments_list[i], Armors):
+                cfg.equipments_list[i].print_obj()
 
     def print_shields(self):
         print("All shields:")
-        for i in range(len(Equipments.list)):
-            if isinstance(Equipments.list[i], Shields):
-                Equipments.list[i].print_obj()
+        for i in range(len(cfg.equipments_list)):
+            if isinstance(cfg.equipments_list[i], Shields):
+                cfg.equipments_list[i].print_obj()
 
     def print_melee_weapons(self):
         print("All melee weapons:")
-        for i in range(len(Equipments.list)):
-            if isinstance(Equipments.list[i], MeleeWeapons):
-                Equipments.list[i].print_obj()
+        for i in range(len(cfg.equipments_list)):
+            if isinstance(cfg.equipments_list[i], MeleeWeapons):
+                cfg.equipments_list[i].print_obj()
 
     def print_ammo(self):
         print("All ammo:")
-        for i in range(len(Equipments.list)):
-            if isinstance(Equipments.list[i], Ammo):
-                Equipments.list[i].print_obj()
+        for i in range(len(cfg.equipments_list)):
+            if isinstance(cfg.equipments_list[i], Ammo):
+                cfg.equipments_list[i].print_obj()
 
     def print_ranged_weapons(self):
         print("All ranged weapons:")
-        for i in range(len(Equipments.list)):
-            if isinstance(Equipments.list[i], RangedWeapons):
-                Equipments.list[i].print_obj()
+        for i in range(len(cfg.equipments_list)):
+            if isinstance(cfg.equipments_list[i], RangedWeapons):
+                cfg.equipments_list[i].print_obj()
 
     def print_characters(self):
         print("All characters:")
-        for i in range(len(global_variables.char_list)):
-            global_variables.char_list[i].print_obj()
+        for i in range(len(cfg.char_list)):
+            cfg.char_list[i].print_obj()
 
     def print_characteristics(self):
         print("All characters state:")
-        for i in range(len(global_variables.char_list)):
-            global_variables.char_list[i].print_characteristics()
+        for i in range(len(cfg.char_list)):
+            cfg.char_list[i].print_characteristics()
 
     def print_teams(self):
         print("All teams:")
-        for i in range(len(Team.list)):
-            Team.list[i].print_obj()
+        for i in range(len(cfg.team_list)):
+            cfg.team_list[i].print_obj()

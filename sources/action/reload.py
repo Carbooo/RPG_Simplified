@@ -1,6 +1,7 @@
 import time as time
+import sources.miscellaneous.configuration as cfg
 from sources.character.equipments import RangedWeapons, Crossbows
-from sources.action.actions import ActiveActions, actions
+from sources.action.actions import Actions, ActiveActions
 
 
 #############################################################
@@ -17,7 +18,7 @@ class Reload(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):
-        if self.initiator.check_stamina(actions["reload"]["stamina"]) is False:
+        if self.initiator.check_stamina(cfg.actions["reload"]["stamina"]) is False:
             print("You do not have enough stamina (",
                   self.initiator.body.return_current_stamina(), ") to reload, action cancelled!")
             return False
@@ -58,7 +59,7 @@ class Reload(ActiveActions):
                         try:
                             print("")
                             read = int(input('--> ID (0 = Cancel): '))
-                            if self.fight.cancel_action(read):
+                            if Actions.cancel_action(read):
                                 return False
                         except:
                             print("The input is not an ID")
@@ -75,9 +76,9 @@ class Reload(ActiveActions):
         time.sleep(3)
         
         if isinstance(self.weapon_to_reload, Crossbows):
-            stamina = self.weapon_to_reload.reload_time * actions["reload"]["stamina"] * 10
+            stamina = self.weapon_to_reload.reload_time * cfg.actions["reload"]["stamina"] * 10
         else:
-            stamina = self.weapon_to_reload.reload_time * actions["reload"]["stamina"]
+            stamina = self.weapon_to_reload.reload_time * cfg.actions["reload"]["stamina"]
         self.end_update([], stamina, self.weapon_to_reload.reload_time)
         return True
     

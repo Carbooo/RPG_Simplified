@@ -1,48 +1,22 @@
 import math as math
 import time as time
 from sources.action.spell.spells import Spells
-import sources.miscellaneous.global_variables as global_variables
+import sources.miscellaneous.configuration as cfg
+
 
 #############################################################
-####################### JOY SPELL CLASS ###################
+######################## JOY SPELL CLASS ####################
 #############################################################
-
 class JoySpells(Spells):
     """Class to cast joy spells"""
-    
-    spells_energy = {
-        "EGY": 10.0,
-        "LGT": 20.0
-    }
-    spells_time = {
-        "EGY": 1.0,
-        "LGT": 1.75
-    }
-    spells_stamina = {
-        "EGY": 1.0,
-        "LGT": 3.0
-    }
-    spells_power = {
-        "EGY": {
-            "coef": 1.2,
-            "duration": 5.0
-        },
-        "LGT": {
-            "attack_value": 20.0,
-            "resis_dim_rate": 0.33,
-            "pen_rate": 0.1,
-            "delay": 1.5,
-            "min_damage_for_delay": 5.0
-        }
-    }
  
     def __init__(self, fight, initiator, spell_code):
         super().__init__(fight, initiator, "Joy", spell_code)
         self.name = "Casting a Joy spell"
-        self.spell_stamina = JoySpells.spells_stamina[self.spell_code]
-        self.spell_time = JoySpells.spells_time[self.spell_code]
-        self.spell_energy = JoySpells.spells_energy[self.spell_code]
-        self.spell_power = JoySpells.spells_power[self.spell_code]
+        self.spell_stamina = cfg.joy_spells_stamina[self.spell_code]
+        self.spell_time = cfg.joy_spells_time[self.spell_code]
+        self.spell_energy = cfg.joy_spells_energy[self.spell_code]
+        self.spell_power = cfg.joy_spells_power[self.spell_code]
         self.is_a_success = self.start()
         
     def start(self):
@@ -118,7 +92,8 @@ class JoySpells(Spells):
         )
         self.target.calculate_characteristic()
 
-        self.add_active_spell(self.initiator, self.spell_power["duration"] * math.sqrt(self.magical_coef))
+        self.add_active_spell(self.initiator, self.spell_power["duration"] * math.sqrt(self.magical_coef),
+                              "All attributes slightly increased")
         self.initiator.last_action = None  # To remove it from the scheduler
         return True
     
@@ -192,6 +167,7 @@ class JoySpells(Spells):
         print(")")
         print("*********************************************************************")
         print("")
+        time.sleep(3)
 
         result = self.magical_attack_received(
             self.target,
@@ -203,10 +179,10 @@ class JoySpells(Spells):
             self.spell_power["pen_rate"]
         )
         
-        if result >= self.spell_power["min_damage_for_delay"]:
+        if self.target.body.is_alive() and result >= self.spell_power["min_damage_for_delay"]:
             print("This light attack blinds you and delay your next step!")
+            time.sleep(2)
             self.target.spend_time(self.spell_power["delay"])
 
         self.initiator.last_action = None  # To remove it from the scheduler
         return True
-

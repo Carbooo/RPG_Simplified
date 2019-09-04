@@ -1,8 +1,7 @@
 import copy as copy
 import random as random
 import time as time
-import sources.miscellaneous.global_variables as global_variables
-from sources.action.actions import actions
+import sources.miscellaneous.configuration as cfg
 from sources.character.character import Character
 from sources.action.get_char_information import GetCharInformation
 from sources.action.modify_equipments import ModifyEquipments
@@ -16,6 +15,7 @@ from sources.action.concentrate import Concentrate
 from sources.action.save_and_load import Save, Load
 from sources.action.spell.spells import Spells
 from sources.action.spell.wrath_spells import WrathSpells
+from sources.action.spell.joy_spells import JoySpells
 
 
 #############################################################
@@ -23,10 +23,8 @@ from sources.action.spell.wrath_spells import WrathSpells
 #############################################################
 class Fight:
     """Common base class for all fights"""
-    list = []    
     
     def __init__(self, field, team1, team2):
-        Fight.list.append(self)
         self.field = field
         self.team1 = team1
         self.team2 = team2
@@ -43,14 +41,8 @@ class Fight:
         
         if self.field.set_all_teams(team1,team2) is False:
             print("(Fights) Cannot set team, fight cancelled")
-            Fight.list.pop(len(Character.list) - 1)
         else:
             self.start()
-    
-    def get_id(self):
-        for i in range(len(Character.list)):
-            if Fight.list[i] == self:
-                return i
     
     def belong_to_team(self, character):
         for char in self.team1.characters_list:
@@ -75,7 +67,6 @@ class Fight:
         
         self.scheduler.append(self)
                 
-                
     def start(self):
         while self.team1.is_life_active() and self.team2.is_life_active():
             # Set turn settings
@@ -90,7 +81,7 @@ class Fight:
             
             # Terminate active spell
             elif isinstance(next_event, Spells):
-                next_event.end_active_spell()
+                next_event.end_active_spell(next_event.target)
                 
             elif isinstance(next_event, Character):
                 if (isinstance(next_event.last_action, Move) and next_event.last_action.path) \
@@ -205,13 +196,13 @@ class Fight:
                     break
                 elif event.timeline == scheduler_list[j].timeline \
                 and random.choice([0,1]) == 1:
-                    #To be fair in case of equal timeline
+                    # To be fair in case of equal timeline
                     scheduler_list.insert(j, event)
                     break                        
                 elif j == len(scheduler_list) - 1:
                     scheduler_list.append(event)
         if isinstance(self.scheduler[0], Character) and not self.scheduler[0].body.is_life_active():
-            #First event has not been tested
+            # First event has not been tested
             scheduler_list.remove(self.scheduler[0])
         self.scheduler = scheduler_list
         
@@ -226,7 +217,7 @@ class Fight:
             
             previous_attacks = copy.copy(char.previous_attacks)
             for attack_timeline, attack in previous_attacks:
-                if self.current_timeline >= attack_timeline + global_variables.defense_time / char.speed_ratio:
+                if self.current_timeline >= attack_timeline + cfg.defense_time / char.speed_ratio:
                     char.previous_attacks.remove((attack_timeline, attack))
                     
     def end_turn(self):
@@ -245,54 +236,54 @@ class Fight:
             print("")
             print("Choose one of the following action:")
             
-            for key in actions:
-                print("-", actions[key]["description"], "(", actions[key]["command"], ")")
+            for key in cfg.actions:
+                print("-", cfg.actions[key]["description"], "(", cfg.actions[key]["command"], ")")
             
             read = input('--> ACT: ')
             
-            if read == actions["pass_time"]["command"]:
+            if read == cfg.actions["pass_time"]["command"]:
                 if self.pass_action(character):
                     break
             
-            elif read == actions["rest"]["command"]:
+            elif read == cfg.actions["rest"]["command"]:
                 if self.rest_action(character):
                     break
 
-            elif read == actions["concentrate"]["command"]:
+            elif read == cfg.actions["concentrate"]["command"]:
                 if self.concentrate_action(character):
                     break
 
-            elif read == actions["melee_attack"]["command"]:
+            elif read == cfg.actions["melee_attack"]["command"]:
                 if self.melee_attack_action(character):
                     break
             
-            elif read == actions["ranged_attack"]["command"]:
+            elif read == cfg.actions["ranged_attack"]["command"]:
                 if self.ranged_attack_action(character):
                     break
             
-            elif read == actions["reload"]["command"]:
+            elif read == cfg.actions["reload"]["command"]:
                 if self.reload_action(character):
                     break
             
-            elif read == actions["move"]["command"]:
+            elif read == cfg.actions["move"]["command"]:
                 if self.move_action(character):
                     break
             
-            elif read == actions["modify_equip"]["command"]:
+            elif read == cfg.actions["modify_equip"]["command"]:
                 if self.equip_action(character):
                     break
 
-            elif read == actions["spell"]["command"]:
-                if self.choose_spell(character):
+            elif read == cfg.actions["spell"]["command"]:
+                if self.initiate_spell_object(character):
                     break
 
-            elif read == actions["information"]["command"]:
+            elif read == cfg.actions["information"]["command"]:
                 self.information_action(character)
             
-            elif read == actions["save"]["command"]:
+            elif read == cfg.actions["save"]["command"]:
                 self.save_action(character)
             
-            elif read == actions["load"]["command"]:
+            elif read == cfg.actions["load"]["command"]:
                 self.load_action(character)
             else:
                 print("Action:", read, "is not recognized")
@@ -375,56 +366,18 @@ class Fight:
         character.last_action = action
         return True
     
-    def choose_spell(self, character):
-        print("You have decided to cast a spell")
-        print("Which type of spell?")
-        for spell_type in Character.spells:
-            print("-", spell_type["description"], "(" + spell_type["code"] + ")")
-        
-        while 1:
-            read = input('--> Spell type (0 for cancel) : ')
-            if self.cancel_action(read):
-                return False
-            
-            for spell_type in Character.spells:
-                if read == spell_type["code"]:
-                    print("You chose to cast a " + spell_type["description"])
-                    print("Which spell do you want to cast?")
-                    
-                    for spell in spell_type["list"]:
-                        print("- ", spell["description"] + " (" + spell["code"] + ")")
-        
-                    while 1:
-                        read = input('--> Spell (0 for cancel) : ')
-                        if self.cancel_action(read):
-                            return False
-                        
-                        for spell in spell_type["list"]:
-                            if read == spell["code"]:
-                                action = self.initiate_spell_object(character, spell_type["code"], spell["code"])
-                                if not action.is_a_success:
-                                    return False
-                                character.last_action = action
-                                return True
-                            
-                        print("Spell:", read, "is not recognized")
-                    
-            print("Spell type:", read, "is not recognized")
-    
-    def initiate_spell_object(self, caster, spell_type_code, spell_code):
-        if spell_type_code == "WRA":
-            return WrathSpells(self, caster, spell_code)
-    
-    def cancel_action(self, read):
-        try:
-            read = int(read)
-            if read == 0 or read == '0':
-                print("Action cancelled!")
-                time.sleep(1)
-                return True
-            return False            
-        except:
+    def initiate_spell_object(self, character):
+        spell_type, spell_code = Spells.choose_spell()
+
+        if spell_type == "WRA":
+            action = WrathSpells(self, character, spell_code)
+        elif spell_type == "JOY":
+            action = JoySpells(self, character, spell_code)
+
+        if not action.is_a_success:
             return False
+        character.last_action = action
+        return True
 
     def stop_action(self, char, timeline):
         if isinstance(char.last_action, ModifyEquipments) \
@@ -435,19 +388,23 @@ class Fight:
             char.previous_attacks.append((timeline, char.last_action))
             print("The attack surprises you during your current action(", char.last_action.name, ")!")
             print("Your defense is diminished!")
+            time.sleep(3)
 
             if isinstance(char.last_action, Reload) \
                     or isinstance(char.last_action, Rest) \
                     or isinstance(char.last_action, Concentrate) \
                     or isinstance(char.last_action, Spells):
-                print("Your current action is canceled!")
+                print("Your current action (", char.last_action.name, ") is canceled!")
+                time.sleep(3)
                 char.last_action = None
                 char.timeline = timeline
-                char.spend_time(global_variables.defense_time / 2)
+                char.spend_time(cfg.defense_time / 2)
 
             if isinstance(char.last_action, Reload):
-                print("You loose the ammo used for reloading!")
+                print("You loose the ammo being used for reloading!")
+                time.sleep(3)
                 char.ammo.remove(char.last_action.ammo_to_load)
 
         if char.equipments.loose_reloaded_ammo():
             print("Your bow has lost its loaded arrow!")
+            time.sleep(3)
