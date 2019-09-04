@@ -94,13 +94,17 @@ class Spells(ActiveActions):
         else:
             if is_localized:
                 armor_coef = target.get_armor_coef(accuracy_ratio)
-                target.damages_received(self.initiator, attack_value, accuracy_ratio, armor_coef, resis_dim_rate,
-                                             pen_rate)
+                attack_value = target.damages_received(self.initiator, attack_value, accuracy_ratio, armor_coef, 
+                                                       resis_dim_rate, pen_rate)
             else:
-                target.damages_received(self.initiator, attack_value, 0, 0, resis_dim_rate, pen_rate)
+                # Non localized attack cannot avoid armor (use cover ratio instead) or do critical hit
+                attack_value = target.damages_received(self.initiator, attack_value, 0,
+                                                       target.equipments.get_armor_cover_ratio(),
+                                                       resis_dim_rate, pen_rate)
 
         target.previous_attacks.append((self.initiator.timeline, self))
-
+        return max(0.0, attack_value)
+        
     def choose_enemy_target(self):
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:
             team = self.fight.team2

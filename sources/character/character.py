@@ -382,7 +382,7 @@ class Character:
     
 ###################### DAMAGE FUNCTIONS ########################
     def get_armor_coef(self, accuracy_ratio):
-        cover_ratio = self.equipments.get_armor_cover_ratio()
+        cover_ratio = the 
         avoid_armor_chances = (1 - random.gauss(1, global_variables.high_variance) * cover_ratio) * accuracy_ratio
         
         if cover_ratio == 0:
@@ -419,6 +419,8 @@ class Character:
             time.sleep(3)
             self.spend_time(life_ratio)
             self.spend_stamina(life_ratio * 10, ignore=True)
+        
+        return max(0.0, damage_result)
             
 ###################### RANGED FUNCTIONS ########################
     def calculate_point_distance(self, abscissa, ordinate):

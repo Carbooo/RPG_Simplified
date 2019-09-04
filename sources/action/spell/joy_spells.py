@@ -31,7 +31,8 @@ class JoySpells(Spells):
             "attack_value": 20.0,
             "resis_dim_rate": 0.33,
             "pen_rate": 0.1,
-            "delay": 1.5
+            "delay": 1.5,
+            "min_damage_for_delay": 5.0
         }
     }
  
@@ -186,21 +187,25 @@ class JoySpells(Spells):
         print("")
         print("*********************************************************************")
         self.initiator.print_basic()
-        print("is sending a fireball to (", end=' ')
+        print("is sending a burning light to (", end=' ')
         self.target.print_basic()
         print(")")
         print("*********************************************************************")
         print("")
 
-        self.magical_attack_received(
+        result = self.magical_attack_received(
             self.target,
-            attack_value * distance_ratio,
+            attack_value,
             self.fight.field.get_magical_accuracy(self.initiator, self.target),
             False,  # is_localized
             True,  # can_use_shield
             self.spell_power["resis_dim_rate"], 
             self.spell_power["pen_rate"]
         )
+        
+        if result >= self.spell_power["min_damage_for_delay"]:
+            print("This light attack blinds you and delay your next step!")
+            self.target.spend_time(self.spell_power["delay"])
 
         self.initiator.last_action = None  # To remove it from the scheduler
         return True
