@@ -17,7 +17,7 @@ max_magic_distance = 100.0  # Around 200 meters
 # Spells
 spells = []
 wrath_spells = {
-    "description": "Wrath spell",
+    "description": "Wrath spells",
     "code": "WRA",
     "list": []
 }
@@ -33,7 +33,25 @@ wrath_fireball = {
     "code": "FBL",
     "type": "Wrath"
 }
-wrath_spells["list"].append(wrath_fireball)
+wrath_spells["list"].append(joy_fireball)
+joy_spells = {
+    "description": "joy spells",
+    "code": "JOY",
+    "list": []
+}
+spells.append(joy_spells)
+joy_energize = {
+    "description": "Boost all your attributes",
+    "code": "EGY",
+    "type": "Joy"
+}
+joy_spells["list"].append(joy_energize)
+joy_burning_light = {
+    "description": "Send a burning light",
+    "code": "LGT",
+    "type": "Joy"
+}
+joy_spells["list"].append(joy_burning_light)
 
 
 #############################################################

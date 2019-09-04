@@ -29,7 +29,6 @@ class JoySpells(Spells):
         },
         "LGT": {
             "attack_value": 20.0,
-            "spread_distance": 0,
             "resis_dim_rate": 0.33,
             "pen_rate": 0.1,
             "delay": 1.5
@@ -159,15 +158,15 @@ class JoySpells(Spells):
         return True
         
     def start_light(self):
-        if not self.is_able_to_cast(2):
+        if not self.is_able_to_cast(1):
             return False
         
         self.target = self.choose_enemy_target()
         if not self.target:
             return False
         
-        print("You have decided to throw a fireball")
-        print("The fireball is charging...")
+        print("You have decided to send a burning light")
+        print("The light is charging...")
         time.sleep(3)
         
         self.set_magical_coef()
@@ -184,27 +183,24 @@ class JoySpells(Spells):
     
         attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
                      
-        for char, distance_ratio in self.get_all_spread_targets(
-                self.spell_power["spread_distance"] * self.magical_coef
-        ):
-            print("")
-            print("*********************************************************************")
-            self.initiator.print_basic()
-            print("is sending a fireball to (", end=' ')
-            char.print_basic()
-            print(")")
-            print("*********************************************************************")
-            print("")
+        print("")
+        print("*********************************************************************")
+        self.initiator.print_basic()
+        print("is sending a fireball to (", end=' ')
+        self.target.print_basic()
+        print(")")
+        print("*********************************************************************")
+        print("")
 
-            self.magical_attack_received(
-                char,
-                attack_value * distance_ratio,
-                self.fight.field.get_magical_accuracy(self.initiator, char),
-                False,  # is_localized
-                True,  # can_use_shield
-                self.spell_power["resis_dim_rate"], 
-                self.spell_power["pen_rate"]
-            )
+        self.magical_attack_received(
+            self.target,
+            attack_value * distance_ratio,
+            self.fight.field.get_magical_accuracy(self.initiator, self.target),
+            False,  # is_localized
+            True,  # can_use_shield
+            self.spell_power["resis_dim_rate"], 
+            self.spell_power["pen_rate"]
+        )
 
         self.initiator.last_action = None  # To remove it from the scheduler
         return True
