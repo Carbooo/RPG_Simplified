@@ -163,11 +163,8 @@ class RangedAttack(ActiveActions):
         # Distance = -a*(x-1) + b --> distance min = 1.0, distance max = 0.0
         h_dist = max(0, (self.initiator.calculate_point_distance(self.target.abscissa,
                                                                  self.target.ordinate) - 1) / self.initiator.equipments.get_range() * -1 + 1)
-
-        h_obs = self.fight.field.calculate_ranged_obstacle_ratio(self.initiator, self.target)
-
+        h_obs = self.fight.field.calculate_ranged_obstacle_ratio(self.initiator, self.target.abscissa, self.target.ordinate)
         h_action = self.get_ranged_action_ratio()
-
         return self.initiator.ranged_accuracy_ratio * h_dist * h_obs * h_action
 
     def get_ranged_action_ratio(self):

@@ -155,6 +155,7 @@ class JoySpells(Spells):
             print("Please choose a new one or cancel the attack.")
             self.target = self.choose_enemy_target()
             if not self.target:
+                print("Spell cancelled, the magic and stamina spent is lost")
                 return False
     
         attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
@@ -172,7 +173,6 @@ class JoySpells(Spells):
         result = self.magical_attack_received(
             self.target,
             attack_value,
-            self.fight.field.get_magical_accuracy(self.initiator, self.target),
             False,  # is_localized
             True,  # can_use_shield
             self.spell_power["resis_dim_rate"], 

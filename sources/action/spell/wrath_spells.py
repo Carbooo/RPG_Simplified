@@ -97,10 +97,6 @@ class WrathSpells(Spells):
         if not self.is_able_to_cast(2):
             return False
         
-        self.target = self.choose_enemy_target()
-        if not self.target:
-            return False
-        
         print("You have decided to throw a fireball")
         print("The fireball is charging...")
         time.sleep(3)
@@ -110,17 +106,16 @@ class WrathSpells(Spells):
         return True   
     
     def throw_fireball(self):
-        if not self.fight.field.is_target_magically_reachable(self.initiator, self.target):
-            print("Your initial target is no longer reachable!")
-            print("Please choose a new one or cancel the attack.")
-            self.target = self.choose_enemy_target()
-            if not self.target:
-                return False
+        target = self.choose_pos_target():
+        if not target:
+            print("Spell cancelled, the magic and stamina spent is lost")
+            return False
     
         attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
                      
         for char, distance_ratio in self.get_all_spread_targets(
-                self.spell_power["spread_distance"] * self.magical_coef
+                self.spell_power["spread_distance"] * self.magical_coef,
+                target["abscissa"], target["ordinate"]
         ):
             print("")
             print("*********************************************************************")
@@ -135,7 +130,6 @@ class WrathSpells(Spells):
             self.magical_attack_received(
                 char,
                 attack_value * distance_ratio,
-                self.fight.field.get_magical_accuracy(self.initiator, char),
                 False,  # is_localized
                 True,  # can_use_shield
                 self.spell_power["resis_dim_rate"], 

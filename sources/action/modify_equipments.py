@@ -58,7 +58,8 @@ class ModifyEquipments(ActiveActions):
         
         self.next_unequipment = weapons_list
         self.calculate_timelines(weapons_list)
-        return self.result()
+        self.end_update([self.initiator], self.equip_time * cfg.actions["modify_equip"]["stamina"], self.equip_time)
+        return True
 
     def unequip_spec_weapons(self):
         equipped_list = copy.copy(self.initiator.equipments.weapons_in_use)
@@ -107,11 +108,12 @@ class ModifyEquipments(ActiveActions):
         print("You are going to equip the following weapons:")
         for weapon in weapons_list:
             weapon.print_obj()
+        time.sleep(3)
         
         self.next_equipment = weapons_list
         self.calculate_timelines(weapons_list)
-        time.sleep(3)
-        return self.result()
+        self.end_update([self.initiator], self.equip_time * cfg.actions["modify_equip"]["stamina"], self.equip_time)
+        return True
 
     def equip_spec_weapons(self):
         equipped_list = copy.copy(self.initiator.equipments.weapons_in_use)
@@ -177,7 +179,7 @@ class ModifyEquipments(ActiveActions):
             if nb_of_hands_use + weapon.hand == 2:
                 return self.equip_weapons_list(new_equipment)
             
-    def result(self):
+    def execute(self):
         if self.next_equipment:
             for weapon in self.next_equipment:
                 if not self.initiator.equipments.set_weapon_in_use(weapon):
@@ -186,8 +188,8 @@ class ModifyEquipments(ActiveActions):
             for weapon in self.next_unequipment:
                 if not self.initiator.equipments.remove_weapon(weapon):
                     return False
-       
-        self.end_update([self.initiator], self.equip_time * cfg.actions["modify_equip"]["stamina"], self.equip_time)
+                    
+        self.initiator.last_action = None  # To remove it from the scheduler
         return True
     
     def calculate_timelines(self, weapons):

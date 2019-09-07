@@ -393,7 +393,12 @@ class Character:
             return True
         return False
     
-    def is_distance_magically_reachable(self, enemy):        
+    def is_distance_magically_reachable(self, abscissa, ordinate):        
+        if self.calculate_point_distance(abscissa, ordinate) <= cfg.max_magic_distance:
+            return True
+        return False
+
+    def is_enemy_magically_reachable(self, enemy):        
         if self.calculate_point_distance(enemy.abscissa, enemy.ordinate) <= cfg.max_magic_distance:
             return True
         return False
@@ -401,16 +406,16 @@ class Character:
     def get_magic_distance_ratio(self, enemy):
         return 1 - self.calculate_point_distance(enemy.abscissa, enemy.ordinate) / cfg.max_magic_distance
     
-    def calculate_point_to_enemy_path_distance(self, enemy, abscissa, ordinate):
+    def calculate_point_to_enemy_path_distance(self, target_abs, target_ord, abscissa, ordinate):
         # Only work if abscissa & ordinate are in the segment path
         # and if abscissa and ordinate are different from char position
         ac_length = self.calculate_point_distance(abscissa, ordinate)
-        ah_length = ac_length * self.calculate_point_to_enemy_path_cos_angle(enemy, abscissa, ordinate)
+        ah_length = ac_length * self.calculate_point_to_enemy_path_cos_angle(target_abs, target_ord, abscissa, ordinate)
         return math.sqrt(max(0, math.pow(ac_length, 2) - math.pow(ah_length, 2)))
 
-    def calculate_point_to_enemy_path_cos_angle(self, enemy, abscissa, ordinate):
-        u_abs = enemy.abscissa - self.abscissa
-        u_ord = enemy.ordinate - self.ordinate
+    def calculate_point_to_enemy_path_cos_angle(self, target_abs, target_ord, abscissa, ordinate):
+        u_abs = target_abs - self.abscissa
+        u_ord = target_ord - self.ordinate
         v_abs = abscissa - self.abscissa
         v_ord = ordinate - self.ordinate
 

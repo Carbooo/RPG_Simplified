@@ -88,14 +88,13 @@ class Fight:
                 or (isinstance(next_event.last_action, Rest) and next_event.last_action.nb_of_turns > 0) \
                 or (isinstance(next_event.last_action, Concentrate) and next_event.last_action.nb_of_turns > 0) \
                 or isinstance(next_event.last_action, Reload) \
+                or isinstance(next_event.last_action, ModifyEquipments) \
                 or isinstance(next_event.last_action, Spells):
                     # Destination not reached, keep moving
                     # or
                     # Number of resting / concentrating turns not reached, continue it
                     # or
-                    # Actually reload their range weapon
-                    # or
-                    # Actually cast the charged spell
+                    # Actually reload, modify equipments, or cast the charged spell
                     if not next_event.last_action.execute():
                         next_event.last_action = None  # Stop action if error encounter
                     
@@ -388,23 +387,19 @@ class Fight:
             char.previous_attacks.append((timeline, char.last_action))
             print("The attack surprises you during your current action(", char.last_action.name, ")!")
             print("Your defense is diminished!")
-            time.sleep(3)
+            time.sleep(2)
 
-            if isinstance(char.last_action, Reload) \
-                    or isinstance(char.last_action, Rest) \
-                    or isinstance(char.last_action, Concentrate) \
-                    or isinstance(char.last_action, Spells):
-                print("Your current action (", char.last_action.name, ") is canceled!")
-                time.sleep(3)
-                char.last_action = None
-                char.timeline = timeline
-                char.spend_time(cfg.defense_time / 2)
+            print("Your current action (", char.last_action.name, ") is also canceled!")
+            time.sleep(2)
+            char.last_action = None
+            char.timeline = timeline
+            char.spend_time(cfg.defense_time / 2)
 
             if isinstance(char.last_action, Reload):
                 print("You loose the ammo being used for reloading!")
-                time.sleep(3)
+                time.sleep(2)
                 char.ammo.remove(char.last_action.ammo_to_load)
 
         if char.equipments.loose_reloaded_ammo():
             print("Your bow has lost its loaded arrow!")
-            time.sleep(3)
+            time.sleep(2)

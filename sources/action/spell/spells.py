@@ -90,14 +90,14 @@ class Spells(ActiveActions):
 
         return True
 
-    def get_all_spread_targets(self, spread_distance):
+    def get_all_spread_targets(self, spread_distance, target_abs, target_ord):
         max_distance = spread_distance + 1
         round_distance = int(math.ceil(spread_distance))
         char_list = []
         for x in range(- round_distance, round_distance + 1):
             for y in range(- round_distance, round_distance + 1):
-                abscissa = self.target.abscissa + x
-                ordinate = self.target.ordinate + y
+                abscissa = target_abs + x
+                ordinate = target_ord + y
                 char = self.fight.field.get_character_from_pos(abscissa, ordinate)
                 if char:
                     distance_ratio = (max_distance - char.calculate_point_distance(abscissa, ordinate)) / max_distance
@@ -111,7 +111,7 @@ class Spells(ActiveActions):
 
         return char_list
 
-    def magical_attack_received(self, target, attack_value, accuracy_ratio, is_localized, can_use_shield, 
+    def magical_attack_received(self, target, attack_value, is_localized, can_use_shield, 
                                 resis_dim_rate, pen_rate):
         if target != self.initiator:
             self.fight.stop_action(target, self.initiator.timeline)
@@ -129,6 +129,7 @@ class Spells(ActiveActions):
             time.sleep(4)
         else:
             if is_localized:
+                accuracy_ratio = self.fight.field.get_magical_accuracy(self.initiator, self.target)
                 armor_coef = target.get_armor_coef(accuracy_ratio)
                 attack_value = target.damages_received(self.initiator, attack_value, accuracy_ratio, armor_coef, 
                                                        resis_dim_rate, pen_rate)
@@ -173,6 +174,43 @@ class Spells(ActiveActions):
 
             except:
                 print("The input is not an ID")
+
+    def choose_pos_target(self):
+        if self.fight.belong_to_team(self.initiator) == self.fight.team1:
+            team = self.fight.team2
+        else:
+            team = self.fight.team1
+
+        while 1:
+            try:
+                print("Where do you want to throw your spell?")
+                read = int(input('--> Abscissa (-1 = Cancel): '))
+                if read == -1:
+                    Actions.cancel_action(0)
+                    return False
+                else:
+                    abscissa = read
+                
+                read = int(input('--> Ordinate (-1 = Cancel): '))
+                if read == -1:
+                    Actions.cancel_action(0)
+                    return False
+                else:
+                    ordinate = read
+                
+            except:
+                print("The input is not an integer")
+            
+        
+            if not self.fight.field.is_target_magically_reachable(self.initiator, abscissa, ordinate):
+                print("Target is not magically reachable")
+                continue
+                
+            target = {
+                "abscissa": abscissa,
+                "ordinate": ordinate
+            }
+            return target
 
     def add_active_spell(self, char, duration, surname):
         self.surname = surname

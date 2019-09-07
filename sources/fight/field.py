@@ -109,32 +109,38 @@ class Field:
 
     def is_target_reachable(self, attacker, target):
         if target.body.is_alive() and attacker.is_distance_reachable(target) and \
-                self.calculate_ranged_obstacle_ratio(attacker, target) > 0:
+                self.calculate_ranged_obstacle_ratio(attacker, target.abscissa, target.ordinate) > 0:
             return True
         return False
         
     def is_target_magically_reachable(self, attacker, target):
-        if target.body.is_alive() and attacker.is_distance_magically_reachable(target) and \
-                self.calculate_ranged_obstacle_ratio(attacker, target) > 0:
+        if target.body.is_alive() and attacker.is_enemy_magically_reachable(target) and \
+                self.calculate_ranged_obstacle_ratio(attacker, target.abscissa, target.ordinate) > 0:
+            return True
+        return False
+    
+    def is_pos_magically_reachable(self, attacker, abscissa, ordinate):
+        if attacker.is_distance_magically_reachable(abscissa, ordinate) and \
+                self.calculate_ranged_obstacle_ratio(attacker, abscissa, ordinate) > 0:
             return True
         return False
         
     def get_magical_accuracy(self, attacker, target):
         coef = attacker.get_magic_distance_ratio(target) \
-             * self.calculate_ranged_obstacle_ratio(attacker, target) \
+             * self.calculate_ranged_obstacle_ratio(attacker, target.abscissa, target.ordinate) \
              * attacker.magic_power_ratio
         return 0.5 + coef  # Between 0.5 and 1.5 as other attacks
 
-    def calculate_ranged_obstacle_ratio(self, attacker, target):
-        min_abs = min(attacker.abscissa, target.abscissa)
-        min_ord = min(attacker.ordinate, target.ordinate)
+    def calculate_ranged_obstacle_ratio(self, attacker, target_abs, target_ord):
+        min_abs = min(attacker.abscissa, target_abs)
+        min_ord = min(attacker.ordinate, target_ord)
         path_ratio = 1
 
-        for i in range(abs(attacker.abscissa - target.abscissa) + 1):
-            for j in range(abs(attacker.ordinate - target.ordinate) + 1):
+        for i in range(abs(attacker.abscissa - target_abs) + 1):
+            for j in range(abs(attacker.ordinate - target_ord) + 1):
                 if (min_abs + i != attacker.abscissa or min_ord + j != attacker.ordinate) and \
-                        (min_abs + i != target.abscissa or min_ord + j != target.ordinate) and \
-                        attacker.calculate_point_to_enemy_path_distance(target, min_abs + i, min_ord + j) <= 0.5:
+                        (min_abs + i != target_abs or min_ord + j != target_ord) and \
+                        attacker.calculate_point_to_enemy_path_distance(target_abs, target_ord, min_abs + i, min_ord + j) <= 0.5:
 
                     if self.obstacles_array[min_abs + i, min_ord + j] == cfg.ranged_obstacle or \
                             self.obstacles_array[min_abs + i, min_ord + j] == cfg.full_obstacle or \
