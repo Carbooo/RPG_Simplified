@@ -25,12 +25,39 @@ class Spells(ActiveActions):
         self.spell_hands = 0
         self.spell_power = {}
 
+######################### BASE FUNCTIONS #######################
     def execute(self):
         pass  # Only for inheritance
 
     def end(self):
         pass  # Only for inheritance
 
+    def set_magical_coef(self):
+        self.magical_coef = random.gauss(1, cfg.high_variance) \
+                            * self.initiator.feelings[self.type].use_energy(self.spell_energy)
+
+    def get_stamina_with_coef(self):
+        return self.spell_stamina / math.pow(self.magical_coef, 1.0 / 4.0)
+
+    def get_time_with_coef(self):
+        return self.spell_time / math.pow(self.magical_coef, 1.0 / 4.0)
+
+    def is_able_to_cast(self):
+        if not self.initiator.feelings[self.type].check_energy(self.spell_energy):
+            print("You don't have enough energy (", self.spell_energy, ") to cast this spell")
+            return False
+
+        if not self.initiator.check_stamina(self.spell_stamina):
+            print("You don't have enough stamina (", self.spell_stamina, ") to cast this spell")
+            return False
+
+        if self.initiator.equipments.free_hands < self.spell_hands:
+            print("You don't have enough free hands (", self.spell_hands, ") to cast this spell")
+            return False
+
+        return True
+
+######################### CHOOSE FUNCTIONS #######################
     @staticmethod
     def choose_spell():
         print("You have decided to cast a spell")
@@ -66,83 +93,42 @@ class Spells(ActiveActions):
 
             print("Spell type:", read, "is not recognized")
 
-    def set_magical_coef(self):
-        self.magical_coef = random.gauss(1, cfg.high_variance) \
-                            * self.initiator.feelings[self.type].use_energy(self.spell_energy)
-
-    def get_stamina_with_coef(self):
-        return self.spell_stamina / math.pow(self.magical_coef, 1.0 / 4.0)
-
-    def get_time_with_coef(self):
-        return self.spell_time / math.pow(self.magical_coef, 1.0 / 4.0)
-
-    def is_able_to_cast(self):
-        if not self.initiator.feelings[self.type].check_energy(self.spell_energy):
-            print("You don't have enough energy (", self.spell_energy, ") to cast this spell")
-            return False
-
-        if not self.initiator.check_stamina(self.spell_stamina):
-            print("You don't have enough stamina (", self.spell_stamina, ") to cast this spell")
-            return False
-
-        if self.initiator.equipments.free_hands < self.spell_hands:
-            print("You don't have enough free hands (", self.spell_hands, ") to cast this spell")
-            return False
-
-        return True
-
-    def get_all_spread_targets(self, spread_distance, target_abs, target_ord):
-        max_distance = spread_distance + 1
-        round_distance = int(math.ceil(spread_distance))
-        char_list = []
-        for x in range(- round_distance, round_distance + 1):
-            for y in range(- round_distance, round_distance + 1):
-                abscissa = target_abs + x
-                ordinate = target_ord + y
-                char = self.fight.field.get_character_from_pos(abscissa, ordinate)
-                if char:
-                    distance_ratio = (max_distance - char.calculate_point_distance(abscissa, ordinate)) / max_distance
-                    if distance_ratio > 0:
-                        char_list.append((char, distance_ratio))
-
-        if self.initiator in char_list:
-            # Put the initiator in last, so the self damages made are not influencing the damages made to others
-            char_list.remove(self.initiator)
-            char_list.append(self.initiator)
-
-        return char_list
-
-    def magical_attack_received(self, target, attack_value, is_localized, can_use_shield, 
-                                resis_dim_rate, pen_rate):
-        if target != self.initiator:
-            self.fight.stop_action(target, self.initiator.timeline)
-
-        if can_use_shield:
-            attack_value -= target.magic_defense_with_shields * self.get_attack_coef(target)
-            target.equipments.all_shields_absorbed_damage(attack_value)
+    def choose_pos_target(self):
+        if self.fight.belong_to_team(self.initiator) == self.fight.team1:
+            team = self.fight.team2
         else:
-            attack_value -= target.magic_defense * self.get_attack_coef(target)
+            team = self.fight.team1
 
-        if attack_value <= 0:
-            target.print_basic()
-            print("-- has BLOCKED the attack of --", end=' ')
-            self.initiator.print_basic()
-            time.sleep(4)
-        else:
-            if is_localized:
-                accuracy_ratio = self.fight.field.get_magical_accuracy(self.initiator, self.target)
-                armor_coef = target.get_armor_coef(accuracy_ratio)
-                attack_value = target.damages_received(self.initiator, attack_value, accuracy_ratio, armor_coef, 
-                                                       resis_dim_rate, pen_rate)
-            else:
-                # Non localized attack cannot avoid armor (use cover ratio instead) or do critical hit
-                attack_value = target.damages_received(self.initiator, attack_value, 0,
-                                                       target.equipments.get_armor_cover_ratio(),
-                                                       resis_dim_rate, pen_rate)
+        while 1:
+            try:
+                print("Where do you want to throw your spell?")
+                read = int(input('--> Abscissa (-1 = Cancel): '))
+                if read == -1:
+                    Actions.cancel_action(0)
+                    return False
+                else:
+                    abscissa = read
 
-        target.previous_attacks.append((self.initiator.timeline, self))
-        return max(0.0, attack_value)
-    
+                read = int(input('--> Ordinate (-1 = Cancel): '))
+                if read == -1:
+                    Actions.cancel_action(0)
+                    return False
+                else:
+                    ordinate = read
+
+            except:
+                print("The input is not an integer")
+
+            if not self.fight.field.is_pos_magically_reachable(self.initiator, abscissa, ordinate):
+                print("Target is not magically reachable")
+                continue
+
+            target = {
+                "abscissa": abscissa,
+                "ordinate": ordinate
+            }
+            return target
+
     def choose_target_from_list(self, char_list):
         print("---------- CASTER -----------")
         self.initiator.print_attack_state()
@@ -167,7 +153,7 @@ class Spells(ActiveActions):
 
             except:
                 print("The input is not an ID")
-   
+
     def choose_target(self, include_enemies, include_allied, include_deads):
         team_list = []
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:
@@ -184,66 +170,123 @@ class Spells(ActiveActions):
         char_list = []
         for char in team_list:
             if self.fight.field.is_target_magically_reachable(self.initiator, char) and \
-            (include_deads or char.body.is_alive()):
+                    (include_deads or char.body.is_alive()):
                 char_list.append(char)
-                
-        self.choose_target_from_list(char_list)
 
-    def choose_pos_target(self):
-        if self.fight.belong_to_team(self.initiator) == self.fight.team1:
-            team = self.fight.team2
+        self.target = self.choose_target_from_list(char_list)
+        if not self.target:
+            return False
         else:
-            team = self.fight.team1
+            return True
 
-        while 1:
-            try:
-                print("Where do you want to throw your spell?")
-                read = int(input('--> Abscissa (-1 = Cancel): '))
-                if read == -1:
-                    Actions.cancel_action(0)
+    def rechoose_target_if_necessary(self, include_enemies, include_allied, include_deads):
+        if not self.fight.field.is_target_magically_reachable(self.initiator, self.target):
+            if include_deads or not self.target.body.is_alive():
+                print("Your initial target is no longer reachable!")
+                print("Please choose a new one or cancel the attack.")
+                self.target = self.choose_target(include_enemies, include_allied, include_deads)
+                if not self.target:
+                    print("Spell cancelled, the magic and stamina spent is lost")
                     return False
-                else:
-                    abscissa = read
-                
-                read = int(input('--> Ordinate (-1 = Cancel): '))
-                if read == -1:
-                    Actions.cancel_action(0)
-                    return False
-                else:
-                    ordinate = read
-                
-            except:
-                print("The input is not an integer")
-            
-        
-            if not self.fight.field.is_target_magically_reachable(self.initiator, abscissa, ordinate):
-                print("Target is not magically reachable")
-                continue
-                
-            target = {
-                "abscissa": abscissa,
-                "ordinate": ordinate
-            }
-            return target
+        return True
 
-    def add_active_spell(self, char, duration, surname):
+######################### EXECUTING FUNCTIONS #######################
+    def get_all_spread_targets(self, spread_distance, target_abs, target_ord):
+        max_distance = spread_distance + 1
+        round_distance = int(math.ceil(spread_distance))
+        char_list = []
+        for x in range(- round_distance, round_distance + 1):
+            for y in range(- round_distance, round_distance + 1):
+                abscissa = target_abs + x
+                ordinate = target_ord + y
+                char = self.fight.field.get_character_from_pos(abscissa, ordinate)
+                if char:
+                    distance_ratio = (max_distance - char.calculate_point_distance(target_abs, target_ord)) \
+                                     / max_distance
+                    if distance_ratio > 0:
+                        char_list.append((char, distance_ratio))
+
+        # Put the initiator in last, so the self damages made are not influencing the damages made to others
+        initiator_found = False
+        for char, distance in char_list:
+            if char == self.initiator:
+                initiator_found = (char, distance)
+        if initiator_found:
+            char_list.remove(initiator_found)
+            char_list.append(initiator_found)
+
+        return char_list
+
+    def magical_attack_received(self, attack_value, is_localized, can_use_shield, resis_dim_rate, pen_rate):
+        if self.target != self.initiator:
+            self.fight.stop_action(self.target, self.initiator.timeline)
+
+        if can_use_shield:
+            attack_value -= self.target.magic_defense_with_shields * self.get_attack_coef(self.target)
+            self.target.equipments.all_shields_absorbed_damage(attack_value)
+        else:
+            attack_value -= self.target.magic_defense * self.get_attack_coef(self.target)
+
+        if attack_value <= 0:
+            self.target.print_basic()
+            print("-- has BLOCKED the attack of --", end=' ')
+            self.initiator.print_basic()
+            print("")
+            time.sleep(4)
+        else:
+            if is_localized:
+                accuracy_ratio = self.fight.field.get_magical_accuracy(self.initiator, self.target)
+                armor_coef = self.target.get_armor_coef(accuracy_ratio)
+                attack_value = self.target.damages_received(self.initiator, attack_value, accuracy_ratio, armor_coef,
+                                                           resis_dim_rate, pen_rate)
+            else:
+                # Non localized attack cannot avoid armor (use cover ratio instead) or do critical hit
+                attack_value = self.target.damages_received(self.initiator, attack_value, 0,
+                                                           self.target.equipments.get_armor_cover_ratio(),
+                                                           resis_dim_rate, pen_rate)
+
+        self.target.previous_attacks.append((self.initiator.timeline, self))
+        return max(0.0, attack_value)
+
+######################### ACTIVE SPELLS FUNCTIONS #######################
+    def add_active_spell(self, duration, surname):
         self.surname = surname
         self.timeline = self.initiator.timeline + duration
         self.fight.scheduler.append(self)
-        char.active_spells.append(self)
+        self.target.active_spells.append(self)
 
-    def end_active_spell(self, char):
+    def end_active_spell(self):
         self.fight.scheduler.remove(self)
-        char.active_spells.remove(self)
+        self.target.active_spells.remove(self)
         self.end()
 
-    def identical_active_spell(self, char):
-        for spell in char.active_spells:
+    def identical_active_spell(self):
+        for spell in self.target.active_spells:
             if spell.type == self.type and spell.spell_code == self.spell_code:
                 return spell
         return False
 
-    def remove_identical_active_spell(self, char):
-        spell = self.identical_active_spell(char)
+    def remove_identical_active_spell(self):
+        spell = self.identical_active_spell()
         if spell:
-            spell.end_active_spell(char)
+            spell.end_active_spell()
+
+######################### PRINTING FUNCTIONS #######################
+    def print_spell(self, txt, state, self_spell):
+        print("")
+        print("*********************************************************************")
+        if state == "executing":
+            print("************************ SPELL BEING CAST ***************************")
+        elif state == "ending":
+            print("*********************** ACTIVE SPELL ENDING *************************")
+        elif state == "choosing":
+            print("********************** CHOOSING TARGET SPELL ************************")
+        print("*********************************************************************")
+        self.initiator.print_basic()
+        print(txt, end=' ')
+        if not self_spell:
+            self.target.print_basic()
+        print("")
+        print("*********************************************************************")
+        print("")
+        time.sleep(3)

@@ -1,4 +1,4 @@
-from sources.character.equipments import Equipments, Armors, Weapons, AttackWeapons, MeleeWeapons, \
+from sources.character.equipments import Armors, MagicalArmors, Weapons, AttackWeapons, MeleeWeapons, \
     Shields, RangedWeapons, Bows, Crossbows, Ammo
 import sources.miscellaneous.configuration as cfg
 
@@ -13,7 +13,7 @@ class CharEquipments:
                  weapon1, weapon2, weapon3, weapon4, 
                  ammo_type1, ammo_number1, ammo_type2, ammo_number2):
         self.character = char
-        self.armor = None
+        self.armors = []
         self.weapons_stored = []
         self.weapons_in_use = []
         self.ammo = []
@@ -47,11 +47,19 @@ class CharEquipments:
             print("(Bodies) Armor (", armor_name, ") has not been found and therefore cannot be set")
             return False
         else:
-            self.armor = armor_found
+            self.armors.append(armor_found)
             return True
 
-    def remove_armor(self):
-        self.armor = None
+    def set_magical_armor(self, armor_name, armor_defense):
+        new_armor = MagicalArmors(armor_name, armor_defense)
+        # Put the new armor at the first position
+        current_armors = self.armors.copy()
+        self.armors = [new_armor]
+        self.armors.extend(current_armors)
+        return True
+
+    def remove_armor(self, armor):
+        self.armors.remove(armor)
         return True
 
     def set_weapon_in_stored(self, weapon_name):
@@ -114,17 +122,20 @@ class CharEquipments:
 
     ############################# DAMAGE FUNCTIONS #############################
     def get_armor_cover_ratio(self):
-        if not self.armor:
+        if not self.armors:
             return 0
         else:
-            return self.armor.def_cover
+            return self.armors[0].def_cover
 
     def armor_damage_absorbed(self, damage, armor_coef, resistance_dim_rate, penetration_rate):
-        result = self.armor.damage_absorbed(damage, armor_coef, resistance_dim_rate, penetration_rate)
+        if not self.armors:
+            return damage
 
-        if self.armor and result[0] <= 0:
-            print("Your armor \\ID:", self.armor.get_id(), "\\Name:", self.armor.name, "has been broken!")
-            self.remove_armor()
+        result = self.armors[0].damage_absorbed(damage, armor_coef, resistance_dim_rate, penetration_rate)
+
+        if result[0] == 0:
+            print("Your armor \\ID:", self.armors[0].get_id(), "\\Name:", self.armors[0].name, "has been broken!")
+            self.remove_armor(self.armors[0])
 
         return result[1]
 
@@ -253,15 +264,15 @@ class CharEquipments:
             load += weapon.load
         for weapon in self.weapons_in_use:
             load += weapon.load
-        if self.armor:
-            load += self.armor.load
+        for armor in self.armors:
+            load += armor.load
         return load
 
     def get_armor_load(self):
-        if self.armor:
-            return self.armor.load
-        else:
-            return 0.0
+        load = 0.0
+        for armor in self.armors:
+            load += armor.load
+        return load
     
     def get_stored_load(self):
         load = 0.0
@@ -281,15 +292,15 @@ class CharEquipments:
             bulk += weapon.bulk
         for weapon in self.weapons_in_use:
             bulk += weapon.bulk
-        if self.armor:
-            bulk += self.armor.bulk
+        for armor in self.armors:
+            bulk += armor.bulk
         return bulk
 
     def get_armor_bulk(self):
-        if self.armor:
-            return self.armor.bulk
-        else:
-            return 0.0
+        bulk = 0.0
+        for armor in self.armors:
+            bulk += armor.load
+        return bulk
 
     def get_stored_bulk(self):
         bulk = 0.0
@@ -388,10 +399,11 @@ class CharEquipments:
 
     ########################## PRINTING FUNCTIONS #########################
     def print_armor(self):
-        print("   ArmorID:", self.armor.get_id(), ", Armor:", self.armor.name, ", Defense:", self.armor.defense, end=' ')
+        print("   ArmorID:", self.armors[0].get_id(), ", Armor:", self.armors[0].name,
+              ", Defense:", self.armors[0].defense, end=' ')
 
     def print_full_armor(self):
-        self.armor.print_obj()
+        self.armors[0].print_obj()
         
     @staticmethod
     def print_weapon(weapon):

@@ -215,7 +215,7 @@ wrath_spells_power = {
 
 ##################### JOY SPELLS CONFIG ###################
 joy_spells = {
-    "description": "joy spells",
+    "description": "Joy spells",
     "code": "JOY",
     "list": []
 }
@@ -243,6 +243,10 @@ joy_spells_stamina = {
     "EGY": 1.0,
     "LGT": 3.0
 }
+joy_spells_hands = {
+    "EGY": 0,
+    "LGT": 1
+}
 joy_spells_power = {
     "EGY": {
         "coef": 1.2,
@@ -259,8 +263,8 @@ joy_spells_power = {
 
 ##################### LOVE SPELLS CONFIG ###################
 love_spells = {
-    "description": "Joy spells",
-    "code": "JOY",
+    "description": "Love spells",
+    "code": "LOV",
     "list": []
 }
 love_shield = {
@@ -286,6 +290,10 @@ love_spells_time = {
 love_spells_stamina = {
     "SHD": 2.5,
     "HEA": 5.0
+}
+love_spells_hands = {
+    "SHD": 2,
+    "HEA": 2
 }
 love_spells_power = {
     "SHD": {

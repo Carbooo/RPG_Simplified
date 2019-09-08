@@ -132,7 +132,8 @@ class MagicalArmors(Armors):
         super().__init__(name, 0.0, 0.0, 0.0, 10.0, defense)
         self.type = "MagicalArmor"
         
-    def damage_absorbed(self, damage):
+    def damage_absorbed(self, damage, armor_coef, resis_dim_rate, pen_rate):
+        # Some parameters are not used, but kept for consistency with parent function
         damage_result = max(0, damage - self.defense)
         if damage_result == 0:
             print("Damages absorbed by magical armor:", int(round(damage)))

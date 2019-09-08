@@ -56,7 +56,9 @@ class WrathSpells(Spells):
         return True
         
     def improve_strength(self):
-        self.remove_identical_active_spell(self.initiator)
+        self.print_spell("has greatly improve their strength", "executing", True)
+
+        self.remove_identical_active_spell()
         self.magical_coef *= self.initiator.magic_power_ratio
         
         self.target.update_force(
@@ -73,12 +75,14 @@ class WrathSpells(Spells):
         )
         self.target.calculate_characteristic()
 
-        self.add_active_spell(self.initiator, self.spell_power["duration"] * math.sqrt(self.magical_coef),
+        self.add_active_spell(self.spell_power["duration"] * math.sqrt(self.magical_coef),
                               "Strength greatly increased")
         self.initiator.last_action = None  # To remove it from the scheduler
         return True
     
     def end_improve_strength(self):
+        self.print_spell("has no longer an improved strength", "ending", True)
+
         self.target.update_force(
             (1 - math.pow(self.spell_power["force"], self.magical_coef))
             * self.target.original_force
@@ -107,29 +111,20 @@ class WrathSpells(Spells):
         return True   
     
     def throw_fireball(self):
-        target = self.choose_pos_target():
+        self.print_spell("has a fireball ready and needs to choose a target", "choosing", True)
+        target = self.choose_pos_target()
         if not target:
             print("Spell cancelled, the magic and stamina spent is lost")
             return False
-    
+
         attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
-                     
         for char, distance_ratio in self.get_all_spread_targets(
                 self.spell_power["spread_distance"] * self.magical_coef,
                 target["abscissa"], target["ordinate"]
         ):
-            print("")
-            print("*********************************************************************")
-            self.initiator.print_basic()
-            print("is sending a fireball to (", end=' ')
-            char.print_basic()
-            print(")")
-            print("*********************************************************************")
-            print("")
-            time.sleep(3)
-
+            self.target = char
+            self.print_spell("is sending a fireball to", "executing", False)
             self.magical_attack_received(
-                char,
                 attack_value * distance_ratio,
                 False,  # is_localized
                 True,  # can_use_shield

@@ -16,7 +16,7 @@ from sources.action.save_and_load import Save, Load
 from sources.action.spell.spells import Spells
 from sources.action.spell.wrath_spells import WrathSpells
 from sources.action.spell.joy_spells import JoySpells
-
+from sources.action.spell.love_spells import LoveSpells
 
 #############################################################
 ##################### FIGHTS CLASS ##########################
@@ -81,7 +81,7 @@ class Fight:
             
             # Terminate active spell
             elif isinstance(next_event, Spells):
-                next_event.end_active_spell(next_event.target)
+                next_event.end_active_spell()
                 
             elif isinstance(next_event, Character):
                 if (isinstance(next_event.last_action, Move) and next_event.last_action.path) \
@@ -172,6 +172,9 @@ class Fight:
         self.scheduler[0].print_detailed_state()
         print("")
         self.field.print_obj()
+        print("")
+        self.scheduler[0].print_basic()
+        print("")
         
     def print_ko_state_rest(self, character):
         print("")
@@ -366,12 +369,18 @@ class Fight:
         return True
     
     def initiate_spell_object(self, character):
-        spell_type, spell_code = Spells.choose_spell()
+        choice = Spells.choose_spell()
+        if not choice:
+            return False
+        else:
+            spell_type, spell_code = choice
 
         if spell_type == "WRA":
             action = WrathSpells(self, character, spell_code)
         elif spell_type == "JOY":
             action = JoySpells(self, character, spell_code)
+        elif spell_type == "LOV":
+            action = LoveSpells(self, character, spell_code)
 
         if not action.is_a_success:
             return False

@@ -16,7 +16,7 @@ class JoySpells(Spells):
         self.spell_stamina = cfg.joy_spells_stamina[self.spell_code]
         self.spell_time = cfg.joy_spells_time[self.spell_code]
         self.spell_energy = cfg.joy_spells_energy[self.spell_code]
-        self.spell_hands = cfg.wrath_spells_hands[self.spell_code]
+        self.spell_hands = cfg.joy_spells_hands[self.spell_code]
         self.spell_power = cfg.joy_spells_power[self.spell_code]
         self.is_a_success = self.start()
         
@@ -56,7 +56,9 @@ class JoySpells(Spells):
         return True
         
     def energize(self):
-        self.remove_identical_active_spell(self.initiator)
+        self.print_spell("has improve all their attributes", "executing", True)
+
+        self.remove_identical_active_spell()
         self.magical_coef *= self.initiator.magic_power_ratio
 
         self.target.update_constitution(
@@ -93,12 +95,14 @@ class JoySpells(Spells):
         )
         self.target.calculate_characteristic()
 
-        self.add_active_spell(self.initiator, self.spell_power["duration"] * math.sqrt(self.magical_coef),
+        self.add_active_spell(self.spell_power["duration"] * math.sqrt(self.magical_coef),
                               "All attributes slightly increased")
         self.initiator.last_action = None  # To remove it from the scheduler
         return True
     
     def end_energize(self):
+        self.print_spell("has no longer improved attributes", "ending", True)
+
         self.target.update_constitution(
             (1 - math.pow(self.spell_power["coef"], self.magical_coef))
             * self.target.original_constitution
@@ -137,9 +141,8 @@ class JoySpells(Spells):
     def start_light(self):
         if not self.is_able_to_cast():
             return False
-        
-        self.target = self.choose_target(True, False, False)
-        if not self.target:
+
+        if not self.choose_target(True, False, False):
             return False
         
         print("You have decided to send a burning light")
@@ -151,29 +154,13 @@ class JoySpells(Spells):
         return True   
     
     def throw_light(self):
-        if not self.fight.field.is_target_magically_reachable(self.initiator, self.target) \
-        or not self.target.body.is_alive():
-            print("Your initial target is no longer reachable!")
-            print("Please choose a new one or cancel the attack.")
-            self.target = self.choose_target(True, False, False)
-            if not self.target:
-                print("Spell cancelled, the magic and stamina spent is lost")
-                return False
-    
-        attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
-                     
-        print("")
-        print("*********************************************************************")
-        self.initiator.print_basic()
-        print("is sending a burning light to (", end=' ')
-        self.target.print_basic()
-        print(")")
-        print("*********************************************************************")
-        print("")
-        time.sleep(3)
+        if not self.rechoose_target_if_necessary(True, False, False):
+            return False
 
+        self.print_spell("is sending a burning light to", "executing", False)
+
+        attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
         result = self.magical_attack_received(
-            self.target,
             attack_value,
             False,  # is_localized
             True,  # can_use_shield
