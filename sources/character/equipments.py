@@ -100,7 +100,7 @@ class Armors(Equipments):
         return ratio
 
     def cover_ratio(self):
-        return self.def_cover / 10
+        return self.def_cover / 10.0
 
     def damage_absorbed(self, damage, armor_coef, resis_dim_rate, pen_rate):
         if armor_coef == 0:
@@ -108,18 +108,44 @@ class Armors(Equipments):
             return [1, damage]  # 1 = Not broken ratio
         
         damage_result = damage * pen_rate + max(0, damage * (1 -pen_rate) - self.defense * armor_coef)
-        if damage_result <= 0:
+        if damage_result == 0:
             print("Damages absorbed by armor:", int(round(damage * (1 -pen_rate))))
             time.sleep(2)
             ratio = self.decrease(damage * armor_coef * resis_dim_rate)
             print("The armor has absorbed the remaining damages and no life has been lost")
             time.sleep(3)
-            return [ratio, 0]
         else:
             print("Damages absorbed by armor:", int(round(min(damage * (1 - pen_rate), self.defense * armor_coef))))
             time.sleep(2)
             ratio = self.decrease(self.defense * armor_coef * resis_dim_rate)
-            return [ratio, damage_result]
+        
+        return [ratio, damage_result]
+            
+
+#############################################################
+#################### ARMORS CLASS ###########################
+#############################################################
+class MagicalArmors(Armors):
+    """Common sub class of equipments for all purely magical armors"""
+    
+    def __init__(self, name, defense):
+        super().__init__(name, 0.0, 0.0, 0.0, 10.0, defense)
+        self.type = "MagicalArmor"
+        
+    def damage_absorbed(self, damage):
+        damage_result = max(0, damage - self.defense)
+        if damage_result == 0:
+            print("Damages absorbed by magical armor:", int(round(damage)))
+            time.sleep(2)
+            print("The armor has absorbed the remaining damages and no life has been lost")
+            time.sleep(3)
+            self.defense -= damage
+        else:
+            print("Damages absorbed by magical armor:", int(round(self.defense)))
+            time.sleep(2)
+            self.defense = 0
+        
+        return [self.defense, damage_result]
             
 
 #############################################################
