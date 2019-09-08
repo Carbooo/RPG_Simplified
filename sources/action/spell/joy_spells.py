@@ -16,6 +16,7 @@ class JoySpells(Spells):
         self.spell_stamina = cfg.joy_spells_stamina[self.spell_code]
         self.spell_time = cfg.joy_spells_time[self.spell_code]
         self.spell_energy = cfg.joy_spells_energy[self.spell_code]
+        self.spell_hands = cfg.wrath_spells_hands[self.spell_code]
         self.spell_power = cfg.joy_spells_power[self.spell_code]
         self.is_a_success = self.start()
         
@@ -134,10 +135,10 @@ class JoySpells(Spells):
         return True
         
     def start_light(self):
-        if not self.is_able_to_cast(1):
+        if not self.is_able_to_cast():
             return False
         
-        self.target = self.choose_enemy_target()
+        self.target = self.choose_target(True, False, False)
         if not self.target:
             return False
         
@@ -150,10 +151,11 @@ class JoySpells(Spells):
         return True   
     
     def throw_light(self):
-        if not self.fight.field.is_target_magically_reachable(self.initiator, self.target):
+        if not self.fight.field.is_target_magically_reachable(self.initiator, self.target) \
+        or not self.target.body.is_alive():
             print("Your initial target is no longer reachable!")
             print("Please choose a new one or cancel the attack.")
-            self.target = self.choose_enemy_target()
+            self.target = self.choose_target(True, False, False)
             if not self.target:
                 print("Spell cancelled, the magic and stamina spent is lost")
                 return False

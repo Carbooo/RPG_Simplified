@@ -16,6 +16,7 @@ class WrathSpells(Spells):
         self.spell_stamina = cfg.wrath_spells_stamina[self.spell_code]
         self.spell_time = cfg.wrath_spells_time[self.spell_code]
         self.spell_energy = cfg.wrath_spells_energy[self.spell_code]
+        self.spell_hands = cfg.wrath_spells_hands[self.spell_code]
         self.spell_power = cfg.wrath_spells_power[self.spell_code]
         self.is_a_success = self.start()
         
@@ -94,7 +95,7 @@ class WrathSpells(Spells):
         return True
         
     def start_fireball(self):
-        if not self.is_able_to_cast(2):
+        if not self.is_able_to_cast():
             return False
         
         print("You have decided to throw a fireball")

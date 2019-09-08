@@ -22,6 +22,7 @@ class Spells(ActiveActions):
         self.spell_stamina = 0
         self.spell_time = 0
         self.spell_energy = 0
+        self.spell_hands = 0
         self.spell_power = {}
 
     def execute(self):
@@ -75,7 +76,7 @@ class Spells(ActiveActions):
     def get_time_with_coef(self):
         return self.spell_time / math.pow(self.magical_coef, 1.0 / 4.0)
 
-    def is_able_to_cast(self, free_hands_required=0):
+    def is_able_to_cast(self):
         if not self.initiator.feelings[self.type].check_energy(self.spell_energy):
             print("You don't have enough energy (", self.spell_energy, ") to cast this spell")
             return False
@@ -84,8 +85,8 @@ class Spells(ActiveActions):
             print("You don't have enough stamina (", self.spell_stamina, ") to cast this spell")
             return False
 
-        if self.initiator.equipments.free_hands < free_hands_required:
-            print("You don't have enough free hands (", free_hands_required, ") to cast this spell")
+        if self.initiator.equipments.free_hands < self.spell_hands:
+            print("You don't have enough free hands (", self.spell_hands, ") to cast this spell")
             return False
 
         return True
@@ -141,23 +142,15 @@ class Spells(ActiveActions):
 
         target.previous_attacks.append((self.initiator.timeline, self))
         return max(0.0, attack_value)
-        
-    def choose_enemy_target(self):
-        if self.fight.belong_to_team(self.initiator) == self.fight.team1:
-            team = self.fight.team2
-        else:
-            team = self.fight.team1
-
-        print("--------- ATTACKER -----------")
+    
+    def choose_target_from_list(self, char_list):
+        print("---------- CASTER -----------")
         self.initiator.print_attack_state()
         print("")
         print("--------- TARGETS -----------")
-        print("Choose one of the following enemies:")
-        enemy_list = []
-        for char in team.characters_list:
-            if self.fight.field.is_target_magically_reachable(self.initiator, char):
-                enemy_list.append(char)
-                char.print_defense_state()
+        print("Choose one of the following targets:")
+        for char in char_list:
+            char.print_defense_state()
 
         while 1:
             try:
@@ -166,14 +159,35 @@ class Spells(ActiveActions):
                 if Actions.cancel_action(read):
                     return False
 
-                for enemy in enemy_list:
-                    if enemy.get_id() == read:
-                        return enemy
+                for char in char_list:
+                    if char.get_id() == read:
+                        return char
 
                 print("ID:", read, "is not available")
 
             except:
                 print("The input is not an ID")
+   
+    def choose_target(self, include_enemies, include_allied, include_deads):
+        team_list = []
+        if self.fight.belong_to_team(self.initiator) == self.fight.team1:
+            if include_enemies:
+                team_list.extend(self.fight.team2.characters_list)
+            if include_allied:
+                team_list.extend(self.fight.team1.characters_list)
+        else:
+            if include_enemies:
+                team_list.extend(self.fight.team1.characters_list)
+            if include_allied:
+                team_list.extend(self.fight.team2.characters_list)
+
+        char_list = []
+        for char in team_list:
+            if self.fight.field.is_target_magically_reachable(self.initiator, char) and \
+            (include_deads or char.body.is_alive()):
+                char_list.append(char)
+                
+        self.choose_target_from_list(char_list)
 
     def choose_pos_target(self):
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:

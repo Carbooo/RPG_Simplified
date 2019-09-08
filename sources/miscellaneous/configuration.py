@@ -194,6 +194,10 @@ wrath_spells_stamina = {
     "STR": 1.0,
     "FBL": 7.5
 }
+wrath_spells_hands = {
+    "STR": 0,
+    "FBL": 2
+}
 wrath_spells_power = {
     "STR": {
         "force": 2.0,
@@ -250,5 +254,45 @@ joy_spells_power = {
         "pen_rate": 0.1,
         "delay": 1.5,
         "min_damage_for_delay": 5.0
+    }
+}
+
+##################### LOVE SPELLS CONFIG ###################
+love_spells = {
+    "description": "Joy spells",
+    "code": "JOY",
+    "list": []
+}
+love_shield = {
+    "description": "Set a protective shield",
+    "code": "SHD"
+}
+love_heal = {
+    "description": "Cure an injure ally",
+    "code": "HEA"
+}
+spells.append(love_spells)
+love_spells["list"].append(love_shield)
+love_spells["list"].append(love_heal)
+
+love_spells_energy = {
+        "SHD": 15.0,
+        "HEA": 30.0
+    }
+love_spells_time = {
+    "SHD": 1.75,
+    "HEA": 3.0
+}
+love_spells_stamina = {
+    "SHD": 2.5,
+    "HEA": 5.0
+}
+love_spells_power = {
+    "SHD": {
+        "defense": 100.0,
+        "turn_decay": 10.0
+    },
+    "HEA": {
+        "heal": 40.0
     }
 }
