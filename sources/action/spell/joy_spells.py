@@ -36,9 +36,9 @@ class JoySpells(Spells):
         else:
             return False
     
-    def end(self):
+    def end(self, no_alert):
         if self.spell_code == "EGY":
-            return self.end_energize()
+            return self.end_energize(no_alert)
         else:
             return False
     
@@ -100,8 +100,9 @@ class JoySpells(Spells):
         self.initiator.last_action = None  # To remove it from the scheduler
         return True
     
-    def end_energize(self):
-        self.print_spell("has no longer improved attributes", "ending", True)
+    def end_energize(self, no_alert):
+        if not no_alert:
+            self.print_spell("has no longer improved attributes", "ending", True)
 
         self.target.update_constitution(
             (1 - math.pow(self.spell_power["coef"], self.magical_coef))

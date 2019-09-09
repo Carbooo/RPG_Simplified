@@ -52,11 +52,18 @@ class CharEquipments:
 
     def set_magical_armor(self, armor_name, armor_defense):
         new_armor = MagicalArmors(armor_name, armor_defense)
-        # Put the new armor at the first position
+        # Put the new armor at the first position (first to receive damages)
         current_armors = self.armors.copy()
         self.armors = [new_armor]
         self.armors.extend(current_armors)
-        return True
+        return new_armor
+    
+    def decay_magical_armor(self, armor, value):
+        armor.defense -= value
+        if armor.defense < 0:
+            self.remove_armor(armor)
+            return True
+        return False
 
     def remove_armor(self, armor):
         self.armors.remove(armor)
@@ -128,16 +135,18 @@ class CharEquipments:
             return self.armors[0].def_cover
 
     def armor_damage_absorbed(self, damage, armor_coef, resistance_dim_rate, penetration_rate):
-        if not self.armors:
-            return damage
-
-        result = self.armors[0].damage_absorbed(damage, armor_coef, resistance_dim_rate, penetration_rate)
-
-        if result[0] == 0:
-            print("Your armor \\ID:", self.armors[0].get_id(), "\\Name:", self.armors[0].name, "has been broken!")
-            self.remove_armor(self.armors[0])
-
-        return result[1]
+        damage_result = damage
+        for armor in self.armors:
+            if damage_result > 0:
+                result = armor.damage_absorbed(damage, armor_coef, resistance_dim_rate, penetration_rate)
+                damage_result = result[1]
+                if result[0] == 0:
+                    print("Your armor \\ID:", armor.get_id(), "\\Name:", armor.name, "has been broken!")
+                    self.remove_armor(armor)
+            else:
+                break
+            
+        return damage_result
 
     def all_weapons_absorbed_damage(self, damage):
         weapons_list = []

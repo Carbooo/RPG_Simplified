@@ -36,9 +36,9 @@ class WrathSpells(Spells):
         else:
             return False
     
-    def end(self):
+    def end(self, no_alert):
         if self.spell_code == "STR":
-            return self.end_improve_strength()
+            return self.end_improve_strength(no_alert)
         else:
             return False
     
@@ -80,8 +80,9 @@ class WrathSpells(Spells):
         self.initiator.last_action = None  # To remove it from the scheduler
         return True
     
-    def end_improve_strength(self):
-        self.print_spell("has no longer an improved strength", "ending", True)
+    def end_improve_strength(self, no_alert):
+        if not no_alert:
+            self.print_spell("has no longer an improved strength", "ending", True)
 
         self.target.update_force(
             (1 - math.pow(self.spell_power["force"], self.magical_coef))

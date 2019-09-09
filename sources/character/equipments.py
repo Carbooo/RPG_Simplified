@@ -109,13 +109,13 @@ class Armors(Equipments):
         
         damage_result = damage * pen_rate + max(0, damage * (1 -pen_rate) - self.defense * armor_coef)
         if damage_result == 0:
-            print("Damages absorbed by armor:", int(round(damage * (1 -pen_rate))))
+            print("Damages absorbed by", self.name, ":", int(round(damage * (1 -pen_rate))))
             time.sleep(2)
             ratio = self.decrease(damage * armor_coef * resis_dim_rate)
-            print("The armor has absorbed the remaining damages and no life has been lost")
+            print("The", self.name, "has absorbed the remaining damages and no life has been lost")
             time.sleep(3)
         else:
-            print("Damages absorbed by armor:", int(round(min(damage * (1 - pen_rate), self.defense * armor_coef))))
+            print("Damages absorbed by", self.name, ":", int(round(min(damage * (1 - pen_rate), self.defense * armor_coef))))
             time.sleep(2)
             ratio = self.decrease(self.defense * armor_coef * resis_dim_rate)
         
@@ -133,20 +133,12 @@ class MagicalArmors(Armors):
         self.type = "MagicalArmor"
         
     def damage_absorbed(self, damage, armor_coef, resis_dim_rate, pen_rate):
-        # Some parameters are not used, but kept for consistency with parent function
-        damage_result = max(0, damage - self.defense)
-        if damage_result == 0:
-            print("Damages absorbed by magical armor:", int(round(damage)))
-            time.sleep(2)
-            print("The armor has absorbed the remaining damages and no life has been lost")
-            time.sleep(3)
-            self.defense -= damage
-        else:
-            print("Damages absorbed by magical armor:", int(round(self.defense)))
-            time.sleep(2)
-            self.defense = 0
-        
-        return [self.defense, damage_result]
+        ratio, damage_result = super().damage_absorbed(damage, 1, 0, 0)
+        self.defense -= damage
+        if self.defense <= 0:
+            self.life = 0
+            ratio = 0
+        return ratio, damage_result
             
 
 #############################################################

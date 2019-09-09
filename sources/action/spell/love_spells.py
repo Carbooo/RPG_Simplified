@@ -36,9 +36,9 @@ class LoveSpells(Spells):
         else:
             return False
     
-    def end(self):
+    def end(self, no_alert):
         if self.spell_code == "SHD":
-            return self.end_shield()
+            return self.end_shield(no_alert)
         else:
             return False
     
@@ -66,17 +66,22 @@ class LoveSpells(Spells):
         self.remove_identical_active_spell()
         self.magical_coef *= self.initiator.magic_power_ratio
         self.spell_power["defense"] *= self.magical_coef
-
+        self.spell_power["armor"] = self.target.equipments.set_magical_armor("Love shield", self.spell_power["defense"])
+        
         self.add_active_spell(1.0, "Magic shield")
         self.initiator.last_action = None  # To remove it from the scheduler
         return True
     
-    def end_shield(self):
-        self.print_spell("has no longer a magic shield", "ending", False)
-
-        self.spell_power["defense"] -= self.spell_power["turn_decay"]
-        if self.spell_power["defense"] > 0:
-            self.add_active_spell(1.0, "Protecting shield")
+    def end_shield(self, no_alert):
+        if no_alert or self.spell_power["armor"].is_broken():
+            self.target.equipments.remove_armor(self.spell_power["armor"])
+            return True
+            
+        is_depleted = self.target.equipments.decay_magical_armor(self.spell_power["armor"], self.spell_power["turn_decay"])
+        if is_depleted:
+            self.print_spell("has no longer a magic love shield", "ending", False)
+        else:
+            self.timeline += 1
         return True
         
     def start_heal(self):

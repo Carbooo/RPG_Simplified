@@ -29,7 +29,7 @@ class Spells(ActiveActions):
     def execute(self):
         pass  # Only for inheritance
 
-    def end(self):
+    def end(self, no_alert):
         pass  # Only for inheritance
 
     def set_magical_coef(self):
@@ -255,10 +255,10 @@ class Spells(ActiveActions):
         self.fight.scheduler.append(self)
         self.target.active_spells.append(self)
 
-    def end_active_spell(self):
+    def end_active_spell(self, no_alert=False):
         self.fight.scheduler.remove(self)
         self.target.active_spells.remove(self)
-        self.end()
+        self.end(no_alert)
 
     def identical_active_spell(self):
         for spell in self.target.active_spells:
@@ -269,7 +269,7 @@ class Spells(ActiveActions):
     def remove_identical_active_spell(self):
         spell = self.identical_active_spell()
         if spell:
-            spell.end_active_spell()
+            spell.end_active_spell(no_alert=True)
 
 ######################### PRINTING FUNCTIONS #######################
     def print_spell(self, txt, state, self_spell):
