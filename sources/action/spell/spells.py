@@ -27,9 +27,9 @@ class Spells(ActiveActions):
 
 ######################### BASE FUNCTIONS #######################
     def execute(self):
-        pass  # Only for inheritance
+        self.initiator.last_action = None
 
-    def end(self, no_alert):
+    def end(self, is_canceled):
         pass  # Only for inheritance
 
     def set_magical_coef(self):
@@ -249,17 +249,24 @@ class Spells(ActiveActions):
         return max(0.0, attack_value)
 
 ######################### ACTIVE SPELLS FUNCTIONS #######################
-    def add_active_spell(self, duration, surname):
-        self.surname = surname
-        self.timeline = self.initiator.timeline + duration
-        self.fight.scheduler.append(self)
+    def add_active_spell(self):
         self.target.active_spells.append(self)
 
-    def end_active_spell(self, no_alert=False):
-        self.fight.scheduler.remove(self)
+    def end_active_spell(self):
         self.target.active_spells.remove(self)
-        self.end(no_alert)
 
+    def add_lasting_spell(self, surname, duration, is_target_a_user=True):
+        self.surname = surname
+        self.timeline = self.timeline + duration
+        self.fight.scheduler.append(self)
+        if is_target_a_user:
+            self.add_active_spell(surname)
+    
+    def end_lasting_spell(self, is_target_a_user=True):
+        self.fight.scheduler.remove(self)
+        if is_target_a_user:
+            self.end_active_spell()
+        
     def identical_active_spell(self):
         for spell in self.target.active_spells:
             if spell.type == self.type and spell.spell_code == self.spell_code:
@@ -269,7 +276,7 @@ class Spells(ActiveActions):
     def remove_identical_active_spell(self):
         spell = self.identical_active_spell()
         if spell:
-            spell.end_active_spell(no_alert=True)
+            spell.end(is_canceled=True)
 
 ######################### PRINTING FUNCTIONS #######################
     def print_spell(self, txt, state, self_spell):

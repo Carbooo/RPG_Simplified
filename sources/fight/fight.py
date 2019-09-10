@@ -79,9 +79,9 @@ class Fight:
             if isinstance(next_event, Fight):
                 self.pass_a_turn()
             
-            # Terminate active spell
+            # Terminate / Update active spell
             elif isinstance(next_event, Spells):
-                next_event.end_active_spell()
+                next_event.end()
                 
             elif isinstance(next_event, Character):
                 if (isinstance(next_event.last_action, Move) and next_event.last_action.path) \
@@ -133,7 +133,7 @@ class Fight:
         print("******************** A GAME TURN HAS PASSED *************************")
         print("*********************************************************************")
         self.timeline += 1 
-        time.sleep(3)
+        time.sleep(2)
         
         for char in self.char_order:
             if char.exceeded_feelings_check():

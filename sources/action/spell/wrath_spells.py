@@ -36,9 +36,9 @@ class WrathSpells(Spells):
         else:
             return False
     
-    def end(self, no_alert):
+    def end(self, is_canceled=False):
         if self.spell_code == "STR":
-            return self.end_improve_strength(no_alert)
+            return self.end_improve_strength(is_canceled)
         else:
             return False
     
@@ -75,15 +75,14 @@ class WrathSpells(Spells):
         )
         self.target.calculate_characteristic()
 
-        self.add_active_spell(self.spell_power["duration"] * math.sqrt(self.magical_coef),
-                              "Strength greatly increased")
-        self.initiator.last_action = None  # To remove it from the scheduler
+        self.add_lasting_spell("Strength greatly increased", 
+                              self.spell_power["duration"] * math.sqrt(self.magical_coef))
         return True
     
-    def end_improve_strength(self, no_alert):
-        if not no_alert:
+    def end_improve_strength(self, is_canceled):
+        if not is_canceled:
             self.print_spell("has no longer an improved strength", "ending", True)
-
+        
         self.target.update_force(
             (1 - math.pow(self.spell_power["force"], self.magical_coef))
             * self.target.original_force
@@ -97,6 +96,8 @@ class WrathSpells(Spells):
             * self.target.original_dexterity
         )
         self.target.calculate_characteristic()
+        
+        self.end_lasting_spell()
         return True
         
     def start_fireball(self):
@@ -132,6 +133,5 @@ class WrathSpells(Spells):
                 self.spell_power["resis_dim_rate"], 
                 self.spell_power["pen_rate"]
             )
-
-        self.initiator.last_action = None  # To remove it from the scheduler
+            
         return True

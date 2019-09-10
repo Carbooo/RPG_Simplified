@@ -36,9 +36,9 @@ class JoySpells(Spells):
         else:
             return False
     
-    def end(self, no_alert):
+    def end(self, is_canceled=False):
         if self.spell_code == "EGY":
-            return self.end_energize(no_alert)
+            return self.end_energize(is_canceled)
         else:
             return False
     
@@ -95,13 +95,12 @@ class JoySpells(Spells):
         )
         self.target.calculate_characteristic()
 
-        self.add_active_spell(self.spell_power["duration"] * math.sqrt(self.magical_coef),
-                              "All attributes slightly increased")
-        self.initiator.last_action = None  # To remove it from the scheduler
+        self.add_lasting_spell("All attributes slightly increased",
+                              self.spell_power["duration"] * math.sqrt(self.magical_coef))
         return True
     
-    def end_energize(self, no_alert):
-        if not no_alert:
+    def end_energize(self, is_canceled):
+        if not is_canceled:
             self.print_spell("has no longer improved attributes", "ending", True)
 
         self.target.update_constitution(
@@ -137,6 +136,8 @@ class JoySpells(Spells):
             * self.target.original_morale
         )
         self.target.calculate_characteristic()
+        
+        self.end_lasting_spell()
         return True
         
     def start_light(self):
@@ -174,5 +175,4 @@ class JoySpells(Spells):
             time.sleep(2)
             self.target.spend_time(self.spell_power["delay"])
 
-        self.initiator.last_action = None  # To remove it from the scheduler
         return True
