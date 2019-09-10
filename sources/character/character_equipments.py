@@ -129,9 +129,10 @@ class CharEquipments:
 
     def armor_damage_absorbed(self, damage, armor_coef, resistance_dim_rate, penetration_rate):
         damage_result = damage
-        for armor in self.armors:
+        armors = self.armors.copy()
+        for armor in armors:
             if damage_result > 0:
-                result = armor.damage_absorbed(damage, armor_coef, resistance_dim_rate, penetration_rate)
+                result = armor.damage_absorbed(damage_result, armor_coef, resistance_dim_rate, penetration_rate)
                 damage_result = result[1]
                 if result[0] == 0:
                     print("Your armor \\ID:", armor.get_id(), "\\Name:", armor.name, "has been broken!")
@@ -407,12 +408,25 @@ class CharEquipments:
         return defenses
 
     ########################## PRINTING FUNCTIONS #########################
-    def print_armor(self):
-        print("   ArmorID:", self.armors[0].get_id(), ", Armor:", self.armors[0].name,
-              ", Defense:", self.armors[0].defense, end=' ')
+    def print_armors(self):
+        print("   - Armors:")
+        if not self.armors:
+            print("      \\No armor")
+            return False
+        for armor in self.armors:
+            print("      \\", end=' ')
+            print("ArmorID:", armor.get_id(), ", Armor:", armor.name, ", Defense:", armor.defense)
+        return True
 
-    def print_full_armor(self):
-        self.armors[0].print_obj()
+    def print_full_armors(self):
+        print("   - Armors:")
+        if not self.armors:
+            print("      \\No armor")
+            return False
+        for armor in self.armors:
+            print("      \\", end=' ')
+            armor.print_obj()
+        return True
         
     @staticmethod
     def print_weapon(weapon):
@@ -435,7 +449,7 @@ class CharEquipments:
 
     def print_weapons_stored(self):
         print("   - Weapons stored:")
-        if len(self.weapons_stored) <= 0:
+        if not self.weapons_stored:
             print("      \\No weapon stored")
             return False
         for weapon in self.weapons_stored:
@@ -445,7 +459,7 @@ class CharEquipments:
 
     def print_full_weapons_stored(self):
         print("   - Weapons stored:")
-        if len(self.weapons_stored) <= 0:
+        if not self.weapons_stored:
             print("      \\No weapon stored")
             return False
         for weapon in self.weapons_stored:
@@ -456,7 +470,7 @@ class CharEquipments:
     def print_weapons_in_use(self):
         print("")
         print("   - Weapons used:")
-        if len(self.weapons_in_use) <= 0:
+        if not self.weapons_in_use:
             print("      \\No weapon used")
             return False
         for weapon in self.weapons_in_use:
@@ -467,7 +481,7 @@ class CharEquipments:
     def print_full_weapons_in_use(self):
         print("")
         print("   - Weapons used:")
-        if len(self.weapons_in_use) <= 0:
+        if self.weapons_in_use:
             print("      \\No weapon used")
             return False
         for weapon in self.weapons_in_use:
@@ -477,7 +491,7 @@ class CharEquipments:
     
     def print_ammo(self):
         print("   - Ammo available:")
-        if len(self.ammo) <= 0:
+        if not self.ammo:
             print("      \\No ammo")
             return False
 
@@ -498,14 +512,14 @@ class CharEquipments:
 
     def print_equipments(self):
         print("-- EQUIPMENTS --")
-        self.print_armor()
+        self.print_armors()
         self.print_weapons_in_use()
         self.print_weapons_stored()
         self.print_ammo()
 
     def print_full_equipments(self):
         print("-- EQUIPMENTS --")
-        self.print_full_armor()
+        self.print_full_armors()
         self.print_full_weapons_in_use()
         self.print_full_weapons_stored()
         self.print_ammo()

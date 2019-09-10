@@ -203,7 +203,7 @@ class Spells(ActiveActions):
                 if char:
                     distance_ratio = (max_distance - char.calculate_point_distance(target_abs, target_ord)) \
                                      / max_distance
-                    if distance_ratio > 0:
+                    if distance_ratio > 0.1:  # Min distance ratio to be touched by a spell
                         char_list.append((char, distance_ratio))
 
         # Put the initiator in last, so the self damages made are not influencing the damages made to others

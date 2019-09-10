@@ -408,7 +408,7 @@ class Field:
         return cost / self.obstacle_movement_ratio(current_abs, current_ord, target_abs, target_ord)
 
     @staticmethod
-    def is_a_browsed_pos(self, current_paths, new_abs, new_ord):
+    def is_a_browsed_pos(current_paths, new_abs, new_ord):
         for path in range(len(current_paths)):
             for i in range(len(current_paths[path][3])):
                 if new_abs == current_paths[path][3][i][0] and \
