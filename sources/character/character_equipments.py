@@ -58,13 +58,6 @@ class CharEquipments:
         self.armors.extend(current_armors)
         return new_armor
     
-    def decay_magical_armor(self, armor, value):
-        armor.defense -= value
-        if armor.defense < 0:
-            self.remove_armor(armor)
-            return True
-        return False
-
     def remove_armor(self, armor):
         self.armors.remove(armor)
         return True
@@ -147,6 +140,13 @@ class CharEquipments:
                 break
             
         return damage_result
+    
+    def decay_magical_armor(self, armor, value):
+        ratio = armor.decrease(value)
+        if ratio == 0:
+            self.remove_armor(armor)
+            return True
+        return False
 
     def all_weapons_absorbed_damage(self, damage):
         weapons_list = []

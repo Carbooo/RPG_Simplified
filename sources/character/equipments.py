@@ -133,12 +133,18 @@ class MagicalArmors(Armors):
         self.type = "MagicalArmor"
         
     def damage_absorbed(self, damage, armor_coef, resis_dim_rate, pen_rate):
+        # Same parameters as parent for consistency
         ratio, damage_result = super().damage_absorbed(damage, 1, 0, 0)
+        ratio = self.decrease(damage)
+        return ratio, damage_result
+    
+    def decrease(self, damage):
         self.defense -= damage
         if self.defense <= 0:
             self.life = 0
-            ratio = 0
-        return ratio, damage_result
+            return 0
+        else:
+            return 1
             
 
 #############################################################
