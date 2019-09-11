@@ -102,24 +102,20 @@ class Armors(Equipments):
     def cover_ratio(self):
         return self.def_cover / 10.0
 
-    def damage_absorbed(self, damage, armor_coef, resis_dim_rate, pen_rate):
-        if armor_coef == 0:
-            # The armor did not cover the attack
-            return [1, damage]  # 1 = Not broken ratio
+    def damage_absorbed(self, damages, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate):
+        pen_damages = damages * pen_rate
+        absorbed_damages = min(damages, self.defense * armor_coef)
+        direct_damages = (damages - absorbed_damages) * (1.0 - pen_rate) * flesh_dam_rate
         
-        damage_result = damage * pen_rate + max(0, damage * (1 -pen_rate) - self.defense * armor_coef)
-        if damage_result == 0:
-            print("Damages absorbed by", self.name, ":", int(round(damage * (1 -pen_rate))))
-            time.sleep(2)
-            ratio = self.decrease(damage * armor_coef * resis_dim_rate)
+        print("Damages absorbed by", self.name, ":", int(round(absorbed_damages)))
+        time.sleep(2)
+        ratio = self.decrease(absorbed_damages)
+            
+        if direct_damages == 0:
             print("The", self.name, "has absorbed the remaining damages and no life has been lost")
             time.sleep(3)
-        else:
-            print("Damages absorbed by", self.name, ":", int(round(min(damage * (1 - pen_rate), self.defense * armor_coef))))
-            time.sleep(2)
-            ratio = self.decrease(self.defense * armor_coef * resis_dim_rate)
         
-        return [ratio, damage_result]
+        return [ratio, direct_damages]
             
 
 #############################################################

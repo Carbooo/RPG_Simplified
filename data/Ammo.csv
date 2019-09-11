@@ -1,5 +1,5 @@
 Name;Load;Bulk;Resistance;RangedWeaponType;Stability;Flesh damage;Penetration rate;Resistance Diminution Rate
-Bodkin arrow;0.5;0.1;0.1;Bow;10.5;8;20;1
-Broadhead arrow;0.6;0.11;0.1;Bow;9.5;12;15;2
-Bodkin bolt;0.3;0.06;0.1;Crossbow;10.5;8;20;1
-Broadhead bolt;0.4;0.07;0.1;Crossbow;9.5;12;15;2
+Bodkin arrow;0.5;0.1;0.1;Bow;10.5;1.0;20;1
+Broadhead arrow;0.6;0.11;0.1;Bow;9.5;1.5;15;2
+Bodkin bolt;0.3;0.06;0.1;Crossbow;10.5;1.0;20;1
+Broadhead bolt;0.4;0.07;0.1;Crossbow;9.5;1.5;15;2

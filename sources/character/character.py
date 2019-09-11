@@ -351,14 +351,14 @@ class Character:
             time.sleep(2)
             return 1
             
-    def damages_received(self, enemy, attack_value, accuracy_ratio, armor_coef, resis_dim_rate, pen_rate):
+    def damages_received(self, enemy, attack_value, accuracy_ratio, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate=1.0):
         enemy.print_basic()
         print("-- has HIT --", end=' ')
         self.print_basic()
         print("-- with a power of", int(round(attack_value)))
         time.sleep(2)        
         
-        damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, resis_dim_rate, pen_rate)
+        damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate)
         
         if accuracy_ratio != 0 and random.random() / accuracy_ratio < cfg.critical_hit_chance:
             print("The damages are amplified, because they hit a critical area!")

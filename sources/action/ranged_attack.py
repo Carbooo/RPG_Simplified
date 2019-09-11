@@ -157,7 +157,7 @@ class RangedAttack(ActiveActions):
             resis_dim_rate = self.initiator.resis_dim_rate * self.ammo_used.resis_dim_rate
             pen_rate = self.initiator.pen_rate * self.ammo_used.pen_rate
             self.target.damages_received(self.initiator, attack_result, accuracy_ratio, armor_coef, resis_dim_rate,
-                                         pen_rate)
+                                         pen_rate, self.ammo_used.flesh_damage)
 
     def shoot_hit_chance(self):
         # Distance = -a*(x-1) + b --> distance min = 1.0, distance max = 0.0
