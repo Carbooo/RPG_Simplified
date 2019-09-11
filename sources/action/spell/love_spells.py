@@ -68,7 +68,7 @@ class LoveSpells(Spells):
         self.spell_power["defense"] *= self.magical_coef
         self.spell_power["armor"] = self.target.equipments.set_magical_armor("Love shield", self.spell_power["defense"])
         
-        self.add_lasting_spell("Magic shield", 1.0)
+        self.add_lasting_spell("Magic shield", cfg.recurrent_spell_frequency)
         return True
     
     def end_shield(self, is_canceled):

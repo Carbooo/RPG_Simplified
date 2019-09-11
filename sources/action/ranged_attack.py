@@ -44,7 +44,7 @@ class RangedAttack(ActiveActions):
         print("")
 
         print("--------- TARGETS -----------")
-        print("Choose one of the following enemies:")
+        print("Choose one of the reachable enemies:")
         enemy_list = []
         hit_chance_list = []
         for char in team.characters_list:

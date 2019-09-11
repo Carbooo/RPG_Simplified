@@ -134,7 +134,7 @@ class Spells(ActiveActions):
         self.initiator.print_attack_state()
         print("")
         print("--------- TARGETS -----------")
-        print("Choose one of the following targets:")
+        print("Choose one of the available targets:")
         for char in char_list:
             char.print_defense_state()
 

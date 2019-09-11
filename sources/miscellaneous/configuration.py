@@ -162,7 +162,7 @@ actions = {
 
 ######################## SPELLS CONFIG ######################
 spells = []
-
+recurrent_spell_frequency = 1.0  # Frequency (in turn) when effects occur
 
 ##################### WRATH SPELLS CONFIG ###################
 wrath_spells = {
@@ -302,5 +302,53 @@ love_spells_power = {
     },
     "HEA": {
         "heal": 40.0
+    }
+}
+
+##################### SADNESS SPELLS CONFIG ###################
+sadness_spells = {
+    "description": "Sadness spells",
+    "code": "SAD",
+    "list": []
+}
+sadness_throw_ice_pick = {
+    "description": "Throw an ice pick",
+    "code": "IPK"
+}
+sadness_despair_storm = {
+    "description": "Create a cloud generating despair",
+    "code": "DST"
+}
+spells.append(sadness_spells)
+sadness_spells["list"].append(sadness_throw_ice_pick)
+sadness_spells["list"].append(sadness_despair_storm)
+
+sadness_spells_energy = {
+    "IPK": 20.0,
+    "DST": 35.0
+}
+sadness_spells_time = {
+    "IPK": 1.75,
+    "DST": 3.0
+}
+sadness_spells_stamina = {
+    "IPK": 2.5,
+    "DST": 7.5
+}
+sadness_spells_hands = {
+    "IPK": 1,
+    "DST": 2
+}
+sadness_spells_power = {
+    "IPK": {
+        "attack_value": 50.0,
+        "resis_dim_rate": 0.2,
+        "pen_rate": 0.35
+    },
+    "DST": {
+        "spread_distance": 3,
+        "moral_dim_rate": 0.5,
+        "stamina_dim_rate": 3.0,
+        "movement_dim_rate": 0.4
     }
 }
