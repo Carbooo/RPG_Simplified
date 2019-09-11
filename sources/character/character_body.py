@@ -127,7 +127,7 @@ class CharBody:
         self.life_rest(final_life_rest * time_spent)
         self.stamina_rest(final_stamina_rest * time_spent)
 
-    def global_ratio(self):
+    def get_global_ratio(self):
         return self.life_ratio_adjusted * self.stamina_ratio_adjusted
 
     ############################# STATE / SHAPE FUNCTIONS ##########################

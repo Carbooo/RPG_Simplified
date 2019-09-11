@@ -8,12 +8,6 @@ class Team:
     """Common base class for all teams"""
 
     def __init__(self, name, characters_name_list):
-        for team in cfg.team_list:
-            if team.name == name:
-                print("(Teams) Team creation failed because the name:", name, "is already used !")
-                exit(0)
-        self.name = name
-
         self.characters_list = []
         for name in characters_name_list:
             char_found = False
@@ -26,6 +20,7 @@ class Team:
                 print("(Teams) Team creation failed because the character name:", name, "cannot be found !")
                 exit(0)
 
+        self.name = name
         self.ID = len(cfg.team_list)
         cfg.team_list.append(self)
 

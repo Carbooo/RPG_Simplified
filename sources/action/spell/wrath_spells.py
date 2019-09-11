@@ -21,6 +21,7 @@ class WrathSpells(Spells):
         self.is_a_success = self.start()
         
     def start(self):
+        super().start()
         if self.spell_code == "STR":
             return self.start_improve_strength()
         elif self.spell_code == "FBL":
@@ -29,6 +30,7 @@ class WrathSpells(Spells):
             return False
     
     def execute(self):
+        super().execute()
         if self.spell_code == "STR":
             return self.improve_strength()
         elif self.spell_code == "FBL":
@@ -37,6 +39,7 @@ class WrathSpells(Spells):
             return False
     
     def end(self, is_canceled=False):
+        super().end(is_canceled)
         if self.spell_code == "STR":
             return self.end_improve_strength(is_canceled)
         else:

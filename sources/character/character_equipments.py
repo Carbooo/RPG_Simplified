@@ -127,12 +127,13 @@ class CharEquipments:
         else:
             return self.armors[0].def_cover
 
-    def armor_damage_absorbed(self, damage, armor_coef, resistance_dim_rate, penetration_rate):
+    def armor_damage_absorbed(self, damage, armor_coef, resistance_dim_rate, penetration_rate, flesh_dam_rate):
         damage_result = damage
         armors = self.armors.copy()
         for armor in armors:
             if damage_result > 0:
-                result = armor.damage_absorbed(damage_result, armor_coef, resistance_dim_rate, penetration_rate)
+                result = armor.damage_absorbed(damage_result, armor_coef, resistance_dim_rate,
+                                               penetration_rate, flesh_dam_rate)
                 damage_result = result[1]
                 if result[0] == 0:
                     print("Your armor \\ID:", armor.get_id(), "\\Name:", armor.name, "has been broken!")
@@ -415,7 +416,7 @@ class CharEquipments:
             return False
         for armor in self.armors:
             print("      \\", end=' ')
-            print("ArmorID:", armor.get_id(), ", Armor:", armor.name, ", Defense:", armor.defense)
+            print("ArmorID:", armor.get_id(), ", Armor:", armor.name, ", Defense:", round(armor.defense, 1))
         return True
 
     def print_full_armors(self):
@@ -430,15 +431,15 @@ class CharEquipments:
         
     @staticmethod
     def print_weapon(weapon):
-        print("WeaponID:", weapon.get_id(), ", Weapon:", weapon.name, ", Defense:", weapon.defense,
-              ", MeleePower:", weapon.melee_power, ", NbOfHand(s):", weapon.hand, end=' ')
+        print("WeaponID:", weapon.get_id(), ", Weapon:", weapon.name, ", Defense:", round(weapon.defense, 1),
+              ", MeleePower:", round(weapon.melee_power, 1), ", NbOfHand(s):", weapon.hand, end=' ')
         
         if isinstance(weapon, RangedWeapons):
             if weapon.current_ammo is not None:
                 ammo_name = weapon.current_ammo.name
             else:
                 ammo_name = None
-            print(", MaxRange:", weapon.get_max_range(), ", RangePower:", weapon.range_power,
+            print(", MaxRange:", round(weapon.get_max_range(), 1), ", RangePower:", round(weapon.range_power, 1),
                   ", CurrentAmmo:", ammo_name)
         else:
             print("")

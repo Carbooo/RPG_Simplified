@@ -17,6 +17,7 @@ from sources.action.spell.spells import Spells
 from sources.action.spell.wrath_spells import WrathSpells
 from sources.action.spell.joy_spells import JoySpells
 from sources.action.spell.love_spells import LoveSpells
+from sources.action.spell.sadness_spells import SadnessSpells
 
 #############################################################
 ##################### FIGHTS CLASS ##########################
@@ -37,7 +38,7 @@ class Fight:
         self.char_order = []
         self.scheduler = []
         self.set_initial_order()
-        self.automatic_mode = False
+        self.skip_saving = False
         
         if self.field.set_all_teams(team1,team2) is False:
             print("(Fights) Cannot set team, fight cancelled")
@@ -226,11 +227,11 @@ class Fight:
         self.order_scheduler()
 
         #Automatic saves
-        Save(self, "AutoSave1")
-        if self.nb_of_turn % 3 == 0:
-            Save(self, "AutoSave3")
-        if self.nb_of_turn % 5 == 0:
-            Save(self, "AutoSave5")    
+        if self.skip_saving:
+            self.skip_saving = False
+        else:
+            Save.copy_all_to_next()
+            Save(self, "AutoSave1")
 
 #################### CHOOSE ACTIONS ########################
     def choose_actions(self, character):
@@ -352,6 +353,7 @@ class Fight:
         action = Save(self)
         if not action.is_a_success:
             return False
+        self.skip_saving = True
         return True
     
     def load_action(self, character):
@@ -359,6 +361,7 @@ class Fight:
         action = Load(self)
         if not action.is_a_success:
             return False
+        self.skip_saving = True
         return True
     
     def concentrate_action(self, character):
@@ -381,6 +384,8 @@ class Fight:
             action = JoySpells(self, character, spell_code)
         elif spell_type == "LOV":
             action = LoveSpells(self, character, spell_code)
+        elif spell_type == "SAD":
+            action = SadnessSpells(self, character, spell_code)
 
         if not action.is_a_success:
             return False

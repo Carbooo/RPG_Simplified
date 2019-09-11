@@ -26,6 +26,9 @@ class Spells(ActiveActions):
         self.spell_power = {}
 
 ######################### BASE FUNCTIONS #######################
+    def start(self):
+        pass  # Only for inheritance
+
     def execute(self):
         self.initiator.last_action = None
 
@@ -260,7 +263,7 @@ class Spells(ActiveActions):
         self.timeline = self.timeline + duration
         self.fight.scheduler.append(self)
         if is_target_a_user:
-            self.add_active_spell(surname)
+            self.add_active_spell()
     
     def end_lasting_spell(self, is_target_a_user=True):
         self.fight.scheduler.remove(self)

@@ -220,7 +220,7 @@ joy_spells = {
     "list": []
 }
 joy_energize = {
-    "description": "Boost all your attributes",
+    "description": "Boost all your attributes and restore some stamina",
     "code": "EGY"
 }
 joy_burning_light = {
@@ -240,8 +240,8 @@ joy_spells_time = {
     "LGT": 1.75
 }
 joy_spells_stamina = {
-    "EGY": 1.0,
-    "LGT": 3.0
+    "EGY": 2.0,
+    "LGT": 4.0
 }
 joy_spells_hands = {
     "EGY": 0,
@@ -249,7 +249,8 @@ joy_spells_hands = {
 }
 joy_spells_power = {
     "EGY": {
-        "coef": 1.2,
+        "moral_increase": 1.15,
+        "stamina_restored": 20.0,
         "duration": 5.0
     },
     "LGT": {

@@ -19,17 +19,12 @@ class Character:
                  love_sensibility, love_mastering, hate_sensibility, hate_mastering, 
                  fear_sensibility, fear_mastering, sadness_sensibility, sadness_mastering,
                  abscissa, ordinate):
-        # Check name availability
-        for char in cfg.char_list:
-            if char.name == name:
-                print("(Characters) Character creation failed because the name:", name, "is already used !")
-                exit(0)
-        self.name = name
         
         # Set ID
         self.ID = len(cfg.char_list)
         cfg.char_list.append(self)
-        
+        self.name = name
+
         # Set characteristics
         self.original_constitution = float(constitution)
         self.constitution = float(constitution)
@@ -152,6 +147,9 @@ class Character:
         self.morale_ratio = self.morale / 10.0
 
 ######################### CHARACTERISTICS FUNCTIONS ########################
+    def get_global_ratio(self):
+        self.body.get_global_ratio() * self.morale_ratio
+
     def calculate_load_ratios(self):
         self.load_ratio = min(cfg.max_bonus,
                               cfg.load_mean
@@ -183,7 +181,7 @@ class Character:
         self.agility *= new_agility / previous_agility
 
     def calculate_speed_ratio(self):
-        self.speed_ratio = max(cfg.min_speed, self.body.global_ratio())
+        self.speed_ratio = max(cfg.min_speed, self.get_global_ratio())
 
     def calculate_accuracies(self):
         weapons_accuracies = self.equipments.calculate_accuracies()
@@ -196,9 +194,9 @@ class Character:
             ranged_coef = (self.dexterity + self.force/2 + self.agility/3 + self.reflex/3) / (1 + 1.0/2 + 2.0/3)
         
         # Set accuracies
-        self.melee_handiness = self.body.global_ratio() * melee_coef * weapons_accuracies["melee_weapons"]
+        self.melee_handiness = self.get_global_ratio() * melee_coef * weapons_accuracies["melee_weapons"]
         self.melee_handiness_ratio = self.melee_handiness / cfg.accuracy_mean
-        self.ranged_accuracy = self.body.global_ratio() * ranged_coef * weapons_accuracies["ranged_weapons"]
+        self.ranged_accuracy = self.get_global_ratio() * ranged_coef * weapons_accuracies["ranged_weapons"]
         self.ranged_accuracy_ratio = self.ranged_accuracy / cfg.accuracy_mean
          
     def calculate_melee_range(self):
@@ -215,12 +213,12 @@ class Character:
         # Set attack powers
         self.pen_rate = attack_powers["pen_rate"]
         self.resis_dim_rate = attack_powers["resis_dim_rate"]
-        self.melee_power = self.body.global_ratio() * melee_coef * attack_powers["melee_power"]
+        self.melee_power = self.get_global_ratio() * melee_coef * attack_powers["melee_power"]
         if self.equipments.is_using_a_crossbow():
             self.ranged_power = 10.0 * attack_powers["ranged_power"]  # Physical state doesn't influence crossbow power
         else:
-            self.ranged_power = self.body.global_ratio() * ranged_coef * attack_powers["ranged_power"]
-        self.magic_power = self.body.global_ratio() * magical_coef * 10.0
+            self.ranged_power = self.get_global_ratio() * ranged_coef * attack_powers["ranged_power"]
+        self.magic_power = self.get_global_ratio() * magical_coef * 10.0
         self.magic_power_ratio = self.magic_power / 100.0
     
     def calculate_defense(self):
@@ -233,9 +231,9 @@ class Character:
         magic_coef = (self.spirit + self.willpower/2 + self.constitution/3) / (1 + 1.0/2 + 1.0/3)
         
         # Set defenses
-        self.melee_defense = self.body.global_ratio() * melee_coef * weapons_defense["melee_defense"]
-        self.ranged_defense = self.body.global_ratio() * ranged_coef * weapons_defense["ranged_defense"]
-        self.magic_defense = self.body.global_ratio() * magic_coef * 10.0
+        self.melee_defense = self.get_global_ratio() * melee_coef * weapons_defense["melee_defense"]
+        self.ranged_defense = self.get_global_ratio() * ranged_coef * weapons_defense["ranged_defense"]
+        self.magic_defense = self.get_global_ratio() * magic_coef * 10.0
         self.magic_defense_with_shields = self.magic_defense + weapons_defense["magic_defense"]
         
     def calculate_dodging(self):
@@ -243,7 +241,7 @@ class Character:
         dodging_coef = (self.reflex + self.agility) / (1.0 + 1.0) / self.constitution_ratio
         # More bulky equipment, lower dodge ratio (load ratio already included in agility stat)
         dodging_coef *= math.sqrt(math.pow(self.bulk_ratio, 1.0 / 3) * math.pow(self.use_bulk_ratio, 1.0 / 2))
-        self.dodging = self.body.global_ratio() * dodging_coef
+        self.dodging = self.get_global_ratio() * dodging_coef
     
     def calculate_characteristic(self):
         # Must respect the order of the 3 first items
@@ -360,11 +358,11 @@ class Character:
         
         damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate)
         
-        if accuracy_ratio != 0 and random.random() / accuracy_ratio < cfg.critical_hit_chance:
-            print("The damages are amplified, because they hit a critical area!")
-            damage_result *= cfg.critical_hit_boost
-        
         if damage_result > 0:
+            if accuracy_ratio != 0 and random.random() / accuracy_ratio < cfg.critical_hit_chance:
+                print("The damages are amplified, because they hit a critical area!")
+                damage_result *= cfg.critical_hit_boost
+
             life_ratio = self.body.loose_life(damage_result)
             # Damages received diminish the defender
             if self.body.is_alive():

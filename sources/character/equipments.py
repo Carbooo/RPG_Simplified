@@ -12,11 +12,6 @@ class Equipments:
     """Common base class for all equipments"""
 
     def __init__(self, name, load, bulk, resistance):
-        for equip in cfg.equipments_list:
-            if equip.name == name:
-                print("(Equipments) Equipment creation failed because the name:", name, "is already used !")
-                exit(0)
-    
         self.name = name
         self.type = "None"
         self.original_life = 100.0
@@ -106,16 +101,17 @@ class Armors(Equipments):
         pen_damages = damages * pen_rate
         absorbed_damages = min(damages, self.defense * armor_coef)
         direct_damages = (damages - absorbed_damages) * (1.0 - pen_rate) * flesh_dam_rate
+        total_damages = pen_damages + direct_damages
         
         print("Damages absorbed by", self.name, ":", int(round(absorbed_damages)))
         time.sleep(2)
         ratio = self.decrease(absorbed_damages)
             
-        if direct_damages == 0:
-            print("The", self.name, "has absorbed the remaining damages and no life has been lost")
+        if total_damages == 0:
+            print("The", self.name, "has absorbed the damages and no life has been lost")
             time.sleep(3)
         
-        return [ratio, direct_damages]
+        return [ratio, total_damages]
             
 
 #############################################################
@@ -128,9 +124,9 @@ class MagicalArmors(Armors):
         super().__init__(name, 0.0, 0.0, 0.0, 10.0, defense)
         self.type = "MagicalArmor"
         
-    def damage_absorbed(self, damage, armor_coef, resis_dim_rate, pen_rate):
+    def damage_absorbed(self, damage, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate):
         # Same parameters as parent for consistency
-        ratio, damage_result = super().damage_absorbed(damage, 1, 0, 0)
+        ratio, damage_result = super().damage_absorbed(damage, 1, 0, 0, 1)
         ratio = self.decrease(damage)
         return ratio, damage_result
     

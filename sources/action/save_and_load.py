@@ -1,5 +1,6 @@
 import pickle
 import time as time
+from shutil import copyfile
 from sources.action.actions import Actions
 
 
@@ -12,7 +13,7 @@ class Save(Actions):
     save_path = 'saves\\'
     save_extension = '.sav'
     
-    def __init__(self, fight, filename = False):
+    def __init__(self, fight, filename=None):
         super().__init__(fight)
         self.filename = filename
         self.is_a_success = self.start()
@@ -38,7 +39,21 @@ class Save(Actions):
                     return True
                 except:
                     print("Cannot open file:", self.filename)
-        
+
+    @staticmethod
+    def copy_to_next(filename):
+        if "AutoSave" in filename:
+            source = Save.save_path + filename + Save.save_extension
+            new_name = filename[:-1] + str(int(filename[-1:]) + 1)
+            target = Save.save_path + new_name + Save.save_extension
+            copyfile(source, target)
+        else:
+            print("Error: Function should only be used for AutoSave files")
+
+    @staticmethod
+    def copy_all_to_next():
+        for i in range(4, 0, -1):  # Files need to be initialized
+            Save.copy_to_next("AutoSave" + str(i))
     
 #############################################################
 ####################### LOAD CLASS ##########################

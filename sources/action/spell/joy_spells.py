@@ -21,6 +21,7 @@ class JoySpells(Spells):
         self.is_a_success = self.start()
         
     def start(self):
+        super().start()
         if self.spell_code == "EGY":
             return self.start_energize()
         elif self.spell_code == "LGT":
@@ -29,6 +30,7 @@ class JoySpells(Spells):
             return False
     
     def execute(self):
+        super().execute()
         if self.spell_code == "EGY":
             return self.energize()
         elif self.spell_code == "LGT":
@@ -37,6 +39,7 @@ class JoySpells(Spells):
             return False
     
     def end(self, is_canceled=False):
+        super().end(is_canceled)
         if self.spell_code == "EGY":
             return self.end_energize(is_canceled)
         else:
@@ -46,7 +49,7 @@ class JoySpells(Spells):
         if not self.is_able_to_cast():
             return False
         
-        print("You have decided to energize yourselves, improving your overall stats.")
+        print("You have decided to energize yourselves, improving your overall stats and restoring stamina.")
         print("The effect will start soon!")
         time.sleep(3)
             
@@ -57,40 +60,12 @@ class JoySpells(Spells):
         
     def energize(self):
         self.print_spell("has improve all their attributes", "executing", True)
-
         self.remove_identical_active_spell()
-        self.magical_coef *= self.initiator.magic_power_ratio
 
-        self.target.update_constitution(
-            (math.pow(self.spell_power["coef"], self.magical_coef) - 1)
-            * self.target.original_constitution
-        )
-        self.target.update_force(
-            (math.pow(self.spell_power["coef"], self.magical_coef) - 1)
-            * self.target.original_force
-        )
-        self.target.update_agility(
-            (math.pow(self.spell_power["coef"], self.magical_coef) - 1)
-            * self.target.original_agility
-        )
-        self.target.update_dexterity(
-            (math.pow(self.spell_power["coef"], self.magical_coef) - 1)
-            * self.target.original_dexterity
-        )
-        self.target.update_reflex(
-            (math.pow(self.spell_power["coef"], self.magical_coef) - 1)
-            * self.target.original_reflex
-        )
-        self.target.update_willpower(
-            (math.pow(self.spell_power["coef"], self.magical_coef) - 1)
-            * self.target.original_willpower
-        )
-        self.target.update_spirit(
-            (math.pow(self.spell_power["coef"], self.magical_coef) - 1)
-            * self.target.original_spirit
-        )
+        self.magical_coef *= self.initiator.magic_power_ratio
+        self.target.body.udpate(self.spell_power["stamina_restored"] * self.magical_coef)
         self.target.update_morale(
-            (math.pow(self.spell_power["coef"], self.magical_coef) - 1)
+            (math.pow(self.spell_power["moral_increase"], self.magical_coef) - 1)
             * self.target.original_morale
         )
         self.target.calculate_characteristic()
@@ -103,34 +78,6 @@ class JoySpells(Spells):
         if not is_canceled:
             self.print_spell("has no longer improved attributes", "ending", True)
 
-        self.target.update_constitution(
-            (1 - math.pow(self.spell_power["coef"], self.magical_coef))
-            * self.target.original_constitution
-        )
-        self.target.update_force(
-            (1 - math.pow(self.spell_power["coef"], self.magical_coef))
-            * self.target.original_force
-        )
-        self.target.update_agility(
-            (1 - math.pow(self.spell_power["coef"], self.magical_coef))
-            * self.target.original_agility
-        )
-        self.target.update_dexterity(
-            (1 - math.pow(self.spell_power["coef"], self.magical_coef))
-            * self.target.original_dexterity
-        )
-        self.target.update_reflex(
-            (1 - math.pow(self.spell_power["coef"], self.magical_coef))
-            * self.target.original_reflex
-        )
-        self.target.update_willpower(
-            (1 - math.pow(self.spell_power["coef"], self.magical_coef))
-            * self.target.original_willpower
-        )
-        self.target.update_spirit(
-            (1 - math.pow(self.spell_power["coef"], self.magical_coef))
-            * self.target.original_spirit
-        )
         self.target.update_morale(
             (1 - math.pow(self.spell_power["coef"], self.magical_coef))
             * self.target.original_morale

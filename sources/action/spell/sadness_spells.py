@@ -21,6 +21,7 @@ class SadnessSpells(Spells):
         self.is_a_success = self.start()
         
     def start(self):
+        super().start()
         if self.spell_code == "IPK":
             return self.start_ice_pick()
         elif self.spell_code == "DST":
@@ -29,6 +30,7 @@ class SadnessSpells(Spells):
             return False
     
     def execute(self):
+        super().execute()
         if self.spell_code == "IPK":
             return self.throw_ice_pick()
         elif self.spell_code == "DST":
@@ -37,6 +39,7 @@ class SadnessSpells(Spells):
             return False
     
     def end(self, is_canceled=False):
+        super().end(is_canceled)
         if self.spell_code == "DST":
             return self.end_despair_storm(is_canceled)
         else:

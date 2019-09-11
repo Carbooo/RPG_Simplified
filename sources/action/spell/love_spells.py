@@ -5,7 +5,7 @@ import sources.miscellaneous.configuration as cfg
 
 
 #############################################################
-######################## JOY SPELL CLASS ####################
+####################### LOVE SPELL CLASS ####################
 #############################################################
 class LoveSpells(Spells):
     """Class to cast love spells"""
@@ -18,9 +18,11 @@ class LoveSpells(Spells):
         self.spell_energy = cfg.love_spells_energy[self.spell_code]
         self.spell_hands = cfg.love_spells_hands[self.spell_code]
         self.spell_power = cfg.love_spells_power[self.spell_code]
+        self.armor = None
         self.is_a_success = self.start()
         
     def start(self):
+        super().start()
         if self.spell_code == "SHD":
             return self.start_shield()
         elif self.spell_code == "HEA":
@@ -29,6 +31,7 @@ class LoveSpells(Spells):
             return False
     
     def execute(self):
+        super().execute()
         if self.spell_code == "SHD":
             return self.shield()
         elif self.spell_code == "HEA":
@@ -37,6 +40,7 @@ class LoveSpells(Spells):
             return False
     
     def end(self, is_canceled=False):
+        super().end(is_canceled)
         if self.spell_code == "SHD":
             return self.end_shield(is_canceled)
         else:
@@ -66,26 +70,25 @@ class LoveSpells(Spells):
         self.remove_identical_active_spell()
         self.magical_coef *= self.initiator.magic_power_ratio
         self.spell_power["defense"] *= self.magical_coef
-        self.spell_power["armor"] = self.target.equipments.set_magical_armor("Love shield", self.spell_power["defense"])
+        self.armor = self.target.equipments.set_magical_armor("Love shield", self.spell_power["defense"])
         
-        self.add_lasting_spell("Magic shield", cfg.recurrent_spell_frequency)
+        self.add_lasting_spell("Magic love shield", cfg.recurrent_spell_frequency)
         return True
     
     def end_shield(self, is_canceled):
         if is_canceled:
-            self.target.equipments.remove_armor(self.spell_power["armor"])
+            self.target.equipments.remove_armor(self.armor)
             self.end_lasting_spell()
             return True
         
-        if self.spell_power["armor"].is_broken():
+        if self.armor.is_broken():
             # Armor is already removed
             self.end_lasting_spell()
             return True
             
-        is_depleted = self.target.equipments.decay_magical_armor(self.spell_power["armor"], self.spell_power["turn_decay"])
+        is_depleted = self.target.equipments.decay_magical_armor(self.armor, self.spell_power["turn_decay"])
         if is_depleted:
             self.print_spell("has no longer a magic love shield", "ending", False)
-            self.target.equipments.remove_armor(self.spell_power["armor"])
             self.end_lasting_spell()
         else:
             self.timeline += 1
