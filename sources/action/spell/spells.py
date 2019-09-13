@@ -30,7 +30,7 @@ class Spells(ActiveActions):
         pass  # Only for inheritance
 
     def execute(self):
-        self.initiator.last_action = None
+        self.initiator.last_action = None  # To avoid looping on the spell
 
     def end(self, is_canceled):
         pass  # Only for inheritance
@@ -260,7 +260,7 @@ class Spells(ActiveActions):
 
     def add_lasting_spell(self, surname, duration, is_target_a_user=True):
         self.surname = surname
-        self.timeline = self.timeline + duration
+        self.timeline = self.initiator.timeline + duration
         self.fight.scheduler.append(self)
         if is_target_a_user:
             self.add_active_spell()

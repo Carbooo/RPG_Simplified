@@ -49,6 +49,7 @@ class Character:
         self.spirit = float(spirit)
         self.spirit_ratio = float(spirit) / 10.0
         self.original_morale = float(morale)
+        self.true_original_morale = float(morale)  # To handle team state influence
         self.morale = float(morale)
         self.morale_ratio = float(morale) / 10.0
         self.original_empathy = float(empathy)
@@ -74,6 +75,8 @@ class Character:
         self.last_action = None
         self.previous_attacks = []
         self.active_spells = []
+        self.team_state = 1.0
+        self.is_a_zombie = False
         
         # Set feelings
         self.nb_of_concentrate = 0
@@ -171,7 +174,14 @@ class Character:
                                   cfg.use_bulk_mean
                                   / max(1.0, self.equipments.get_in_use_bulk())
                                   * self.force_ratio)
-
+    
+    def calculate_morale(self):
+        previous_morale = self.original_morale
+        self.original_morale = self.true_original_morale \
+                * math.pow(self.team_state, cfg.team_state_effect_on_moral)
+        new_morale = self.original_morale
+        self.morale *= new_morale / previous_morale
+    
     def calculate_agility(self):
         previous_agility = self.original_agility
         self.original_agility = self.true_original_agility \
@@ -247,6 +257,7 @@ class Character:
         # Must respect the order of the 3 first items
         self.calculate_load_ratios()
         self.calculate_bulk_ratios()
+        self.calculate_morale()
         self.calculate_agility()
         
         self.calculate_accuracies()

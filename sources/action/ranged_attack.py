@@ -84,7 +84,13 @@ class RangedAttack(ActiveActions):
                     self.target = enemy_list[i]
                     hit_chance = hit_chance_list[i]
                     self.shooting_time *= self.shoot_speed(hit_chance)
-                    return self.result()
+                    
+                    if self.initiator.equipments.is_using_a_crossbow():
+                        stamina = cfg.actions["ranged_attack"]["stamina"] * self.shooting_time / 10
+                    else:
+                        stamina = cfg.actions["ranged_attack"]["stamina"] * self.shooting_time
+                    self.end_update([], stamina, cfg.actions["ranged_attack"]["duration"] * self.shooting_time)
+                    return True
 
             print("ID:", read, "is not available")
 
@@ -92,7 +98,22 @@ class RangedAttack(ActiveActions):
         # Harder is the target to hit, longer it takes to aim and shoot (between 0.66 to 2)
         return 0.66 + 1.34 * (1 - hit_chance)
 
-    def result(self):
+    def execute(self):
+        if not self.fight.field.is_target_reachable(self.initiator, self.target):
+            print("")
+            print("*********************************************************************")
+            print("The target (", end=' ')
+            self.target.print_basic()
+            print(") is no longer reachable by a ranged attack")
+            print("The attack of (", end=' ')
+            self.initiator.print_basic()
+            print(") has been cancelled !")
+            print("*********************************************************************")
+            print("")
+            time.sleep(5)
+            return False
+        
+        self.initiator.last_action = None  # To avoid looping on this action
         print("")
         print("*********************************************************************")
         self.initiator.print_basic()
@@ -104,7 +125,7 @@ class RangedAttack(ActiveActions):
         print("*********************************************************************")
         print("")
         time.sleep(3)
-
+        
         target = self.fight.field.shoot_has_hit_another_target(self.initiator, self.target, hit_chance)
         if not target:
             print("The shoot has missed its target!")
@@ -125,15 +146,10 @@ class RangedAttack(ActiveActions):
             self.range_defend(math.sqrt(1 - hit_chance))
 
         self.initiator.equipments.use_ammo()
-        if self.initiator.equipments.is_using_a_crossbow():
-            stamina = cfg.actions["ranged_attack"]["stamina"] * self.shooting_time / 10
-        else:
-            stamina = cfg.actions["ranged_attack"]["stamina"] * self.shooting_time
-        self.end_update([self.initiator, self.target], stamina,
-                        cfg.actions["ranged_attack"]["duration"] * self.shooting_time)
         return True
 
     def range_defend(self, hit_chance):
+        self.target.previous_attacks.append((self.initiator.timeline, self))
         self.fight.stop_action(self.target, self.timeline)
 
         # Calculate att coef
