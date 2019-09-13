@@ -73,7 +73,7 @@ class Fight:
             next_event = self.scheduler[0]
             self.last_timeline = self.current_timeline
             self.current_timeline = next_event.timeline
-            self.time_effect_on_all()
+            self.begin_turn()
             
             # Automatic turn every 1 timeline
             if isinstance(next_event, Fight):
@@ -84,7 +84,8 @@ class Fight:
                 next_event.end()
                 
             elif isinstance(next_event, Character):
-                if (isinstance(next_event.last_action, Move) and next_event.last_action.path) \
+                if isinstance(next_event.last_action, Move) \
+                or isinstance(next_event.last_action, RangedAttack) \
                 or (isinstance(next_event.last_action, Rest) and next_event.last_action.nb_of_turns > 0) \
                 or (isinstance(next_event.last_action, Concentrate) and next_event.last_action.nb_of_turns > 0) \
                 or isinstance(next_event.last_action, Reload) \
@@ -208,7 +209,10 @@ class Fight:
             scheduler_list.remove(self.scheduler[0])
         self.scheduler = scheduler_list
         
-    def time_effect_on_all(self):
+    def begin_turn(self):
+        self.update_team_morale(self.team1)
+        self.update_team_morale(self.team2)
+        
         time_diff = self.current_timeline - self.last_timeline
         for char in self.char_order:
             char.body.turn_rest(time_diff)
@@ -221,7 +225,18 @@ class Fight:
             for attack_timeline, attack in previous_attacks:
                 if self.current_timeline >= attack_timeline + cfg.defense_time / char.speed_ratio:
                     char.previous_attacks.remove((attack_timeline, attack))
-                    
+    
+    def update_team_morale(self, team):
+        total_ratio = 0
+        for char in team.characters_list:
+            if not char.is_a_zombie:
+                total_ratio += char.body.global_ratio()
+       
+        total_ratio /= len(team.characters_list)
+        
+        for char in team.characters_list:
+            char.team_state = total_ratio
+                  
     def end_turn(self):
         self.order_scheduler()
 
@@ -388,8 +403,19 @@ class Fight:
         return True
 
     def stop_action(self, char, timeline):
-        if isinstance(char.last_action, ModifyEquipments) \
+        # Stop action without penalty
+        if isinstance(char.last_action, Move)
+                or isinstance(char.last_action, PassTime):
+            print("Your current action (", char.last_action.name, ") is canceled by the attack!")
+            time.sleep(2)
+            char.last_action = None
+            char.timeline = timeline
+            char.spend_time(cfg.defense_time / 2)
+        
+        # Stop action with penalty
+        elif isinstance(char.last_action, ModifyEquipments) \
                 or isinstance(char.last_action, Reload) \
+                or isinstance(char.last_action, RangedAttack) \
                 or isinstance(char.last_action, Rest) \
                 or isinstance(char.last_action, Concentrate) \
                 or isinstance(char.last_action, Spells):
@@ -408,7 +434,8 @@ class Fight:
                 print("You loose the ammo being used for reloading!")
                 time.sleep(2)
                 char.ammo.remove(char.last_action.ammo_to_load)
-
+        
+        # Loose reloaded bow ammo
         if char.equipments.loose_reloaded_ammo():
             print("Your bow has lost its loaded arrow!")
             time.sleep(2)
