@@ -87,7 +87,7 @@ class CharBody:
     def spend_stamina(self, coefficient, ignore=False):
         if not ignore and not self.check_stamina(coefficient):
             print("Error: Stamina below 0")
-        self.update_stamina(coefficient * cfg.turn_stamina)
+        self.update_stamina(- coefficient * cfg.turn_stamina)
 
     def check_stamina(self, coefficient):
         if self.stamina >= cfg.turn_stamina * coefficient:

@@ -514,7 +514,8 @@ class Field:
     def print_obj(self):
         print("************************** FIELD ************************")
         print("--  ACTIVE SPELLS --")
-        print(self.active_spells)
+        for spell in self.active_spells:
+            print("   -", spell.surname, "(", spell.target_abs, "x", spell.target_ord, ")")
         print("")
 
         obs_array = np.transpose(self.obstacles_array)

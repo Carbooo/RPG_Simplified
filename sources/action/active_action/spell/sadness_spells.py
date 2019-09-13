@@ -85,8 +85,8 @@ class SadnessSpells(Spells):
         if not self.is_able_to_cast():
             return False
         
-        print("You have decided to throw a fireball")
-        print("The fireball is charging...")
+        print("You have decided to cast a despair ice storm")
+        print("The storm is forming...")
         time.sleep(3)
         
         self.set_magical_coef()
