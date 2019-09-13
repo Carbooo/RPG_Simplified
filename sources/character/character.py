@@ -77,6 +77,7 @@ class Character:
         self.active_spells = []
         self.team_state = 1.0
         self.is_a_zombie = False
+        self.coef_speed_ratio = 1.0
         
         # Set feelings
         self.nb_of_concentrate = 0
@@ -191,7 +192,7 @@ class Character:
         self.agility *= new_agility / previous_agility
 
     def calculate_speed_ratio(self):
-        self.speed_ratio = max(cfg.min_speed, self.get_global_ratio())
+        self.speed_ratio = max(cfg.min_speed, self.get_global_ratio() * self.coef_speed_ratio)
 
     def calculate_accuracies(self):
         weapons_accuracies = self.equipments.calculate_accuracies()

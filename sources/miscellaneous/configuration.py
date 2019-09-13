@@ -97,13 +97,13 @@ actions = {
     "rest": {
         "description": "Rest a little",
         "command": "RES",
-        "duration": 1.0,  # Not used, duration choose by the user
+        "duration": 0.0,  # Not used, duration choose by the user
         "stamina": 0.0
     },
     "concentrate": {
         "description": "Concentrate on your mind and feelings",
         "command": "CON",
-        "duration": 1.0,  # Not used, duration choose by the user
+        "duration": 0.0,  # Not used, duration choose by the user
         "stamina": 1.5
     },
     "melee_attack": {
@@ -127,7 +127,7 @@ actions = {
     "move": {
         "description": "Move to an adjacent case",
         "command": "MOV",
-        "duration": 0.15,  # Normal run is around 2.7 meters --> around 1 case per second
+        "duration": 0.2,  # Normal run is around 2.7 meters -->  twice as slow here
         "stamina": 0.1
     },
     "modify_equip": {
@@ -352,6 +352,7 @@ sadness_spells_power = {
         "spread_distance": 3,
         "moral_dim_rate": 0.5,
         "stamina_dim_rate": 3.0,
-        "movement_dim_rate": 0.4
+        "speed_dim_rate": 0.3,
+        "duration": 10
     }
 }

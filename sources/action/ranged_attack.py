@@ -149,7 +149,6 @@ class RangedAttack(ActiveActions):
         return True
 
     def range_defend(self, hit_chance):
-        self.target.previous_attacks.append((self.initiator.timeline, self))
         self.fight.stop_action(self.target, self.timeline)
 
         # Calculate att coef
@@ -162,6 +161,9 @@ class RangedAttack(ActiveActions):
         defense_level = self.target.ranged_defense * self.get_attack_coef(self.target)
         attack_result = attack_power - defense_level
 
+        # Update availability after computed the result
+        self.target.previous_attacks.append((self.initiator.timeline, self))
+        
         # Attack result --> Either block or be fully hit
         if attack_result <= cfg.ranged_attack_stage[0]:
             self.target.all_shields_absorbed_damage(attack_power)

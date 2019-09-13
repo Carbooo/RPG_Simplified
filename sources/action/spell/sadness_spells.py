@@ -18,6 +18,9 @@ class SadnessSpells(Spells):
         self.spell_energy = cfg.sadness_spells_energy[self.spell_code]
         self.spell_hands = cfg.sadness_spells_hands[self.spell_code]
         self.spell_power = cfg.sadness_spells_power[self.spell_code]
+        self.target_abs = -1
+        self.target_ord = -1
+        self.affected_targets = []
         self.is_a_success = self.start()
         
     def start(self):
@@ -90,29 +93,42 @@ class SadnessSpells(Spells):
         return True   
     
     def throw_despair_storm(self):
-        self.print_spell("has a fireball ready and needs to choose a target", "choosing", True)
+        self.print_spell("has a despair storm ready and needs to choose a target", "choosing", True)
         target = self.choose_pos_target()
         if not target:
             print("Spell cancelled, the magic and stamina spent is lost")
             return False
 
-        attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
-        for char, distance_ratio in self.get_all_spread_targets(
-                self.spell_power["spread_distance"] * self.magical_coef,
-                target["abscissa"], target["ordinate"]
-        ):
-            self.target = char
-            self.print_spell("is sending a fireball to", "executing", False)
-            self.magical_attack_received(
-                attack_value * distance_ratio,
-                False,  # is_localized
-                True,  # can_use_shield
-                self.spell_power["resis_dim_rate"], 
-                self.spell_power["pen_rate"]
-            )
-            
+        self.target_abs = target["abscissa"]
+        self.target_ord = target["ordinate"]
+        self.magical_coef *= self.initiator.magic_power_ratio
+        self.apply_despair_storm()
         return True
         
+    def apply_despair_storm(self):
+        current_targets = []
+        for char, distance_ratio in self.get_all_spread_targets(
+                self.spell_power["spread_distance"] * self.magical_coef,
+                self.target_abs, self.target_ord
+        ):
+            self.target = char
+            self.print_spell("'s despair storm diminishes", "executing", False)
+            coef = math.sqrt(distance_ratio)
+            char.update_morale(- self.spell_power["moral_dim_rate"] * coef)
+            char.spend_stamina(self.spell_power["stamina_dim_rate"] * coef)
+            current_targets.append(char)
+            if char not in self.affected_targets:
+                char.coef_speed_ratio -= self.spell_power["speed_dim_rate"] * coef
+                self.affected_targets.append(char)
+        
+        # Increase speed back to normal when char left the storm
+        for char in self.affected_targets:
+            if char not in current_targets:
+                char.coef_speed_ratio += self.spell_power["speed_dim_rate"] * coef
+                # fix coef and add active spell for field and unit
+        
+        self.affected_targets = current_targets
+                    
     def end_despair_storm(self, is_canceled):
         if is_canceled:
             self.target.equipments.remove_armor(self.spell_power["armor"])

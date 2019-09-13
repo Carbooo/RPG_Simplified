@@ -408,6 +408,11 @@ class Fight:
         return True
 
     def stop_action(self, char, timeline):
+        # Loose reloaded bow ammo no matter last action
+        if char.equipments.loose_reloaded_ammo():
+            print("Your bow has lost its loaded arrow!")
+            time.sleep(2)
+            
         # Stop action without penalty
         if isinstance(char.last_action, Move)
                 or isinstance(char.last_action, PassTime):
@@ -416,6 +421,7 @@ class Fight:
             char.last_action = None
             char.timeline = timeline
             char.spend_time(cfg.defense_time / 2)
+            return False
         
         # Stop action with penalty
         elif isinstance(char.last_action, ModifyEquipments) \
@@ -439,8 +445,5 @@ class Fight:
                 print("You loose the ammo being used for reloading!")
                 time.sleep(2)
                 char.ammo.remove(char.last_action.ammo_to_load)
-        
-        # Loose reloaded bow ammo
-        if char.equipments.loose_reloaded_ammo():
-            print("Your bow has lost its loaded arrow!")
-            time.sleep(2)
+            
+            return True

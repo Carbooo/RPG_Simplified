@@ -26,8 +26,8 @@ class MeleeAttack(ActiveActions):
         elif not self.choose_target():
             return False
 
-        return self.result()
-
+        return True
+        
     def choose_target(self):
         if not self.can_melee_attack():
             print("No enemy can be reached by a melee attack")
@@ -73,15 +73,36 @@ class MeleeAttack(ActiveActions):
 
             print("ID:", read, "is not available")
 
+        self.end_update([],
+                        cfg.actions["melee_attack"]["stamina"],
+                        cfg.actions["melee_attack"]["duration"])
         return True
 
-    def result(self):
-        self.fight.stop_action(self.target, self.timeline)
+    def execute(self):
+        if not self.initiator.can_melee_attack(self.target):
+            print("")
+            print("*********************************************************************")
+            print("The target (", end=' ')
+            self.target.print_basic()
+            print(") is no longer reachable by a melee attack")
+            print("The attack of (", end=' ')
+            self.initiator.print_basic()
+            print(") has been cancelled !")
+            print("*********************************************************************")
+            print("")
+            time.sleep(5)
+            return False
+            
+        self.fight.stop_action(self.target, self.initiator.timeline)
+        self.initiator.last_action = None  # To avoid looping on this action
         
         attack_result = self.melee_defense_result()
-        print("attack_result:", attack_result)
         self.melee_attack_type(attack_result)
-
+        
+        # Update availability after computed the result
+        self.target.previous_attacks.append((self.initiator.timeline, self))
+        self.initiator.previous_attacks.append((self.initiator.timeline, self))
+        
         abscissa = self.target.abscissa
         ordinate = self.target.ordinate
         if self.actual_defense == "Dodge" and \
@@ -102,9 +123,6 @@ class MeleeAttack(ActiveActions):
                     print("And the attacker took the initial position of the defender!")
                     time.sleep(2)
                 
-        self.end_update([self.initiator, self.target],
-                        cfg.actions["melee_attack"]["stamina"],
-                        cfg.actions["melee_attack"]["duration"])
         return True
 
     def melee_defense_result(self):
