@@ -1,6 +1,6 @@
 import math as math
 import time as time
-from sources.action.spell.spells import Spells
+from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
 
 #############################################################
@@ -54,8 +54,8 @@ class WrathSpells(Spells):
         time.sleep(3)
             
         self.target = self.initiator
-        self.set_magical_coef() 
-        self.end_update([], self.get_stamina_with_coef(), self.get_time_with_coef())
+        self.set_magical_coef()
+        self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
         return True
         
     def improve_strength(self):
@@ -112,7 +112,7 @@ class WrathSpells(Spells):
         time.sleep(3)
         
         self.set_magical_coef()
-        self.end_update([], self.get_stamina_with_coef(), self.get_time_with_coef())
+        self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
         return True   
     
     def throw_fireball(self):

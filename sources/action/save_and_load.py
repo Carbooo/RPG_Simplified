@@ -1,7 +1,7 @@
 import pickle
 import time as time
 from shutil import copyfile
-from sources.action.actions import Actions
+from sources.action.action import Actions
 
 
 #############################################################

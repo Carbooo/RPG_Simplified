@@ -1,6 +1,7 @@
 import time as time
 import math as math
-from sources.action.actions import Actions, ActiveActions
+from sources.action.action import Actions
+from sources.action.active_action.active_action import ActiveActions
 import sources.miscellaneous.configuration as cfg
 
 
@@ -38,12 +39,12 @@ class Rest(ActiveActions):
         time.sleep(3)
         
         self.resting_ratio = math.pow(self.nb_of_turns, cfg.resting_ratio)
-        self.end_update([], 0, 1, True)
+        self.end_update(0, 1, True)
         return True
 
     def execute(self):
         self.initiator.body.global_rest(self.resting_ratio)
         self.nb_of_turns -= 1
         if self.nb_of_turns > 0:
-            self.end_update([], 0, 1, True)
+            self.end_update(0, 1, True)
         return True

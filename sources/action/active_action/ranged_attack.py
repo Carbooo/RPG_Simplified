@@ -3,8 +3,9 @@ import math as math
 import time as time
 import sources.miscellaneous.configuration as cfg
 from sources.character.character import Character
-from sources.action.actions import Actions, ActiveActions
-from sources.action.move import Move
+from sources.action.action import Actions
+from sources.action.active_action.active_action import ActiveActions
+from sources.action.active_action.move import Move
 
 
 #############################################################
@@ -89,7 +90,7 @@ class RangedAttack(ActiveActions):
                         stamina = cfg.actions["ranged_attack"]["stamina"] * self.shooting_time / 10
                     else:
                         stamina = cfg.actions["ranged_attack"]["stamina"] * self.shooting_time
-                    self.end_update([], stamina, cfg.actions["ranged_attack"]["duration"] * self.shooting_time)
+                    self.end_update(stamina, cfg.actions["ranged_attack"]["duration"] * self.shooting_time)
                     return True
 
             print("ID:", read, "is not available")

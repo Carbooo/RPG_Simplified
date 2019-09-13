@@ -1,7 +1,8 @@
 import time as time
 import sources.miscellaneous.configuration as cfg
 from sources.character.equipments import RangedWeapons, Crossbows
-from sources.action.actions import Actions, ActiveActions
+from sources.action.action import Actions
+from sources.action.active_action.active_action import ActiveActions
 
 
 #############################################################
@@ -79,7 +80,7 @@ class Reload(ActiveActions):
             stamina = self.weapon_to_reload.reload_time * cfg.actions["reload"]["stamina"] * 10
         else:
             stamina = self.weapon_to_reload.reload_time * cfg.actions["reload"]["stamina"]
-        self.end_update([], stamina, self.weapon_to_reload.reload_time)
+        self.end_update(stamina, self.weapon_to_reload.reload_time)
         return True
     
     def execute(self):

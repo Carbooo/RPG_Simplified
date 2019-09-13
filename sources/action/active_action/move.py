@@ -1,7 +1,8 @@
 import math as math
 import time as time
 import sources.miscellaneous.configuration as cfg
-from sources.action.actions import Actions, ActiveActions
+from sources.action.action import Actions
+from sources.action.active_action.active_action import ActiveActions
 
 
 #############################################################
@@ -71,10 +72,9 @@ class Move(ActiveActions):
                 print("You do not have enough stamina (", self.initiator.body.stamina, ") to move there")
                 print("")
                 continue
-            
-            self.end_update([],
-                        self.get_move_coef() * cfg.actions["move"]["stamina"],
-                        self.get_move_coef() * cfg.actions["move"]["duration"])
+
+            self.end_update(self.get_move_coef() * cfg.actions["move"]["stamina"],
+                            self.get_move_coef() * cfg.actions["move"]["duration"])
             return True
 
     def execute(self):
@@ -102,7 +102,7 @@ class Move(ActiveActions):
             
         # Update path regularly to adapt to field changes
         if self.nb_of_move_left <= 0:
-            coord = self.path[to -1]
+            coord = self.path[-1]
             path = self.fight.field.choose_path_move(self.initiator, coord[0], coord[1])
             if path:
                 self.path = path
@@ -129,10 +129,9 @@ class Move(ActiveActions):
                     "x", self.target_ord, 
                     "is no longer available *******")
             return self.cancel_move()
-        
-        self.end_update([],
-                    self.get_move_coef() * cfg.actions["move"]["stamina"],
-                    self.get_move_coef() * cfg.actions["move"]["duration"])
+
+        self.end_update(self.get_move_coef() * cfg.actions["move"]["stamina"],
+                        self.get_move_coef() * cfg.actions["move"]["duration"])
         return True
 
     def get_move_coef(self):

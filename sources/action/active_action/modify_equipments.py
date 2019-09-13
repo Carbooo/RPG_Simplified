@@ -2,7 +2,8 @@ import copy as copy
 import math as math
 import time as time
 import sources.miscellaneous.configuration as cfg
-from sources.action.actions import Actions, ActiveActions
+from sources.action.action import Actions
+from sources.action.active_action.active_action import ActiveActions
 
 
 #############################################################
@@ -58,7 +59,7 @@ class ModifyEquipments(ActiveActions):
         
         self.next_unequipment = weapons_list
         self.calculate_timelines(weapons_list)
-        self.end_update([self.initiator], self.equip_time * cfg.actions["modify_equip"]["stamina"], self.equip_time)
+        self.end_update(self.equip_time * cfg.actions["modify_equip"]["stamina"], self.equip_time)
         return True
 
     def unequip_spec_weapons(self):
@@ -112,7 +113,7 @@ class ModifyEquipments(ActiveActions):
         
         self.next_equipment = weapons_list
         self.calculate_timelines(weapons_list)
-        self.end_update([self.initiator], self.equip_time * cfg.actions["modify_equip"]["stamina"], self.equip_time)
+        self.end_update(self.equip_time * cfg.actions["modify_equip"]["stamina"], self.equip_time)
         return True
 
     def equip_spec_weapons(self):
@@ -188,6 +189,7 @@ class ModifyEquipments(ActiveActions):
             for weapon in self.next_unequipment:
                 if not self.initiator.equipments.remove_weapon(weapon):
                     return False
+                self.initiator.equipments.loose_reloaded_ammo()
                     
         self.initiator.last_action = None  # To remove it from the scheduler
         return True

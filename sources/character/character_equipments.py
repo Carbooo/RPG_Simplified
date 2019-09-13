@@ -1,3 +1,4 @@
+import time as time
 from sources.character.equipments import Armors, MagicalArmors, Weapons, AttackWeapons, MeleeWeapons, \
     Shields, RangedWeapons, Bows, Crossbows, Ammo
 import sources.miscellaneous.configuration as cfg
@@ -241,6 +242,8 @@ class CharEquipments:
             if isinstance(weapon, Bows) and weapon.is_reloaded():
                 has_lost = True
                 weapon.unload()
+                print("Your bow has lost its loaded arrow!")
+                time.sleep(2)
         return has_lost
 
     ############################# TEST ON EQUIP ###########################

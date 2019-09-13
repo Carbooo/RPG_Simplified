@@ -1,4 +1,4 @@
-from sources.action.actions import Actions
+from sources.action.action import Actions
 
 
 #############################################################

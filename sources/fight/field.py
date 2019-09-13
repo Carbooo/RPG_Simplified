@@ -20,6 +20,7 @@ class Field:
         self.characters_array = []
         self.obstacles_array = obstacles_array
         self.reliefs_array = reliefs_array
+        self.active_spells = []
         self.reset_characters_array()
         if self.validate_arrays_size():
             if self.validate_obstacles_array():
@@ -511,6 +512,11 @@ class Field:
         print(stri)
 
     def print_obj(self):
+        print("************************** FIELD ************************")
+        print("--  ACTIVE SPELLS --")
+        print(self.active_spells)
+        print("")
+
         obs_array = np.transpose(self.obstacles_array)
         char_array = np.transpose(self.characters_array)
         print("ID:", self.get_id(), ", name:", self.name)

@@ -152,7 +152,7 @@ class Character:
 
 ######################### CHARACTERISTICS FUNCTIONS ########################
     def get_global_ratio(self):
-        self.body.get_global_ratio() * self.morale_ratio
+        return self.body.get_global_ratio() * self.morale_ratio
 
     def calculate_load_ratios(self):
         self.load_ratio = min(cfg.max_bonus,

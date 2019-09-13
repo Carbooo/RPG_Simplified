@@ -1,5 +1,6 @@
 import time as time
-from sources.action.actions import Actions, ActiveActions
+from sources.action.action import Actions
+from sources.action.active_action.active_action import ActiveActions
 
 
 #############################################################

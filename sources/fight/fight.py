@@ -4,20 +4,20 @@ import time as time
 import sources.miscellaneous.configuration as cfg
 from sources.character.character import Character
 from sources.action.get_char_information import GetCharInformation
-from sources.action.modify_equipments import ModifyEquipments
-from sources.action.melee_attack import MeleeAttack
-from sources.action.move import Move
-from sources.action.ranged_attack import RangedAttack
-from sources.action.reload import Reload
-from sources.action.pass_time import PassTime
-from sources.action.rest import Rest
-from sources.action.concentrate import Concentrate
+from sources.action.active_action.modify_equipments import ModifyEquipments
+from sources.action.active_action.melee_attack import MeleeAttack
+from sources.action.active_action.move import Move
+from sources.action.active_action.ranged_attack import RangedAttack
+from sources.action.active_action.reload import Reload
+from sources.action.active_action.pass_time import PassTime
+from sources.action.active_action.rest import Rest
+from sources.action.active_action.concentrate import Concentrate
 from sources.action.save_and_load import Save, Load
-from sources.action.spell.spells import Spells
-from sources.action.spell.wrath_spells import WrathSpells
-from sources.action.spell.joy_spells import JoySpells
-from sources.action.spell.love_spells import LoveSpells
-from sources.action.spell.sadness_spells import SadnessSpells
+from sources.action.active_action.spell.spells import Spells
+from sources.action.active_action.spell.wrath_spells import WrathSpells
+from sources.action.active_action.spell.joy_spells import JoySpells
+from sources.action.active_action.spell.love_spells import LoveSpells
+from sources.action.active_action.spell.sadness_spells import SadnessSpells
 
 #############################################################
 ##################### FIGHTS CLASS ##########################
@@ -231,7 +231,7 @@ class Fight:
         total_ratio = 0
         for char in team.characters_list:
             if not char.is_a_zombie:
-                total_ratio += char.body.global_ratio()
+                total_ratio += char.body.get_global_ratio()
        
         total_ratio /= len(team.characters_list)
         
@@ -409,13 +409,10 @@ class Fight:
 
     def stop_action(self, char, timeline):
         # Loose reloaded bow ammo no matter last action
-        if char.equipments.loose_reloaded_ammo():
-            print("Your bow has lost its loaded arrow!")
-            time.sleep(2)
+        char.equipments.loose_reloaded_ammo()
             
         # Stop action without penalty
-        if isinstance(char.last_action, Move)
-                or isinstance(char.last_action, PassTime):
+        if isinstance(char.last_action, Move) or isinstance(char.last_action, PassTime):
             print("Your current action (", char.last_action.name, ") is canceled by the attack!")
             time.sleep(2)
             char.last_action = None

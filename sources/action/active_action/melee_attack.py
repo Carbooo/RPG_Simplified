@@ -3,7 +3,8 @@ import random as random
 import time as time
 import sources.miscellaneous.configuration as cfg
 from sources.character.character import Character
-from sources.action.actions import Actions, ActiveActions
+from sources.action.action import Actions
+from sources.action.active_action.active_action import ActiveActions
 
 
 #############################################################
@@ -73,9 +74,7 @@ class MeleeAttack(ActiveActions):
 
             print("ID:", read, "is not available")
 
-        self.end_update([],
-                        cfg.actions["melee_attack"]["stamina"],
-                        cfg.actions["melee_attack"]["duration"])
+        self.end_update(cfg.actions["melee_attack"]["stamina"], cfg.actions["melee_attack"]["duration"])
         return True
 
     def execute(self):

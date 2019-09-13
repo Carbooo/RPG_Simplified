@@ -1,6 +1,6 @@
 import math as math
 import time as time
-from sources.action.spell.spells import Spells
+from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
 
 #############################################################
@@ -20,7 +20,8 @@ class SadnessSpells(Spells):
         self.spell_power = cfg.sadness_spells_power[self.spell_code]
         self.target_abs = -1
         self.target_ord = -1
-        self.affected_targets = []
+        self.nb_of_turns = -1
+        self.affected_targets = {}
         self.is_a_success = self.start()
         
     def start(self):
@@ -60,7 +61,7 @@ class SadnessSpells(Spells):
         time.sleep(3)
         
         self.set_magical_coef()
-        self.end_update([], self.get_stamina_with_coef(), self.get_time_with_coef())
+        self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
         return True   
     
     def throw_ice_pick(self):
@@ -89,7 +90,7 @@ class SadnessSpells(Spells):
         time.sleep(3)
         
         self.set_magical_coef()
-        self.end_update([], self.get_stamina_with_coef(), self.get_time_with_coef())
+        self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
         return True   
     
     def throw_despair_storm(self):
@@ -102,49 +103,45 @@ class SadnessSpells(Spells):
         self.target_abs = target["abscissa"]
         self.target_ord = target["ordinate"]
         self.magical_coef *= self.initiator.magic_power_ratio
+        self.nb_of_turns = int(round(self.spell_power["duration"] * self.magical_coef))
         self.apply_despair_storm()
+        self.fight.field.active_spells.append(self)
+        self.add_lasting_spell("Despair storm", cfg.recurrent_spell_frequency, False)
         return True
         
     def apply_despair_storm(self):
-        current_targets = []
+        current_targets = {}
         for char, distance_ratio in self.get_all_spread_targets(
                 self.spell_power["spread_distance"] * self.magical_coef,
                 self.target_abs, self.target_ord
         ):
             self.target = char
             self.print_spell("'s despair storm diminishes", "executing", False)
-            coef = math.sqrt(distance_ratio)
+            coef = math.sqrt(distance_ratio) * self.magical_coef
             char.update_morale(- self.spell_power["moral_dim_rate"] * coef)
             char.spend_stamina(self.spell_power["stamina_dim_rate"] * coef)
-            current_targets.append(char)
+            current_targets[char] = coef
             if char not in self.affected_targets:
                 char.coef_speed_ratio -= self.spell_power["speed_dim_rate"] * coef
-                self.affected_targets.append(char)
-        
+                self.affected_targets[char] = coef
+                char.active_spells.append(self)
+
         # Increase speed back to normal when char left the storm
         for char in self.affected_targets:
             if char not in current_targets:
-                char.coef_speed_ratio += self.spell_power["speed_dim_rate"] * coef
-                # fix coef and add active spell for field and unit
-        
+                char.coef_speed_ratio += self.spell_power["speed_dim_rate"] * self.affected_targets[char]
+                char.active_spells.remove(self)
+
         self.affected_targets = current_targets
-                    
+
     def end_despair_storm(self, is_canceled):
-        if is_canceled:
-            self.target.equipments.remove_armor(self.spell_power["armor"])
-            self.end_lasting_spell()
-            return True
-        
-        if self.spell_power["armor"].is_broken():
-            # Armor is already removed
-            self.end_lasting_spell()
-            return True
-            
-        is_depleted = self.target.equipments.decay_magical_armor(self.spell_power["armor"], self.spell_power["turn_decay"])
-        if is_depleted:
-            self.print_spell("has no longer a magic love shield", "ending", False)
-            self.target.equipments.remove_armor(self.spell_power["armor"])
-            self.end_lasting_spell()
+        self.nb_of_turns -= 1
+        if self.nb_of_turns == 0:
+            self.fight.field.active_spells.remove(self)
+            self.end_lasting_spell(False)
+            for char in self.affected_targets:
+                char.active_spells.remove(self)
         else:
+            self.apply_despair_storm()
             self.timeline += 1
         return True

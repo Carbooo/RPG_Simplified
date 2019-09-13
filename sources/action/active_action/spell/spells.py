@@ -1,7 +1,8 @@
 import math as math
 import time as time
 import random as random
-from sources.action.actions import Actions, ActiveActions
+from sources.action.action import Actions
+from sources.action.active_action.active_action import ActiveActions
 import sources.miscellaneous.configuration as cfg
 
 

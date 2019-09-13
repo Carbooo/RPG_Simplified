@@ -1,6 +1,7 @@
 import time as time
 import math as math
-from sources.action.actions import Actions, ActiveActions
+from sources.action.action import Actions
+from sources.action.active_action.active_action import ActiveActions
 import sources.miscellaneous.configuration as cfg
 
 
@@ -73,7 +74,7 @@ class Concentrate(ActiveActions):
         
         self.concentration_ratio = math.pow(self.nb_of_turns, cfg.concentration_rate)
         self.initiator.nb_of_concentrate += 1
-        self.end_update([], 0, 1, True)
+        self.end_update(0, 1, True)
         return True
 
     def execute(self):
@@ -85,5 +86,5 @@ class Concentrate(ActiveActions):
                                                                         )
         self.nb_of_turns -= 1
         if self.nb_of_turns > 0:
-            self.end_update([], 0, 1, True)
+            self.end_update(0, 1, True)
         return True
