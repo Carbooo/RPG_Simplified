@@ -45,6 +45,8 @@ concentrate_update_coef = 3  # Energy coef to update feeling with concentration
 max_alive_energy = 1000
 max_safe_energy = 200
 feelings_list = ["Wrath", "Joy", "Love", "Hate", "Fear", "Sadness"]
+default_energy = 50.0  # Starting energy for sensibility 10
+medium_energy = 100.0  # Energy reference for spells
 
 ######################## FIELD CONFIG ######################
 melee_handicap_ratio = 0.5

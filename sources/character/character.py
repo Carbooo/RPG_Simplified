@@ -15,9 +15,9 @@ class Character:
     
     def __init__(self, name, constitution, force, agility, dexterity, reflex, willpower, spirit, morale, empathy,
                  armor, weapon1, weapon2, weapon3, weapon4, ammo_type1, ammo_number1, ammo_type2, ammo_number2,
-                 wrath_sensibility, wrath_mastering, joy_sensibility, joy_mastering, 
-                 love_sensibility, love_mastering, hate_sensibility, hate_mastering, 
-                 fear_sensibility, fear_mastering, sadness_sensibility, sadness_mastering,
+                 wrath_sensibility, wrath_mastering, wrath_knowledge, joy_sensibility, joy_mastering, joy_knowledge,
+                 love_sensibility, love_mastering, love_knowledge, hate_sensibility, hate_mastering, hate_knowledge,
+                 fear_sensibility, fear_mastering, fear_knowledge, sadness_sensibility, sadness_mastering, sadness_knowledge,
                  abscissa, ordinate):
         
         # Set ID
@@ -82,12 +82,12 @@ class Character:
         # Set feelings
         self.nb_of_concentrate = 0
         self.feelings = {
-            "Wrath" : Feeling("Wrath", wrath_sensibility, wrath_mastering),
-            "Joy": Feeling("Joy", joy_sensibility, joy_mastering),
-            "Love": Feeling("Love", love_sensibility, love_mastering),
-            "Hate": Feeling("Hate", hate_sensibility, hate_mastering),
-            "Fear": Feeling("Fear", fear_sensibility, fear_mastering),
-            "Sadness": Feeling("Sadness", sadness_sensibility, sadness_mastering)
+            "Wrath" : Feeling("Wrath", wrath_sensibility, wrath_mastering, wrath_knowledge),
+            "Joy": Feeling("Joy", joy_sensibility, joy_mastering, joy_knowledge),
+            "Love": Feeling("Love", love_sensibility, love_mastering, love_knowledge),
+            "Hate": Feeling("Hate", hate_sensibility, hate_mastering, hate_knowledge),
+            "Fear": Feeling("Fear", fear_sensibility, fear_mastering, fear_knowledge),
+            "Sadness": Feeling("Sadness", sadness_sensibility, sadness_mastering, sadness_knowledge)
         }
         
         # Calculate character characteristics

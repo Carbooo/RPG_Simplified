@@ -45,7 +45,7 @@ class SadnessSpells(Spells):
     def end(self, is_canceled=False):
         super().end(is_canceled)
         if self.spell_code == "DST":
-            return self.end_despair_storm(is_canceled)
+            return self.end_despair_storm()
         else:
             return False
     
@@ -134,13 +134,14 @@ class SadnessSpells(Spells):
 
         self.affected_targets = current_targets
 
-    def end_despair_storm(self, is_canceled):
+    def end_despair_storm(self):
         self.nb_of_turns -= 1
         if self.nb_of_turns == 0:
             self.fight.field.active_spells.remove(self)
             self.end_lasting_spell(False)
             for char in self.affected_targets:
                 char.active_spells.remove(self)
+                char.coef_speed_ratio += self.spell_power["speed_dim_rate"] * self.affected_targets[char]
         else:
             self.apply_despair_storm()
             self.timeline += 1

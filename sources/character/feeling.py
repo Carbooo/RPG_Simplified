@@ -9,19 +9,20 @@ import sources.miscellaneous.configuration as cfg
 class Feeling:
     """Common base class to handle the six feelings"""
     
-    def __init__(self, type, sensibility, mastering):
+    def __init__(self, type, sensibility, mastering, knowledge):
         self.type = type
         self.sensibility = float(sensibility)
         self.sensibility_ratio = float(sensibility) / 10.0
         self.mastering = float(mastering)
         self.mastering_ratio = float(mastering) / 10.0
-        self.energy = float(sensibility) * 10.0
-        self.energy_ratio = float(sensibility) * 10.0 / 100
+        self.energy = max(0.0, cfg.default_energy + (float(sensibility) - 10.0) * 10.0)
+        self.energy_ratio = self.energy / cfg.medium_energy
+        self.knowledge = knowledge
         self.warned_of_exceeded_energy = False
     
     def update_energy(self, energy):
         self.energy = max(0, self.energy + energy)
-        self.energy_ratio = self.energy / 100
+        self.energy_ratio = self.energy / cfg.medium_energy
         
     def gain_energy(self, energy):
         self.update_energy(energy * self.sensibility_ratio)
@@ -29,7 +30,7 @@ class Feeling:
     def loose_energy(self, energy):
         self.update_energy(- energy / self.sensibility_ratio)
       
-    def use_energy(self, energy):
+    def use_energy(self, energy):-
         if not self.check_energy(energy):
             print("Error: Energy feeling below 0")
         
@@ -44,10 +45,10 @@ class Feeling:
             return False
             
     def natural_energy_update(self, time):
-        energy = abs(math.pow((self.energy - 100) / cfg.natural_update_ratio, 3) * time)
-        if self.energy > 100:
+        energy = abs(math.pow((self.energy - cfg.default_energy) / cfg.natural_update_ratio, 3) * time)
+        if self.energy > cfg.default_energy:
             self.gain_energy(energy)
-        elif self.energy < 100 and self.energy > 0:
+        elif self.energy < cfg.default_energy and self.energy > 0:
             self.loose_energy(energy)
     
     def concentrate_energy_update(self, action, ratio):
