@@ -17,6 +17,7 @@ class JoySpells(Spells):
         self.spell_time = cfg.joy_spells_time[self.spell_code]
         self.spell_energy = cfg.joy_spells_energy[self.spell_code]
         self.spell_hands = cfg.joy_spells_hands[self.spell_code]
+        self.spell_knowledge = cfg.joy_spells_knowledge[self.spell_code]
         self.spell_power = cfg.joy_spells_power[self.spell_code]
         self.is_a_success = self.start()
         

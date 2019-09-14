@@ -1,4 +1,5 @@
 from sources.action.action import Actions
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -24,7 +25,7 @@ class GetCharInformation(Actions):
         
         while 1:
             try:
-                read = int(input('--> ID (0 = Cancel): '))
+                read = int(func.optional_input('--> ID (0 = Cancel): '))
                 if Actions.cancel_action(read):
                     return False
             except:

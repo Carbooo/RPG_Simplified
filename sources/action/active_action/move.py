@@ -1,6 +1,7 @@
 import math as math
 import time as time
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 from sources.action.action import Actions
 from sources.action.active_action.active_action import ActiveActions
 
@@ -31,7 +32,7 @@ class Move(ActiveActions):
             abscissa = -1
             ordinate = -1
 
-            read = input('--> Abscissa (-1 = Cancel): ')
+            read = func.optional_input('--> Abscissa (-1 = Cancel): ')
             if read == "-1":
                 Actions.cancel_action(0)
                 return False
@@ -42,7 +43,7 @@ class Move(ActiveActions):
                 print("")
                 continue
 
-            read = input('--> Ordinate (-1 = Cancel): ')
+            read = func.optional_input('--> Ordinate (-1 = Cancel): ')
             if read == "-1":
                 Actions.cancel_action(0)
                 return False

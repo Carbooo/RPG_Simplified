@@ -2,6 +2,7 @@ import copy as copy
 import math as math
 import time as time
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 from sources.action.action import Actions
 from sources.action.active_action.active_action import ActiveActions
 
@@ -34,7 +35,7 @@ class ModifyEquipments(ActiveActions):
         elif self.initiator.equipments.free_hands == 1 and self.initiator.equipments.weapons_stored:
             while 1:
                 print("Do you want to equip (EQP) or unequip (UQP) weapons?")            
-                read = input('--> Action (0 = Cancel): ')
+                read = func.optional_input('--> Action (0 = Cancel): ')
                 
                 if Actions.cancel_action(read):
                     return False
@@ -74,9 +75,9 @@ class ModifyEquipments(ActiveActions):
             print("Choose a weapon to be unequipped:")            
             try:
                 if not equipment_to_remove:
-                    read = int(input('--> ID (0 = Cancel): '))
+                    read = int(func.optional_input('--> ID (0 = Cancel): '))
                 else:
-                    read = int(input('--> ID (0 = Cancel, -1 = Stop): '))
+                    read = int(func.optional_input('--> ID (0 = Cancel, -1 = Stop): '))
             except:
                 print("The input is not an ID")
                 print("")
@@ -136,9 +137,9 @@ class ModifyEquipments(ActiveActions):
             
             try:
                 if not new_equipment:
-                    read = int(input('--> ID (0 = Cancel): '))
+                    read = int(func.optional_input('--> ID (0 = Cancel): '))
                 else:
-                    read = int(input('--> ID (0 = Cancel, -1 = Stop): '))
+                    read = int(func.optional_input('--> ID (0 = Cancel, -1 = Stop): '))
             except:
                 print("The input is not an ID")
                 print("")

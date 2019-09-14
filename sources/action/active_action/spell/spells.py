@@ -4,6 +4,7 @@ import random as random
 from sources.action.action import Actions
 from sources.action.active_action.active_action import ActiveActions
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -59,6 +60,10 @@ class Spells(ActiveActions):
             print("You don't have enough free hands (", self.spell_hands, ") to cast this spell")
             return False
 
+        if self.initiator.feelings[self.type].knowledge < self.spell_knowledge:
+            print("You don't have the required knowledge (", self.spell_knowledge, ") to cast this spell")
+            return False
+
         return True
 
 ######################### CHOOSE FUNCTIONS #######################
@@ -71,7 +76,7 @@ class Spells(ActiveActions):
             print("-", spell_type["description"], "(" + spell_type["code"] + ")")
 
         while 1:
-            read = input('--> Spell type (0 for cancel) : ')
+            read = func.optional_input('--> Spell type (0 for cancel) : ')
             if Actions.cancel_action(read):
                 return False
 
@@ -85,7 +90,7 @@ class Spells(ActiveActions):
                         print("- ", spell["description"] + " (" + spell["code"] + ")")
 
                     while 1:
-                        read = input('--> Spell (0 for cancel) : ')
+                        read = func.optional_input('--> Spell (0 for cancel) : ')
                         if Actions.cancel_action(read):
                             return False
 
@@ -106,14 +111,14 @@ class Spells(ActiveActions):
         while 1:
             try:
                 print("Where do you want to throw your spell?")
-                read = int(input('--> Abscissa (-1 = Cancel): '))
+                read = int(func.optional_input('--> Abscissa (-1 = Cancel): '))
                 if read == -1:
                     Actions.cancel_action(0)
                     return False
                 else:
                     abscissa = read
 
-                read = int(input('--> Ordinate (-1 = Cancel): '))
+                read = int(func.optional_input('--> Ordinate (-1 = Cancel): '))
                 if read == -1:
                     Actions.cancel_action(0)
                     return False
@@ -145,7 +150,7 @@ class Spells(ActiveActions):
         while 1:
             try:
                 print("")
-                read = int(input('--> ID (0 = Cancel): '))
+                read = int(func.optional_input('--> ID (0 = Cancel): '))
                 if Actions.cancel_action(read):
                     return False
 

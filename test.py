@@ -1,6 +1,8 @@
+import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 from data.import_data import ImportData
 from sources.fight.fight import Fight
-import sources.miscellaneous.configuration as cfg
+
 
 ##################### SET UP ###################
 ImportData("Armors", "data/Armors.csv")
@@ -15,7 +17,12 @@ ImportData("ObstaclesField", "data/ShortObstacles.csv")
 ImportData("ObstaclesField", "data/TwoBridges.csv")
 ImportData("ObstaclesField", "data/LongObstacles.csv")
 
-##################### FIGHT #####################
-# Fights(Fields.list[3], Teams.list[0], Teams.list[1])
-# Fights(Fields.list[0], Teams.list[8], Teams.list[9])
-Fight(cfg.field_list[0], cfg.team_list[10], cfg.team_list[11])
+
+##################### TESTING ###################
+def test_ranged():
+    func.automatic = True
+    func.actions = ["EQP", 236]
+    Fight(cfg.field_list[0], cfg.team_list[10], cfg.team_list[11])
+
+
+test_ranged()

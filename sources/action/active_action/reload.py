@@ -1,5 +1,6 @@
 import time as time
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 from sources.character.equipments import RangedWeapons, Crossbows
 from sources.action.action import Actions
 from sources.action.active_action.active_action import ActiveActions
@@ -59,7 +60,7 @@ class Reload(ActiveActions):
                     while not ammo_chosen:
                         try:
                             print("")
-                            read = int(input('--> ID (0 = Cancel): '))
+                            read = int(func.optional_input('--> ID (0 = Cancel): '))
                             if Actions.cancel_action(read):
                                 return False
                         except:

@@ -202,6 +202,10 @@ wrath_spells_hands = {
     "STR": 0,
     "FBL": 2
 }
+wrath_spells_knowledge = {
+    "STR": 1,
+    "FBL": 3
+}
 wrath_spells_power = {
     "STR": {
         "force": 2.0,
@@ -250,6 +254,10 @@ joy_spells_stamina = {
 joy_spells_hands = {
     "EGY": 0,
     "LGT": 1
+}
+joy_spells_knowledge = {
+    "EGY": 1,
+    "LGT": 2
 }
 joy_spells_power = {
     "EGY": {
@@ -300,6 +308,10 @@ love_spells_hands = {
     "SHD": 2,
     "HEA": 2
 }
+love_spells_knowledge = {
+    "SHD": 2,
+    "HEA": 3
+}
 love_spells_power = {
     "SHD": {
         "defense": 100.0,
@@ -343,6 +355,10 @@ sadness_spells_stamina = {
 sadness_spells_hands = {
     "IPK": 1,
     "DST": 2
+}
+sadness_spells_knowledge = {
+    "IPK": 2,
+    "DST": 4
 }
 sadness_spells_power = {
     "IPK": {

@@ -2,6 +2,7 @@ import pickle
 import time as time
 from shutil import copyfile
 from sources.action.action import Actions
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -26,7 +27,7 @@ class Save(Actions):
             print("Write a file name for the saving:")     
             
             while 1:
-                self.filename = input('--> file name (0 = Cancel): ')
+                self.filename = func.optional_input('--> file name (0 = Cancel): ')
                 
                 if Actions.cancel_action(self.filename):
                     return False
@@ -69,7 +70,7 @@ class Load(Actions):
         print("Write the file name of a previous save:")
         
         while 1:
-            filename = input('--> file name (0 = Cancel): ')
+            filename = func.optional_input('--> file name (0 = Cancel): ')
             
             if Actions.cancel_action(filename):
                 return False           

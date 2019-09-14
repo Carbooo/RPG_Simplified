@@ -3,10 +3,10 @@ import time as time
 from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
 
+
 #############################################################
 ####################### WRATH SPELL CLASS ###################
 #############################################################
-
 class WrathSpells(Spells):
     """Class to cast wrath spells"""
  
@@ -17,6 +17,7 @@ class WrathSpells(Spells):
         self.spell_time = cfg.wrath_spells_time[self.spell_code]
         self.spell_energy = cfg.wrath_spells_energy[self.spell_code]
         self.spell_hands = cfg.wrath_spells_hands[self.spell_code]
+        self.spell_knowledge = cfg.wrath_spells_knowledge[self.spell_code]
         self.spell_power = cfg.wrath_spells_power[self.spell_code]
         self.is_a_success = self.start()
         

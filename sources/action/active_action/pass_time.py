@@ -1,4 +1,5 @@
 import time as time
+import sources.miscellaneous.global_functions as func
 from sources.action.action import Actions
 from sources.action.active_action.active_action import ActiveActions
 
@@ -19,7 +20,7 @@ class PassTime(ActiveActions):
         txt = "--> Number of 0.1 turn (0 = Cancel): "
         while 1:
             try:
-                read = int(input(txt))
+                read = int(func.optional_input(txt))
                 if Actions.cancel_action(read):
                     return False
                 else:

@@ -3,6 +3,7 @@ import math as math
 from sources.action.action import Actions
 from sources.action.active_action.active_action import ActiveActions
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -26,7 +27,7 @@ class Concentrate(ActiveActions):
             print("- ", feeling)
         txt = "--> Feeling (0 = Cancel): "
         while 1:
-            self.feeling = input(txt)
+            self.feeling = func.optional_input(txt)
             if Actions.cancel_action(self.feeling):
                 return False
             elif self.feeling in cfg.feelings_list:
@@ -38,7 +39,7 @@ class Concentrate(ActiveActions):
         print("Do you want to increase (INC) or decrease (DEC) the feeling?")
         txt = "--> INC / DEC (0 = Cancel): "
         while 1:
-            self.action = input(txt)
+            self.action = func.optional_input(txt)
             if Actions.cancel_action(self.action):
                 return False
             elif self.action == "INC":
@@ -56,7 +57,7 @@ class Concentrate(ActiveActions):
         txt = "--> Number of turns (0 = Cancel): "
         while 1:
             try:
-                self.nb_of_turns = int(input(txt))
+                self.nb_of_turns = int(func.optional_input(txt))
                 if Actions.cancel_action(self.nb_of_turns):
                     return False
                 elif self.nb_of_turns < cfg.min_concentration_turn:

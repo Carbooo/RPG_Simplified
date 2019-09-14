@@ -16,6 +16,7 @@ class LoveSpells(Spells):
         self.spell_time = cfg.love_spells_time[self.spell_code]
         self.spell_energy = cfg.love_spells_energy[self.spell_code]
         self.spell_hands = cfg.love_spells_hands[self.spell_code]
+        self.spell_knowledge = cfg.love_spells_knowledge[self.spell_code]
         self.spell_power = cfg.love_spells_power[self.spell_code]
         self.armor = None
         self.is_a_success = self.start()

@@ -3,10 +3,10 @@ import time as time
 from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
 
+
 #############################################################
 ####################### SADNESS SPELL CLASS ###################
 #############################################################
-
 class SadnessSpells(Spells):
     """Class to cast sadness spells"""
  
@@ -17,6 +17,7 @@ class SadnessSpells(Spells):
         self.spell_time = cfg.sadness_spells_time[self.spell_code]
         self.spell_energy = cfg.sadness_spells_energy[self.spell_code]
         self.spell_hands = cfg.sadness_spells_hands[self.spell_code]
+        self.spell_knowledge = cfg.sadness_spells_knowledge[self.spell_code]
         self.spell_power = cfg.sadness_spells_power[self.spell_code]
         self.target_abs = -1
         self.target_ord = -1

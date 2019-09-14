@@ -105,7 +105,7 @@ class ImportData:
 
     def import_characters(self):
         for row in self.my_csv:
-            if len(row) != 33:
+            if len(row) != 39:
                 print("Characters import does not contain the right number of columns")
                 return False
             else:
@@ -114,7 +114,8 @@ class ImportData:
                           row[10], row[11], row[12], row[13], row[14], row[15], int(row[16]), row[17], int(row[18]),
                           int(row[19]), int(row[20]), int(row[21]), int(row[22]), int(row[23]), int(row[24]),
                           int(row[25]), int(row[26]), int(row[27]), int(row[28]), int(row[29]), int(row[30]),
-                          int(row[31]), int(row[32]))
+                          int(row[31]), int(row[32]), int(row[33]), int(row[34]), int(row[35]), int(row[36]),
+                          int(row[37]), int(row[38]))
         return True
 
     def import_teams(self):

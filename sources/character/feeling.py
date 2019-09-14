@@ -30,7 +30,7 @@ class Feeling:
     def loose_energy(self, energy):
         self.update_energy(- energy / self.sensibility_ratio)
       
-    def use_energy(self, energy):-
+    def use_energy(self, energy):
         if not self.check_energy(energy):
             print("Error: Energy feeling below 0")
         
@@ -79,5 +79,6 @@ class Feeling:
                 return True
 
     def print_obj(self):
-        print("Type:", self.type, ", Sensibility:", int(round(self.sensibility)), ", Mastering:",
-              int(round(self.mastering)), ", Energy:", int(round(self.energy)))
+        print("Type:", self.type, ", Sensibility:", int(round(self.sensibility)),
+              ", Mastering:", int(round(self.mastering)), ", Knowledge:", self.knowledge,
+              ", Energy:", int(round(self.energy)))

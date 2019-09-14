@@ -2,6 +2,7 @@ import copy as copy
 import random as random
 import time as time
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 from sources.character.character import Character
 from sources.action.get_char_information import GetCharInformation
 from sources.action.active_action.modify_equipments import ModifyEquipments
@@ -257,7 +258,7 @@ class Fight:
             for key in cfg.actions:
                 print("-", cfg.actions[key]["description"], "(", cfg.actions[key]["command"], ")")
             
-            read = input('--> ACT: ')
+            read = func.optional_input('--> ACT: ')
             
             if read == cfg.actions["pass_time"]["command"]:
                 if self.pass_action(character):
