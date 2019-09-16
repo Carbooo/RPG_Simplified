@@ -2,6 +2,7 @@ import math as math
 import time as time
 from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -50,8 +51,8 @@ class JoySpells(Spells):
         if not self.is_able_to_cast():
             return False
         
-        print("You have decided to energize yourselves, improving your overall stats and restoring stamina.")
-        print("The effect will start soon!")
+        func.optional_print("You have decided to energize yourselves, improving your overall stats and restoring stamina.")
+        func.optional_print("The effect will start soon!")
         time.sleep(3)
             
         self.target = self.initiator
@@ -95,8 +96,8 @@ class JoySpells(Spells):
         if not self.choose_target(True, False, False):
             return False
         
-        print("You have decided to send a burning light")
-        print("The light is charging...")
+        func.optional_print("You have decided to send a burning light")
+        func.optional_print("The light is charging...")
         time.sleep(3)
         
         self.set_magical_coef()
@@ -119,7 +120,7 @@ class JoySpells(Spells):
         )
         
         if self.target.body.is_alive() and result >= self.spell_power["min_damage_for_delay"]:
-            print("This light attack blinds you and delay your next step!")
+            func.optional_print("This light attack blinds you and delay your next step!")
             time.sleep(2)
             self.target.spend_time(self.spell_power["delay"])
 

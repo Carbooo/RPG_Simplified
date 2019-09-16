@@ -23,7 +23,7 @@ class ModifyEquipments(ActiveActions):
 
     def start(self):
         if not self.initiator.check_stamina(cfg.actions["modify_equip"]["stamina"]):
-            print("You do not have enough stamina (",
+            func.optional_print("You do not have enough stamina (",
                   self.initiator.body.get_current_stamina(), ") to modify your equipment")
             return False
         
@@ -34,7 +34,7 @@ class ModifyEquipments(ActiveActions):
             return self.equip_spec_weapons()
         elif self.initiator.equipments.free_hands == 1 and self.initiator.equipments.weapons_stored:
             while 1:
-                print("Do you want to equip (EQP) or unequip (UQP) weapons?")            
+                func.optional_print("Do you want to equip (EQP) or unequip (UQP) weapons?")
                 read = func.optional_input('--> Action (0 = Cancel): ')
                 
                 if Actions.cancel_action(read):
@@ -45,15 +45,15 @@ class ModifyEquipments(ActiveActions):
                 elif read == "UQP":
                     return self.unequip_spec_weapons()
                 else:
-                    print("Your choice is not recognized!")
+                    func.optional_print("Your choice is not recognized!")
                 
         else:
-            print("You have no equipment to equip, action cancelled!")
+            func.optional_print("You have no equipment to equip, action cancelled!")
             return False
     
     def unequip_weapons_list(self, weapons_list):
-        print("")
-        print("You are going to unequip the following items:")
+        func.optional_print("")
+        func.optional_print("You are going to unequip the following items:")
         for weapon in weapons_list:
             weapon.print_obj()
         time.sleep(3)
@@ -67,24 +67,24 @@ class ModifyEquipments(ActiveActions):
         equipped_list = copy.copy(self.initiator.equipments.weapons_in_use)
         equipment_to_remove = []
         while 1:
-            print("Current weapons:")
+            func.optional_print("Current weapons:")
             for equip in equipped_list:
                 equip.print_obj()
-            print("")
+            func.optional_print("")
             
-            print("Choose a weapon to be unequipped:")            
+            func.optional_print("Choose a weapon to be unequipped:")
             try:
                 if not equipment_to_remove:
                     read = int(func.optional_input('--> ID (0 = Cancel): '))
                 else:
                     read = int(func.optional_input('--> ID (0 = Cancel, -1 = Stop): '))
             except:
-                print("The input is not an ID")
-                print("")
+                func.optional_print("The input is not an ID")
+                func.optional_print("")
                 continue  
             
             if read == -1 and equipment_to_remove:
-                print("You have stopped to unequip")
+                func.optional_print("You have stopped to unequip")
                 return self.unequip_weapons_list(equipment_to_remove)
             
             elif Actions.cancel_action(read):
@@ -99,15 +99,15 @@ class ModifyEquipments(ActiveActions):
                     break
                 
             if available_equipment is False:
-                print("The input is not an available ID")
-                print("")
+                func.optional_print("The input is not an available ID")
+                func.optional_print("")
                 
             elif not equipped_list:
                 return self.unequip_weapons_list(equipment_to_remove)
 
     def equip_weapons_list(self, weapons_list):
-        print("")
-        print("You are going to equip the following weapons:")
+        func.optional_print("")
+        func.optional_print("You are going to equip the following weapons:")
         for weapon in weapons_list:
             weapon.print_obj()
         time.sleep(3)
@@ -126,12 +126,12 @@ class ModifyEquipments(ActiveActions):
                 not_equipped_list.append(weapon)
                 
         while 1:
-            print("Current weapons:")
+            func.optional_print("Current weapons:")
             for equip in equipped_list:
                 equip.print_obj()
-            print("")
+            func.optional_print("")
             
-            print("Choose a weapon to be equipped:")
+            func.optional_print("Choose a weapon to be equipped:")
             for equip in not_equipped_list:
                 equip.print_obj()
             
@@ -141,13 +141,13 @@ class ModifyEquipments(ActiveActions):
                 else:
                     read = int(func.optional_input('--> ID (0 = Cancel, -1 = Stop): '))
             except:
-                print("The input is not an ID")
-                print("")
+                func.optional_print("The input is not an ID")
+                func.optional_print("")
                 continue  
             
             if read == -1 and new_equipment:
-                print("")
-                print("You have stopped to equip")
+                func.optional_print("")
+                func.optional_print("You have stopped to equip")
                 return self.equip_weapons_list(new_equipment)
             
             # Cannot cancel equip move
@@ -162,8 +162,8 @@ class ModifyEquipments(ActiveActions):
                     break
                 
             if available_equipment is False:
-                print("The input is not an available ID")
-                print("")
+                func.optional_print("The input is not an available ID")
+                func.optional_print("")
                 continue
             
             nb_of_hands_use = 0
@@ -174,9 +174,9 @@ class ModifyEquipments(ActiveActions):
                 not_equipped_list.remove(weapon)
                 new_equipment.append(weapon)
             else:
-                print("You do not have enough free hands to equip:")
+                func.optional_print("You do not have enough free hands to equip:")
                 weapon.print_obj()
-                print("")
+                func.optional_print("")
             
             if nb_of_hands_use + weapon.hand == 2:
                 return self.equip_weapons_list(new_equipment)

@@ -42,7 +42,7 @@ class Fight:
         self.skip_saving = False
         
         if self.field.set_all_teams(team1,team2) is False:
-            print("(Fights) Cannot set team, fight cancelled")
+            func.optional_print("(Fights) Cannot set team, fight cancelled")
         else:
             self.start()
     
@@ -114,27 +114,27 @@ class Fight:
                     self.nb_of_turn += 1 #Count only character turns
                 
             else:
-                print("(Fights) Event:", next_event, "is not recognized")
-                print("The fight stops here")
+                func.optional_print("(Fights) Event:", next_event, "is not recognized", level=3)
+                func.optional_print("The fight stops here", level=3)
                 exit(0)
                 
             self.end_turn()
         
         #Victory of a team
         if self.team1.is_life_active():
-            print("Team:", self.team1.name, " (ID:", self.team1.get_id(), ") has won the fight!")
+            func.optional_print("Team:", self.team1.name, " (ID:", self.team1.get_id(), ") has won the fight!", level=3)
             time.sleep(3)
         else:
-            print("Team:", self.team2.name, " (", self.team2.get_id(), ") has won the fight!")
+            func.optional_print("Team:", self.team2.name, " (", self.team2.get_id(), ") has won the fight!", level=3)
             time.sleep(3)
             
 
 ################################## TURN FUNCTIONS ####################################
     def pass_a_turn(self):
-        print("")
-        print("*********************************************************************")
-        print("******************** A GAME TURN HAS PASSED *************************")
-        print("*********************************************************************")
+        func.optional_print("")
+        func.optional_print("*********************************************************************")
+        func.optional_print("******************** A GAME TURN HAS PASSED *************************", level=2)
+        func.optional_print("*********************************************************************")
         self.timeline += 1 
         time.sleep(2)
         
@@ -143,51 +143,49 @@ class Fight:
                 self.field.remove_dead_char(char)
         
     def print_new_turn(self):
-        print("")
-        print("*********************************************************************")
-        print("************************ NEW CHAR TURN (" + str(self.nb_of_turn) + ") *************************")
-        print("*********************************************************************")
+        func.optional_print("")
+        func.optional_print("*********************************************************************")
+        func.optional_print("************************ NEW CHAR TURN (" + str(self.nb_of_turn) + ") *************************")
+        func.optional_print("*********************************************************************")
         
         # Print character team first, then enemy team
         if self.belong_to_team(self.scheduler[0]) == self.team1:
-            print("************************* ALL DEAD STATE ************************")
+            func.optional_print("************************* ALL DEAD STATE ************************")
             self.team1.print_dead_states()
             self.team2.print_dead_states()
-            print("")
-            print("********************* CURRENT TEAM ALIVE STATE ******************")                          
+            func.optional_print("")
+            func.optional_print("********************* CURRENT TEAM ALIVE STATE ******************")
             self.team1.print_alive_states()
-            print("")
-            print("******************** OPPONENT TEAM ALIVE STATE ******************")
+            func.optional_print("")
+            func.optional_print("******************** OPPONENT TEAM ALIVE STATE ******************")
             self.team2.print_alive_states()
         else:
-            print("************************* ALL DEAD STATE ************************")
+            func.optional_print("************************* ALL DEAD STATE ************************")
             self.team2.print_dead_states()
             self.team1.print_dead_states()
-            print("")
-            print("********************* CURRENT TEAM ALIVE STATE ******************")                          
+            func.optional_print("")
+            func.optional_print("********************* CURRENT TEAM ALIVE STATE ******************")
             self.team2.print_alive_states()
-            print("")
-            print("******************** OPPONENT TEAM ALIVE STATE ******************")
+            func.optional_print("")
+            func.optional_print("******************** OPPONENT TEAM ALIVE STATE ******************")
             self.team1.print_alive_states()
         
-        print("")
-        print("******************** CURRENT CHARACTER STATE ******************")
+        func.optional_print("")
+        func.optional_print("******************** CURRENT CHARACTER STATE ******************")
         self.scheduler[0].print_detailed_state()
-        print("")
+        func.optional_print("")
         self.field.print_obj()
-        print("")
+        func.optional_print("")
         self.scheduler[0].print_basic()
-        print("")
+        func.optional_print("")
         
     def print_ko_state_rest(self, character):
-        print("")
-        print("*********************************************************************")
+        func.optional_print("")
+        func.optional_print("*********************************************************************")
         character.print_basic()
-        print("stamina is too low and can only rest")
-        print("New state:")
-        character.print_state()
-        print("*********************************************************************")
-        print("")
+        func.optional_print("stamina is too low and can only rest", level=2)
+        func.optional_print("*********************************************************************")
+        func.optional_print("")
         time.sleep(3)
         
     def order_scheduler(self):
@@ -252,11 +250,11 @@ class Fight:
 #################### CHOOSE ACTIONS ########################
     def choose_actions(self, character):
         while 1:
-            print("")
-            print("Choose one of the following action:")
+            func.optional_print("")
+            func.optional_print("Choose one of the following action:")
             
             for key in cfg.actions:
-                print("-", cfg.actions[key]["description"], "(", cfg.actions[key]["command"], ")")
+                func.optional_print("-", cfg.actions[key]["description"], "(", cfg.actions[key]["command"], ")")
             
             read = func.optional_input('--> ACT: ')
             
@@ -305,7 +303,7 @@ class Fight:
             elif read == cfg.actions["load"]["command"]:
                 self.load_action(character)
             else:
-                print("Action:", read, "is not recognized")
+                func.optional_print("Action:", read, "is not recognized")
 
     def pass_action(self, character):
         action = PassTime(self, character)
@@ -350,7 +348,7 @@ class Fight:
         return True
                         
     def equip_action(self, character):     
-        print("You have decided to modify your equipment")
+        func.optional_print("You have decided to modify your equipment")
         action = ModifyEquipments(self, character)
         if not action.is_a_success:
             return False
@@ -358,14 +356,14 @@ class Fight:
         return True
     
     def information_action(self, character):
-        print("You have decided to look for information")
+        func.optional_print("You have decided to look for information")
         action = GetCharInformation(self)
         if not action.is_a_success:
             return False
         return True
 
     def save_action(self, character):
-        print("You have decided to save the current game state")
+        func.optional_print("You have decided to save the current game state")
         action = Save(self)
         if not action.is_a_success:
             return False
@@ -373,7 +371,7 @@ class Fight:
         return True
     
     def load_action(self, character):
-        print("You have decided to load a previous game state")
+        func.optional_print("You have decided to load a previous game state")
         action = Load(self)
         if not action.is_a_success:
             return False
@@ -414,7 +412,7 @@ class Fight:
             
         # Stop action without penalty
         if isinstance(char.last_action, Move) or isinstance(char.last_action, PassTime):
-            print("Your current action (", char.last_action.name, ") is canceled by the attack!")
+            func.optional_print("Your current action (", char.last_action.name, ") is canceled by the attack!", level=2)
             time.sleep(2)
             char.last_action = None
             char.timeline = timeline
@@ -429,18 +427,19 @@ class Fight:
                 or isinstance(char.last_action, Concentrate) \
                 or isinstance(char.last_action, Spells):
             char.previous_attacks.append((timeline, char.last_action))
-            print("The attack surprises you during your current action(", char.last_action.name, ")!")
-            print("Your defense is diminished!")
+            func.optional_print("The attack surprises you during your current action(",
+                                char.last_action.name, ")!", level=2)
+            func.optional_print("Your defense is diminished!", level=2)
             time.sleep(2)
 
-            print("Your current action (", char.last_action.name, ") is also canceled!")
+            func.optional_print("Your current action (", char.last_action.name, ") is also canceled!", level=2)
             time.sleep(2)
             char.last_action = None
             char.timeline = timeline
             char.spend_time(cfg.defense_time / 2)
 
             if isinstance(char.last_action, Reload):
-                print("You loose the ammo being used for reloading!")
+                func.optional_print("You loose the ammo being used for reloading!", level=2)
                 time.sleep(2)
                 char.ammo.remove(char.last_action.ammo_to_load)
             

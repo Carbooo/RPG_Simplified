@@ -22,9 +22,9 @@ class Concentrate(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):
-        print("On which feeling do you want to concentrate?")
+        func.optional_print("On which feeling do you want to concentrate?")
         for feeling in cfg.feelings_list:
-            print("- ", feeling)
+            func.optional_print("- ", feeling)
         txt = "--> Feeling (0 = Cancel): "
         while 1:
             self.feeling = func.optional_input(txt)
@@ -33,10 +33,10 @@ class Concentrate(ActiveActions):
             elif self.feeling in cfg.feelings_list:
                 break
             else:
-                print("The feeling is not recognized")
+                func.optional_print("The feeling is not recognized")
 
-        print("")
-        print("Do you want to increase (INC) or decrease (DEC) the feeling?")
+        func.optional_print("")
+        func.optional_print("Do you want to increase (INC) or decrease (DEC) the feeling?")
         txt = "--> INC / DEC (0 = Cancel): "
         while 1:
             self.action = func.optional_input(txt)
@@ -49,11 +49,11 @@ class Concentrate(ActiveActions):
                 self.action = "decrease"
                 break
             else:
-                print("Command invalid. You must choose between increase (INC) and decrease (DEC).")
+                func.optional_print("Command invalid. You must choose between increase (INC) and decrease (DEC).")
 
-        print("")
-        print("How much time do you want to concentrate? (Concentrating longer make it more efficient)")
-        print("Beware that each new concentration is less efficient than the previous ones!")
+        func.optional_print("")
+        func.optional_print("How much time do you want to concentrate? (Concentrating longer make it more efficient)")
+        func.optional_print("Beware that each new concentration is less efficient than the previous ones!")
         txt = "--> Number of turns (0 = Cancel): "
         while 1:
             try:
@@ -61,16 +61,16 @@ class Concentrate(ActiveActions):
                 if Actions.cancel_action(self.nb_of_turns):
                     return False
                 elif self.nb_of_turns < cfg.min_concentration_turn:
-                    print("You cannot rest less than", cfg.min_concentration_turn, "turns")
+                    func.optional_print("You cannot rest less than", cfg.min_concentration_turn, "turns")
                 elif self.nb_of_turns > cfg.max_concentration_turn:
-                    print("You cannot rest more than", cfg.max_concentration_turn, "turns")
+                    func.optional_print("You cannot rest more than", cfg.max_concentration_turn, "turns")
                 else:
                     break
             except:
-                print("The input is not an integer")
+                func.optional_print("The input is not an integer")
 
-        print("")
-        print("You have decided to", self.action, "your", self.feeling, "for", self.nb_of_turns, "turns")
+        func.optional_print("")
+        func.optional_print("You have decided to", self.action, "your", self.feeling, "for", self.nb_of_turns, "turns")
         time.sleep(3)
         
         self.concentration_ratio = math.pow(self.nb_of_turns, cfg.concentration_rate)

@@ -25,14 +25,14 @@ class RangedAttack(ActiveActions):
 
     def start(self):  # Choose ranged target and shoot mode
         if self.initiator.check_stamina(cfg.actions["ranged_attack"]["stamina"]) is False:
-            print("You do not have enough stamina (",
+            func.optional_print("You do not have enough stamina (",
                   self.initiator.body.get_current_stamina(), ") for a ranged attack")
             return False
         elif self.initiator.equipments.is_using_a_ranged_weapon() is False:
-            print("You are not using a ranged weapon")
+            func.optional_print("You are not using a ranged weapon")
             return False
         elif self.can_ranged_attack() is False:
-            print("No enemy can be reached by a ranged attack")
+            func.optional_print("No enemy can be reached by a ranged attack")
             time.sleep(2)
             return False
 
@@ -41,12 +41,12 @@ class RangedAttack(ActiveActions):
         else:
             team = self.fight.team1
 
-        print("--------- ATTACKER -----------")
+        func.optional_print("--------- ATTACKER -----------")
         self.initiator.print_attack_state()
-        print("")
+        func.optional_print("")
 
-        print("--------- TARGETS -----------")
-        print("Choose one of the reachable enemies:")
+        func.optional_print("--------- TARGETS -----------")
+        func.optional_print("Choose one of the reachable enemies:")
         enemy_list = []
         hit_chance_list = []
         for char in team.characters_list:
@@ -66,19 +66,19 @@ class RangedAttack(ActiveActions):
                     hit_chance = hit_chance_list_bis[j]
                     hit_number = j
             self.target = enemy_list_bis.pop(hit_number)
-            print("----- HIT CHANCE:", round(hit_chance_list_bis.pop(hit_number), 2),
+            func.optional_print("----- HIT CHANCE:", round(hit_chance_list_bis.pop(hit_number), 2),
                   "-- FIGHTING AVAILABILITY:", self.target.get_fighting_availability(self.timeline),
                   " -----")
             self.target.print_defense_state()
 
         while 1:
             try:
-                print("")
+                func.optional_print("")
                 read = int(func.optional_input('--> ID (0 = Cancel): '))
                 if Actions.cancel_action(read):
                     return False
             except:
-                print("The input is not an ID")
+                func.optional_print("The input is not an ID")
                 continue
 
             for i in range(len(enemy_list)):
@@ -94,7 +94,7 @@ class RangedAttack(ActiveActions):
                     self.end_update(stamina, cfg.actions["ranged_attack"]["duration"] * self.shooting_time)
                     return True
 
-            print("ID:", read, "is not available")
+            func.optional_print("ID:", read, "is not available")
 
     def shoot_speed(self, hit_chance):
         # Harder is the target to hit, longer it takes to aim and shoot (between 0.66 to 2)
@@ -102,45 +102,45 @@ class RangedAttack(ActiveActions):
 
     def execute(self):
         if not self.fight.field.is_target_reachable(self.initiator, self.target):
-            print("")
-            print("*********************************************************************")
-            print("The target (", end=' ')
+            func.optional_print("")
+            func.optional_print("*********************************************************************")
+            func.optional_print("The target (", end=' ')
             self.target.print_basic()
-            print(") is no longer reachable by a ranged attack")
-            print("The attack of (", end=' ')
+            func.optional_print(") is no longer reachable by a ranged attack")
+            func.optional_print("The attack of (", end=' ')
             self.initiator.print_basic()
-            print(") has been cancelled !")
-            print("*********************************************************************")
-            print("")
+            func.optional_print(") has been cancelled !")
+            func.optional_print("*********************************************************************")
+            func.optional_print("")
             time.sleep(5)
             return False
         
         self.initiator.last_action = None  # To avoid looping on this action
-        print("")
-        print("*********************************************************************")
+        func.optional_print("")
+        func.optional_print("*********************************************************************")
         self.initiator.print_basic()
-        print("is trying to ranged shoot (", end=' ')
+        func.optional_print("is trying to ranged shoot (", end=' ')
         self.target.print_basic()
-        print(")")
+        func.optional_print(")")
         hit_chance = self.shoot_hit_chance()
-        print("Current hit chance:", round(hit_chance, 2))
-        print("*********************************************************************")
-        print("")
+        func.optional_print("Current hit chance:", round(hit_chance, 2), level=2)
+        func.optional_print("*********************************************************************")
+        func.optional_print("")
         time.sleep(3)
         
         target = self.fight.field.shoot_has_hit_another_target(self.initiator, self.target, hit_chance)
         if not target:
-            print("The shoot has missed its target!")
-            print("No damage has been made")
+            func.optional_print("The shoot has missed its target!", level=2)
+            func.optional_print("No damage has been made")
             time.sleep(3)
 
         elif target is True:
-            print("The shoot has hit its target!")
+            func.optional_print("The shoot has hit its target!", level=2)
             time.sleep(3)
             self.range_defend(hit_chance)
 
         else:
-            print("The shoot has hit the WRONG target! It has hit:")
+            func.optional_print("The shoot has hit the WRONG target! It has hit:", level=2)
             target.print_basic()
             target.print_position()
             self.target = target
@@ -171,7 +171,7 @@ class RangedAttack(ActiveActions):
         # Attack result --> Either block or be fully hit
         if attack_result <= cfg.ranged_attack_stage[0]:
             self.target.all_shields_absorbed_damage(attack_power, resis_dim_rate)
-            print("The attack has been fully blocked / avoided by the defender")
+            func.optional_print("The attack has been fully blocked / avoided by the defender", level=2)
             time.sleep(5)
         else:
             accuracy_ratio = 0.5 + hit_chance  # Between 0,5 and 1,5, similar to melee handiness_ratio
@@ -205,11 +205,11 @@ class RangedAttack(ActiveActions):
 
     def can_ranged_attack(self):
         if self.initiator.equipments.has_ammo() is False:
-            print("No ammo for a ranged attack")
+            func.optional_print("No ammo for a ranged attack")
             return False
 
         if self.initiator.equipments.has_reloaded() is False:
-            print("Ranged weapons are not reloaded")
+            func.optional_print("Ranged weapons are not reloaded")
             return False
 
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:

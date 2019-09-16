@@ -3,6 +3,7 @@ import math as math
 import random as random
 import time as time
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -26,7 +27,7 @@ class Equipments:
         cfg.equipments_list.append(self)
     
     def print_obj(self):
-        print("ID:", self.get_id(), ", Name:", self.name, ", Type:",
+        func.optional_print("ID:", self.get_id(), ", Name:", self.name, ", Type:",
               self.type, ", Life:", round(self.life), ", Load:",
               round(self.load, 1), ", Bulk:", round(self.bulk, 1),
               ", Resistance:", round(self.resistance, 1), end=' ')
@@ -86,7 +87,7 @@ class Armors(Equipments):
         
     def print_obj(self):
         super().print_obj()
-        print(", DefCover:", round(self.def_cover, 1), ", Defense:", round(self.defense, 1))
+        func.optional_print(", DefCover:", round(self.def_cover, 1), ", Defense:", round(self.defense, 1))
 
     def decrease(self, damage):
         ratio = super().decrease(damage, cfg.armor_def_malus_rate)
@@ -103,12 +104,12 @@ class Armors(Equipments):
         direct_damages = (damages - absorbed_damages) * (1.0 - pen_rate) * flesh_dam_rate
         total_damages = pen_damages + direct_damages
         
-        print("Damages absorbed by", self.name, ":", int(round(absorbed_damages)))
+        func.optional_print("Damages absorbed by", self.name, ":", int(round(absorbed_damages)), level=3)
         time.sleep(2)
         ratio = self.decrease(absorbed_damages * resis_dim_rate)
             
         if total_damages == 0:
-            print("The", self.name, "has absorbed the damages and no life has been lost")
+            func.optional_print("The", self.name, "has absorbed the damages and no life has been lost", level=3)
             time.sleep(3)
         
         return [ratio, total_damages]
@@ -166,7 +167,7 @@ class Weapons(Equipments):
 
     def print_obj(self):
         super().print_obj()
-        print(", Hand:", self.hand, ", Defense:", round(self.defense, 1),
+        func.optional_print(", Hand:", self.hand, ", Defense:", round(self.defense, 1),
               ", Melee power:", round(self.melee_power, 1), ", Penetration rate:",
               round(self.pen_rate, 2), ", Resistance dim. rate:",
               round(self.resis_dim_rate, 2), ", Melee handiness:",
@@ -198,7 +199,7 @@ class Shields(Weapons):
         
     def print_obj(self):
         super().print_obj()
-        print("")
+        func.optional_print("")
 
     def decrease(self, damage):
         ratio = super().decrease(damage, cfg.shield_def_malus_rate)
@@ -238,7 +239,7 @@ class MeleeWeapons(AttackWeapons):
 
     def print_obj(self):
         super().print_obj()
-        print("")
+        func.optional_print("")
 
     def decrease(self, damage):
         ratio = super().decrease(damage)
@@ -271,7 +272,7 @@ class Ammo(Equipments):
 
     def print_obj(self):
         super().print_obj()
-        print(", stability:", round(self.stability, 1),
+        func.optional_print(", stability:", round(self.stability, 1),
               ", flesh damage:", round(self.flesh_damage, 1),
               ", Penetration rate:", round(self.pen_rate, 2))
 
@@ -307,12 +308,12 @@ class RangedWeapons(AttackWeapons):
 
     def print_obj(self):
         super().print_obj()
-        print(", RangePower:", round(self.range_power, 1), ", Accuracy:", round(self.accuracy, 1),
+        func.optional_print(", RangePower:", round(self.range_power, 1), ", Accuracy:", round(self.accuracy, 1),
               ", MaxRange:", self.get_max_range(), ", ReloadTime:", round(self.reload_time, 1), ", Ammo:", end=' ')
         if self.current_ammo:
-            print(self.current_ammo.name, end=' ')
+            func.optional_print(self.current_ammo.name, end=' ')
         else:
-            print("--None--", end=' ')
+            func.optional_print("--None--", end=' ')
     
     def decrease(self, damage):
         ratio = super().decrease(damage)
@@ -329,7 +330,7 @@ class RangedWeapons(AttackWeapons):
         if isinstance(ammo, Ammo):
             self.current_ammo = ammo
         else:
-            print("(Equipments) Error, parameter (", ammo, ") is not an ammo")
+            func.optional_print("(Equipments) Error, parameter (", ammo, ") is not an ammo")
 
     def unload(self):
         ammo_used = self.current_ammo 
@@ -369,7 +370,7 @@ class Bows(RangedWeapons):
 
     def print_obj(self):
         super().print_obj()
-        print("")
+        func.optional_print("")
 
 
 #############################################################
@@ -388,4 +389,4 @@ class Crossbows(RangedWeapons):
 
     def print_obj(self):
         super().print_obj()
-        print("")
+        func.optional_print("")

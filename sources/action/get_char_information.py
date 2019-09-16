@@ -13,15 +13,15 @@ class GetCharInformation(Actions):
         self.is_a_success = self.start()
         
     def start(self):
-        print("Choose one of the following character:")
+        func.optional_print("Choose one of the following character:")
         
         for char in self.fight.team1.characters_list:
             char.print_basic()
-            print("")
+            func.optional_print("")
             
         for char in self.fight.team2.characters_list:
             char.print_basic()
-            print("")            
+            func.optional_print("")
         
         while 1:
             try:
@@ -29,21 +29,21 @@ class GetCharInformation(Actions):
                 if Actions.cancel_action(read):
                     return False
             except:
-                print("The input is not an ID")
+                func.optional_print("The input is not an ID")
                 continue
             
             for char in self.fight.team1.characters_list:
                 if read == char.get_id():
-                    print("")
+                    func.optional_print("")
                     char.print_obj()
-                    print("")
+                    func.optional_print("")
                     return True
             
             for char in self.fight.team2.characters_list:
                 if read == char.get_id():
-                    print("")
+                    func.optional_print("")
                     char.print_obj()
-                    print("")
+                    func.optional_print("")
                     return True                
             
-            print("ID:", read, "is not available")
+            func.optional_print("ID:", read, "is not available")

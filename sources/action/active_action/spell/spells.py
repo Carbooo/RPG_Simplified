@@ -25,6 +25,7 @@ class Spells(ActiveActions):
         self.spell_time = 0
         self.spell_energy = 0
         self.spell_hands = 0
+        self.spell_knowledge = 0
         self.spell_power = {}
 
 ######################### BASE FUNCTIONS #######################
@@ -49,19 +50,19 @@ class Spells(ActiveActions):
 
     def is_able_to_cast(self):
         if not self.initiator.feelings[self.type].check_energy(self.spell_energy):
-            print("You don't have enough energy (", self.spell_energy, ") to cast this spell")
+            func.optional_print("You don't have enough energy (", self.spell_energy, ") to cast this spell")
             return False
 
         if not self.initiator.check_stamina(self.spell_stamina):
-            print("You don't have enough stamina (", self.spell_stamina, ") to cast this spell")
+            func.optional_print("You don't have enough stamina (", self.spell_stamina, ") to cast this spell")
             return False
 
         if self.initiator.equipments.free_hands < self.spell_hands:
-            print("You don't have enough free hands (", self.spell_hands, ") to cast this spell")
+            func.optional_print("You don't have enough free hands (", self.spell_hands, ") to cast this spell")
             return False
 
         if self.initiator.feelings[self.type].knowledge < self.spell_knowledge:
-            print("You don't have the required knowledge (", self.spell_knowledge, ") to cast this spell")
+            func.optional_print("You don't have the required knowledge (", self.spell_knowledge, ") to cast this spell")
             return False
 
         return True
@@ -69,11 +70,11 @@ class Spells(ActiveActions):
 ######################### CHOOSE FUNCTIONS #######################
     @staticmethod
     def choose_spell():
-        print("You have decided to cast a spell")
-        print("")
-        print("Which type of spell?")
+        func.optional_print("You have decided to cast a spell")
+        func.optional_print("")
+        func.optional_print("Which type of spell?")
         for spell_type in cfg.spells:
-            print("-", spell_type["description"], "(" + spell_type["code"] + ")")
+            func.optional_print("-", spell_type["description"], "(" + spell_type["code"] + ")")
 
         while 1:
             read = func.optional_input('--> Spell type (0 for cancel) : ')
@@ -82,12 +83,12 @@ class Spells(ActiveActions):
 
             for spell_type in cfg.spells:
                 if read == spell_type["code"]:
-                    print("You chose to cast a " + spell_type["description"])
-                    print("")
-                    print("Which spell do you want to cast?")
+                    func.optional_print("You chose to cast a " + spell_type["description"])
+                    func.optional_print("")
+                    func.optional_print("Which spell do you want to cast?")
 
                     for spell in spell_type["list"]:
-                        print("- ", spell["description"] + " (" + spell["code"] + ")")
+                        func.optional_print("- ", spell["description"] + " (" + spell["code"] + ")")
 
                     while 1:
                         read = func.optional_input('--> Spell (0 for cancel) : ')
@@ -98,9 +99,9 @@ class Spells(ActiveActions):
                             if read == spell["code"]:
                                 return spell_type["code"], spell["code"]
 
-                        print("Spell:", read, "is not recognized")
+                        func.optional_print("Spell:", read, "is not recognized")
 
-            print("Spell type:", read, "is not recognized")
+            func.optional_print("Spell type:", read, "is not recognized")
 
     def choose_pos_target(self):
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:
@@ -110,7 +111,7 @@ class Spells(ActiveActions):
 
         while 1:
             try:
-                print("Where do you want to throw your spell?")
+                func.optional_print("Where do you want to throw your spell?")
                 read = int(func.optional_input('--> Abscissa (-1 = Cancel): '))
                 if read == -1:
                     Actions.cancel_action(0)
@@ -126,10 +127,10 @@ class Spells(ActiveActions):
                     ordinate = read
 
             except:
-                print("The input is not an integer")
+                func.optional_print("The input is not an integer")
 
             if not self.fight.field.is_pos_magically_reachable(self.initiator, abscissa, ordinate):
-                print("Target is not magically reachable")
+                func.optional_print("Target is not magically reachable")
                 continue
 
             target = {
@@ -139,17 +140,17 @@ class Spells(ActiveActions):
             return target
 
     def choose_target_from_list(self, char_list):
-        print("---------- CASTER -----------")
+        func.optional_print("---------- CASTER -----------")
         self.initiator.print_attack_state()
-        print("")
-        print("--------- TARGETS -----------")
-        print("Choose one of the available targets:")
+        func.optional_print("")
+        func.optional_print("--------- TARGETS -----------")
+        func.optional_print("Choose one of the available targets:")
         for char in char_list:
             char.print_defense_state()
 
         while 1:
             try:
-                print("")
+                func.optional_print("")
                 read = int(func.optional_input('--> ID (0 = Cancel): '))
                 if Actions.cancel_action(read):
                     return False
@@ -158,10 +159,10 @@ class Spells(ActiveActions):
                     if char.get_id() == read:
                         return char
 
-                print("ID:", read, "is not available")
+                func.optional_print("ID:", read, "is not available")
 
             except:
-                print("The input is not an ID")
+                func.optional_print("The input is not an ID")
 
     def choose_target(self, include_enemies, include_allied, include_deads):
         team_list = []
@@ -191,11 +192,11 @@ class Spells(ActiveActions):
     def rechoose_target_if_necessary(self, include_enemies, include_allied, include_deads):
         if not self.fight.field.is_target_magically_reachable(self.initiator, self.target):
             if include_deads or not self.target.body.is_alive():
-                print("Your initial target is no longer reachable!")
-                print("Please choose a new one or cancel the attack.")
+                func.optional_print("Your initial target is no longer reachable!")
+                func.optional_print("Please choose a new one or cancel the attack.")
                 self.target = self.choose_target(include_enemies, include_allied, include_deads)
                 if not self.target:
-                    print("Spell cancelled, the magic and stamina spent is lost")
+                    func.optional_print("Spell cancelled, the magic and stamina spent is lost")
                     return False
         return True
 
@@ -238,9 +239,9 @@ class Spells(ActiveActions):
 
         if attack_value <= 0:
             self.target.print_basic()
-            print("-- has BLOCKED the attack of --", end=' ')
+            func.optional_print("-- has BLOCKED the attack of --", end=' ', level=3)
             self.initiator.print_basic()
-            print("")
+            func.optional_print("")
             time.sleep(4)
         else:
             if is_localized:
@@ -289,20 +290,20 @@ class Spells(ActiveActions):
 
 ######################### PRINTING FUNCTIONS #######################
     def print_spell(self, txt, state, self_spell):
-        print("")
-        print("*********************************************************************")
+        func.optional_print("")
+        func.optional_print("*********************************************************************")
         if state == "executing":
-            print("************************ SPELL BEING CAST ***************************")
+            func.optional_print("************************ SPELL BEING CAST ***************************")
         elif state == "ending":
-            print("*********************** ACTIVE SPELL ENDING *************************")
+            func.optional_print("*********************** ACTIVE SPELL ENDING *************************")
         elif state == "choosing":
-            print("********************** CHOOSING TARGET SPELL ************************")
-        print("*********************************************************************")
+            func.optional_print("********************** CHOOSING TARGET SPELL ************************")
+        func.optional_print("*********************************************************************")
         self.initiator.print_basic()
-        print(txt, end=' ')
+        func.optional_print(txt, end=' ')
         if not self_spell:
             self.target.print_basic()
-        print("")
-        print("*********************************************************************")
-        print("")
+        func.optional_print("")
+        func.optional_print("*********************************************************************")
+        func.optional_print("")
         time.sleep(3)

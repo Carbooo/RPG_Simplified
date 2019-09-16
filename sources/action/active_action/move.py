@@ -27,7 +27,7 @@ class Move(ActiveActions):
         if not self.initial_move_check():
             return False
 
-        print("Choose your destination:")
+        func.optional_print("Choose your destination:")
         while 1:
             abscissa = -1
             ordinate = -1
@@ -39,8 +39,8 @@ class Move(ActiveActions):
             try:
                 abscissa = int(read)
             except:
-                print("Abscissa:", read, "is not recognized")
-                print("")
+                func.optional_print("Abscissa:", read, "is not recognized")
+                func.optional_print("")
                 continue
 
             read = func.optional_input('--> Ordinate (-1 = Cancel): ')
@@ -50,19 +50,19 @@ class Move(ActiveActions):
             try:
                 ordinate = int(read)
             except:
-                print("Ordinate:", read, "is not recognized")
-                print("")
+                func.optional_print("Ordinate:", read, "is not recognized")
+                func.optional_print("")
                 continue
 
             if not self.fight.field.is_case_free(abscissa, ordinate):
-                print("Position:", abscissa, "x", ordinate, "is not available")
-                print("")
+                func.optional_print("Position:", abscissa, "x", ordinate, "is not available")
+                func.optional_print("")
                 continue
 
             self.path = self.fight.field.choose_path_move(self.initiator, abscissa, ordinate)
             if not self.path:
-                print("Position:", abscissa, "x", ordinate, "cannot be reached")
-                print("")
+                func.optional_print("Position:", abscissa, "x", ordinate, "cannot be reached")
+                func.optional_print("")
                 continue
 
             coord = self.path.pop(0)
@@ -70,8 +70,8 @@ class Move(ActiveActions):
             self.target_ord = coord[1]
             
             if not self.check_move_stamina():
-                print("You do not have enough stamina (", self.initiator.body.stamina, ") to move there")
-                print("")
+                func.optional_print("You do not have enough stamina (", self.initiator.body.stamina, ") to move there")
+                func.optional_print("")
                 continue
 
             self.end_update(self.get_move_coef() * cfg.actions["move"]["stamina"],
@@ -83,12 +83,12 @@ class Move(ActiveActions):
         if not self.fight.field.move_character(self.initiator, self.target_abs, self.target_ord):
             return self.cancel_move()
 
-        print("")
-        print("*********************************************************************")
-        print(self.initiator.print_basic(), "has moved to", self.target_abs, "x", self.target_ord)
-        print("Next steps are:", self.path)
-        print("*********************************************************************")
-        print("")
+        func.optional_print("")
+        func.optional_print("*********************************************************************")
+        func.optional_print(self.initiator.print_basic(), "has moved to", self.target_abs, "x", self.target_ord)
+        func.optional_print("Next steps are:", self.path)
+        func.optional_print("*********************************************************************")
+        func.optional_print("")
         time.sleep(3)
         
         # Test if destination is reachex
@@ -98,7 +98,7 @@ class Move(ActiveActions):
         # Stop moving if max move is reached
         self.total_nb_of_move -= 1 
         if self.total_nb_of_move == 0:
-            print("********* Max number of moves reached ********")
+            func.optional_print("********* Max number of moves reached ********")
             return self.cancel_move()
             
         # Update path regularly to adapt to field changes
@@ -109,7 +109,7 @@ class Move(ActiveActions):
                 self.path = path
                 self.nb_of_move_left = cfg.nb_of_move_before_recalculating_path
             else:
-                print("******* Target destination is no longer reachable *******")
+                func.optional_print("******* Target destination is no longer reachable *******")
                 return self.cancel_move()
         else:
             self.nb_of_move_left -= 1
@@ -120,13 +120,13 @@ class Move(ActiveActions):
         self.target_ord = coord[1]
             
         if not self.check_move_stamina():
-            print("******* You do not have enough stamina (", 
+            func.optional_print("******* You do not have enough stamina (",
                     self.initiator.body.stamina, 
                     ") to keep moving *******")
             return self.cancel_move()
         
         if not self.fight.field.is_case_free(self.target_abs, self.target_ord):
-            print("******* Position:", self.target_abs, 
+            func.optional_print("******* Position:", self.target_abs,
                     "x", self.target_ord, 
                     "is no longer available *******")
             return self.cancel_move()
@@ -146,14 +146,14 @@ class Move(ActiveActions):
             return coef
 
     def cancel_move(self):
-        print("")
-        print("*********************************************************************")
-        print("Position:", self.target_abs, "x", self.target_ord, "is no longer reachable")
-        print("The move of (", end=' ')
+        func.optional_print("")
+        func.optional_print("*********************************************************************")
+        func.optional_print("Position:", self.target_abs, "x", self.target_ord, "is no longer reachable")
+        func.optional_print("The move of (", end=' ')
         self.initiator.print_basic()
-        print(") has been cancelled !")
-        print("*********************************************************************")
-        print("")
+        func.optional_print(") has been cancelled !")
+        func.optional_print("*********************************************************************")
+        func.optional_print("")
         self.path = []
         time.sleep(5)
         return False
@@ -161,20 +161,20 @@ class Move(ActiveActions):
     ######################## BROWSE PATH ##########################
     def initial_move_check(self):
         if self.fight.field.can_move(self.initiator) is False:
-            print("No free case available for move action")
-            print("")
+            func.optional_print("No free case available for move action")
+            func.optional_print("")
             return False
 
         if not self.initiator.check_stamina(1.0 / self.initiator.movement_handicap_ratio()):
-            print("You do not have enough stamina (", self.initiator.body.stamina, ") to move")
-            print("")
+            func.optional_print("You do not have enough stamina (", self.initiator.body.stamina, ") to move")
+            func.optional_print("")
             return False
 
         return True
 
     def check_move_stamina(self):
         if not self.initiator.check_stamina(self.get_move_coef() * cfg.actions["move"]["stamina"]):
-            print("You do not have enough stamina (",
+            func.optional_print("You do not have enough stamina (",
                   self.initiator.body.return_current_stamina(),
                   ") to move in that position (abs:",
                   self.target_abs, ",ord:", self.target_ord, ")")

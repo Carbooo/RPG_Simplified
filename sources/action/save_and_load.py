@@ -24,7 +24,7 @@ class Save(Actions):
             file = open(Save.save_path + self.filename + Save.save_extension, 'wb')
             pickle.dump(self, file)
         else:
-            print("Write a file name for the saving:")     
+            func.optional_print("Write a file name for the saving:")
             
             while 1:
                 self.filename = func.optional_input('--> file name (0 = Cancel): ')
@@ -35,11 +35,11 @@ class Save(Actions):
                 try:
                     file = open(Save.save_path + self.filename + Save.save_extension, 'wb')
                     pickle.dump(self, file)
-                    print("***** GAME HAS BEEN SAVED *****")
+                    func.optional_print("***** GAME HAS BEEN SAVED *****")
                     time.sleep(3)
                     return True
                 except:
-                    print("Cannot open file:", self.filename)
+                    func.optional_print("Cannot open file:", self.filename)
 
     @staticmethod
     def copy_to_next(filename):
@@ -49,13 +49,14 @@ class Save(Actions):
             target = Save.save_path + new_name + Save.save_extension
             copyfile(source, target)
         else:
-            print("Error: Function should only be used for AutoSave files")
+            func.optional_print("Error: Function should only be used for AutoSave files")
 
     @staticmethod
     def copy_all_to_next():
         for i in range(4, 0, -1):  # Files need to be initialized
             Save.copy_to_next("AutoSave" + str(i))
-    
+
+
 #############################################################
 ####################### LOAD CLASS ##########################
 #############################################################
@@ -67,7 +68,7 @@ class Load(Actions):
         self.is_a_success = self.start()
         
     def start(self):
-        print("Write the file name of a previous save:")
+        func.optional_print("Write the file name of a previous save:")
         
         while 1:
             filename = func.optional_input('--> file name (0 = Cancel): ')
@@ -80,11 +81,11 @@ class Load(Actions):
                 file = open(Save.save_path + filename + Save.save_extension, 'rb')
             except:
                 open_file = False
-                print("Cannot open file:", filename)
+                func.optional_print("Cannot open file:", filename)
         
             if open_file:
                 self = pickle.load(file)
-                print("***** GAME HAS BEEN LOADED *****")
+                func.optional_print("***** GAME HAS BEEN LOADED *****")
                 time.sleep(3)
                 self.fight.start()
                 exit(0)

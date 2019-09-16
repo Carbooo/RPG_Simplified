@@ -23,7 +23,7 @@ class MeleeAttack(ActiveActions):
 
     def start(self):
         if not self.initiator.check_stamina(cfg.actions["melee_attack"]["stamina"]):
-            print("You do not have enough stamina (", self.initiator.body.get_current_stamina(), ") for a melee attack")
+            func.optional_print("You do not have enough stamina (", self.initiator.body.get_current_stamina(), ") for a melee attack")
             return False
         elif not self.choose_target():
             return False
@@ -32,7 +32,7 @@ class MeleeAttack(ActiveActions):
         
     def choose_target(self):
         if not self.can_melee_attack():
-            print("No enemy can be reached by a melee attack")
+            func.optional_print("No enemy can be reached by a melee attack")
             time.sleep(3)
             return False
 
@@ -41,18 +41,18 @@ class MeleeAttack(ActiveActions):
         else:
             team = self.fight.team1
 
-        print("--------- ATTACKER -----------")
+        func.optional_print("--------- ATTACKER -----------")
         self.initiator.print_attack_state()
-        print("")
+        func.optional_print("")
 
-        print("--------- TARGETS -----------")
-        print("Choose one of the following enemies:")
+        func.optional_print("--------- TARGETS -----------")
+        func.optional_print("Choose one of the following enemies:")
         enemy_list = []
         for char in team.characters_list:
             self.target = char
             if self.initiator.can_melee_attack(self.target):
-                print("----------------------------")
-                print("----- FIGHTING AVAILABILITY: ",
+                func.optional_print("----------------------------")
+                func.optional_print("----- FIGHTING AVAILABILITY: ",
                     self.target.get_fighting_availability(self.timeline),
                     " -----")
                 self.target.print_defense_state()
@@ -60,12 +60,12 @@ class MeleeAttack(ActiveActions):
 
         while 1:
             try:
-                print("")
+                func.optional_print("")
                 read = int(func.optional_input('--> ID (0 = Cancel): '))
                 if Actions.cancel_action(read):
                     return False
             except:
-                print("The input is not an ID")
+                func.optional_print("The input is not an ID")
                 continue
 
             for char in enemy_list:
@@ -73,23 +73,23 @@ class MeleeAttack(ActiveActions):
                 if self.target.get_id() == read:
                     return True
 
-            print("ID:", read, "is not available")
+            func.optional_print("ID:", read, "is not available")
 
         self.end_update(cfg.actions["melee_attack"]["stamina"], cfg.actions["melee_attack"]["duration"])
         return True
 
     def execute(self):
         if not self.initiator.can_melee_attack(self.target):
-            print("")
-            print("*********************************************************************")
-            print("The target (", end=' ')
+            func.optional_print("")
+            func.optional_print("*********************************************************************")
+            func.optional_print("The target (", end=' ')
             self.target.print_basic()
-            print(") is no longer reachable by a melee attack")
-            print("The attack of (", end=' ')
+            func.optional_print(") is no longer reachable by a melee attack")
+            func.optional_print("The attack of (", end=' ')
             self.initiator.print_basic()
-            print(") has been cancelled !")
-            print("*********************************************************************")
-            print("")
+            func.optional_print(") has been cancelled !")
+            func.optional_print("*********************************************************************")
+            func.optional_print("")
             time.sleep(5)
             return False
             
@@ -107,20 +107,20 @@ class MeleeAttack(ActiveActions):
         ordinate = self.target.ordinate
         if self.actual_defense == "Dodge" and \
            self.fight.field.random_move(self.target, cfg.random_defenser_move_probability * 2):
-                print("The fight made the defenser move from their position!")
+                func.optional_print("The fight made the defenser move from their position!")
                 time.sleep(2)
                 if random.random() < cfg.random_attacker_move_probability:
                     self.fight.field.move_character(self.initiator, abscissa, ordinate)
-                    print("And the attacker took the initial position of the defender!")
+                    func.optional_print("And the attacker took the initial position of the defender!")
                     time.sleep(2)
                 
         elif self.actual_defense == "Defense" and \
              self.fight.field.random_move(self.target, cfg.random_defenser_move_probability):
-                print("The fight made the defenser move from their position!")
+                func.optional_print("The fight made the defenser move from their position!")
                 time.sleep(2)
                 if random.random() < cfg.random_attacker_move_probability:
                     self.fight.field.move_character(self.initiator, abscissa, ordinate)
-                    print("And the attacker took the initial position of the defender!")
+                    func.optional_print("And the attacker took the initial position of the defender!")
                     time.sleep(2)
                 
         return True
@@ -131,7 +131,7 @@ class MeleeAttack(ActiveActions):
         defense_result = Character.get_melee_attack(self.initiator.melee_handiness, self.initiator.melee_power) \
                          - self.target.melee_defense
         if not self.target.check_stamina(cfg.actions["melee_attack"]["stamina"]):
-            print("Defender does not have enough stamina (", self.target.body.get_current_stamina(), ") to defend")
+            func.optional_print("Defender does not have enough stamina (", self.target.body.get_current_stamina(), ") to defend")
             self.actual_defense = "No defense"
         elif defense_result < dodge_result:
             self.actual_defense = "Dodge"
@@ -182,35 +182,35 @@ class MeleeAttack(ActiveActions):
                 self.delay(attack_value)
                 time.sleep(3)
             else:
-                print("The attack is a normal hit")
+                func.optional_print("The attack is a normal hit", level=2)
                 self.melee_attack_received(attack_value)
         elif attack_value < cfg.melee_attack_stage[3]:
             # Big hit or hit + delay for high damages
             r = random.random()
             if r < 0.5:
-                print("The attack will hit and slightly delay the player!")
+                func.optional_print("The attack will hit and slightly delay the player!", level=2)
                 time.sleep(2)
                 self.delay(attack_value / 2)
                 self.melee_attack_received(attack_value * 3 / 4)
             else:
-                print("The attack is a strong hit!")
+                func.optional_print("The attack is a strong hit!", level=2)
                 self.melee_attack_received(attack_value * 4 / 3)
         else:
             # Big hit + delay or huge hit
             r = random.random()
             if r < 0.5:
-                print("The attack will hit AND delay the player!")
+                func.optional_print("The attack will hit AND delay the player!", level=2)
                 time.sleep(2)
                 self.delay(attack_value * 2 / 3)
                 self.melee_attack_received(attack_value)
             else:
-                print("The attack is a HUGE HIT!")
+                func.optional_print("The attack is a HUGE HIT!", level=2)
                 time.sleep(2)
                 self.melee_attack_received(attack_value * 3 / 2)
 
     def block(self):
         self.target.print_basic()
-        print("-- has BLOCKED the attack of --", end=' ')
+        func.optional_print("-- has BLOCKED the attack of --", end=' ', level=2)
         self.initiator.print_basic()
         time.sleep(2)
 
@@ -218,9 +218,9 @@ class MeleeAttack(ActiveActions):
         attack_value /= cfg.melee_attack_stage[3] / 2
         self.target.spend_time(attack_value)
         self.initiator.print_basic()
-        print("-- has DELAYED --", end=' ')
+        func.optional_print("-- has DELAYED --", end=' ', level=2)
         self.target.print_basic()
-        print("-- of", round(attack_value, 2), "TURN(S) --")
+        func.optional_print("-- of", round(attack_value, 2), "TURN(S) --", level=2)
         time.sleep(2)
     
     def melee_attack_received(self, attack_value):

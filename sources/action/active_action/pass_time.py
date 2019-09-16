@@ -16,7 +16,7 @@ class PassTime(ActiveActions):
         self.is_a_success = self.start()
         
     def start(self):
-        print("How much time do you want to wait?")
+        func.optional_print("How much time do you want to wait?")
         txt = "--> Number of 0.1 turn (0 = Cancel): "
         while 1:
             try:
@@ -26,10 +26,10 @@ class PassTime(ActiveActions):
                 else:
                     break
             except:
-                print("The input is not a number")
+                func.optional_print("The input is not a number")
                 continue
             
         self.initiator.spend_absolute_time(read * 0.1)
-        print("You have decided to wait", round(read * 0.1, 1), "turn(s)")
+        func.optional_print("You have decided to wait", round(read * 0.1, 1), "turn(s)")
         time.sleep(3)
         return True

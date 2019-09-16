@@ -2,6 +2,7 @@ import math as math
 import time as time
 from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -50,8 +51,8 @@ class WrathSpells(Spells):
         if not self.is_able_to_cast():
             return False
         
-        print("You have decided to improve your strength.")
-        print("The effect will start soon!")
+        func.optional_print("You have decided to improve your strength.")
+        func.optional_print("The effect will start soon!")
         time.sleep(3)
             
         self.target = self.initiator
@@ -108,8 +109,8 @@ class WrathSpells(Spells):
         if not self.is_able_to_cast():
             return False
         
-        print("You have decided to throw a fireball")
-        print("The fireball is charging...")
+        func.optional_print("You have decided to throw a fireball")
+        func.optional_print("The fireball is charging...")
         time.sleep(3)
         
         self.set_magical_coef()
@@ -120,7 +121,7 @@ class WrathSpells(Spells):
         self.print_spell("has a fireball ready and needs to choose a target", "choosing", True)
         target = self.choose_pos_target()
         if not target:
-            print("Spell cancelled, the magic and stamina spent is lost")
+            func.optional_print("Spell cancelled, the magic and stamina spent is lost")
             return False
 
         attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef

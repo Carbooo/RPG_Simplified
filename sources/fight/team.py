@@ -1,4 +1,5 @@
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -17,7 +18,7 @@ class Team:
                     char_found = True
                     break
             if not char_found:
-                print("(Teams) Team creation failed because the character name:", name, "cannot be found !")
+                func.optional_print("(Teams) Team creation failed because the character name:", name, "cannot be found !")
                 exit(0)
 
         self.name = name
@@ -50,17 +51,17 @@ class Team:
 
             # Test if a position is set or not
             if char.check_position() is False:
-                print("(Teams) Character:")
+                func.optional_print("(Teams) Character:")
                 char.print_position()
-                print("is not positioned")
+                func.optional_print("is not positioned")
                 return False
 
             # Test if a position is taken or not
             for j in range(len(abscissa_list)):
                 if char.abscissa == abscissa_list[j] and char.ordinate == ordinate_list[j]:
-                    print("(Teams) Character:")
+                    func.optional_print("(Teams) Character:")
                     char.print_position()
-                    print("is using a position already taken")
+                    func.optional_print("is using a position already taken")
                     return False
 
             # add the current position for historic
@@ -72,60 +73,60 @@ class Team:
 
     ################ PRINTING FUNCTIONS ########################
     def print_obj(self):
-        print("Team name:", self.name, ", Team members:")
+        func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
-            print("\\", end=' ')
+            func.optional_print("\\", end=' ')
             char.print_basic()
-            print("\\")
+            func.optional_print("\\")
 
     def print_positions(self):
-        print("Team name:", self.name, ", Team members:")
+        func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
-            print("\\")
+            func.optional_print("\\")
             char.print_position()
 
     def print_alive_states(self):
-        print("Team name:", self.name, ", Team members:")
+        func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
             if char.body.state != "Dead":
-                print("\\", end=' ')
+                func.optional_print("\\", end=' ')
                 char.print_state()
 
     def print_dead_states(self):
-        print("Team name:", self.name, ", Team members:")
+        func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
             if char.body.state == "Dead":
-                print("\\", end=' ')
+                func.optional_print("\\", end=' ')
                 char.print_state()
 
     def print_all_states(self):
-        print("Team name:", self.name, ", Team members:")
+        func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
-            print("\\", end=' ')
+            func.optional_print("\\", end=' ')
             char.print_state()
 
     def print_alive_defense_states(self):
-        print("Team name:", self.name, ", Team members:")
+        func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
             if char.body.state != "Dead":
-                print("\\", end=' ')
+                func.optional_print("\\", end=' ')
                 char.print_defense_state()
 
     def print_all_defense_states(self):
-        print("Team name:", self.name, ", Team members:")
+        func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
-            print("\\", end=' ')
+            func.optional_print("\\", end=' ')
             char.print_defense_state()
 
     def print_alive_attack_states(self):
-        print("Team name:", self.name, ", Team members:")
+        func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
             if char.body.state != "Dead":
-                print("\\", end=' ')
+                func.optional_print("\\", end=' ')
                 char.print_state()
 
     def print_all_attack_states(self):
-        print("Team name:", self.name, ", Team members:")
+        func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
-            print("\\", end=' ')
+            func.optional_print("\\", end=' ')
             char.print_attack_state()

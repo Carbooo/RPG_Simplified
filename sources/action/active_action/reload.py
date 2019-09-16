@@ -21,17 +21,17 @@ class Reload(ActiveActions):
 
     def start(self):
         if self.initiator.check_stamina(cfg.actions["reload"]["stamina"]) is False:
-            print("You do not have enough stamina (",
+            func.optional_print("You do not have enough stamina (",
                   self.initiator.body.return_current_stamina(), ") to reload, action cancelled!")
             return False
         elif self.initiator.equipments.is_using_a_ranged_weapon() is False:
-            print("You are not using a ranged weapon, action cancelled!")
+            func.optional_print("You are not using a ranged weapon, action cancelled!")
             return False
         elif self.initiator.equipments.has_reloaded():
-            print("You have already reloaded your ranged weapons, action cancelled!")
+            func.optional_print("You have already reloaded your ranged weapons, action cancelled!")
             return False
         elif self.initiator.equipments.has_ammo() is False:
-            print("You do not have ammo anymore, action cancelled!")
+            func.optional_print("You do not have ammo anymore, action cancelled!")
             return False
 
         for weapon in self.initiator.equipments.weapons_in_use:
@@ -52,29 +52,29 @@ class Reload(ActiveActions):
                     self.ammo_to_load  = ammo_available[0]
                     
                 elif len(ammo_available) > 1:
-                    print("Choose the ammo to reload:")
+                    func.optional_print("Choose the ammo to reload:")
                     for ammo in ammo_available:
-                        print("\t\\", end=' ')
+                        func.optional_print("\t\\", end=' ')
                         ammo.print_obj()
                     ammo_chosen = False
                     while not ammo_chosen:
                         try:
-                            print("")
+                            func.optional_print("")
                             read = int(func.optional_input('--> ID (0 = Cancel): '))
                             if Actions.cancel_action(read):
                                 return False
                         except:
-                            print("The input is not an ID")
+                            func.optional_print("The input is not an ID")
                             continue
                         for ammo in ammo_available:
                             if ammo.get_id() == read:
                                 self.ammo_to_load  = ammo
                                 ammo_chosen = True
                                 break
-                        print("ID:", read, "is not available")
+                        func.optional_print("ID:", read, "is not available")
 
-        print("You have decided to reload your ranged weapon")
-        print("Reload in progress...")
+        func.optional_print("You have decided to reload your ranged weapon")
+        func.optional_print("Reload in progress...")
         time.sleep(3)
         
         if isinstance(self.weapon_to_reload, Crossbows):

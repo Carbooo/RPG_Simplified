@@ -3,6 +3,7 @@ import math as math
 import numpy as np
 import random as random
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -34,7 +35,7 @@ class Field:
         # Check the minimum size of a field
         if self.abscissa_size < cfg.max_position_area * 2 \
                 or self.ordinate_size < cfg.max_position_area:
-            print("(Field) The field is too small.",
+            func.optional_print("(Field) The field is too small.",
                   "It must be at least:",
                   cfg.max_position_area * 2,
                   "x", cfg.max_position_area)
@@ -43,14 +44,14 @@ class Field:
         for i in range(self.abscissa_size):
             if len(self.obstacles_array[i, 0::]) != self.ordinate_size \
                     or len(self.reliefs_array[i, 0::]) != self.ordinate_size:
-                print("(Field) Not all the columns have the same size")
+                func.optional_print("(Field) Not all the columns have the same size")
                 return False
 
         # Check the line size
         for i in range(self.ordinate_size):
             if len(self.obstacles_array[0::, i]) != self.abscissa_size or \
                     len(self.reliefs_array[0::, i]) != self.abscissa_size:
-                print("(Field) Not all the lines have the same size")
+                func.optional_print("(Field) Not all the lines have the same size")
                 return False
 
         return True
@@ -60,7 +61,7 @@ class Field:
         for i in range(self.abscissa_size):
             for j in range(self.ordinate_size):
                 if self.obstacles_array[i, j] not in cfg.obstacle_types_list:
-                    print("(Fields) The obstacle array contains illegal values")
+                    func.optional_print("(Fields) The obstacle array contains illegal values")
                     return False
         return True
 
@@ -332,7 +333,7 @@ class Field:
             # If a character could not be set, reset all characters
             if not self.set_initial_character(char):
                 team.reset_characters()
-                print("(Fields) Cannot set team:")
+                func.optional_print("(Fields) Cannot set team:")
                 team.print_obj()
                 return False
         return True
@@ -357,11 +358,11 @@ class Field:
         # The control is only done here and not in the sub-set function
         # To prevent the new field position to be erronous
         if not team1.is_positioned():
-            print("(Fields) Cannot set team:")
+            func.optional_print("(Fields) Cannot set team:")
             team1.print_obj()
             return False
         if not team2.is_positioned():
-            print("(Fields) Cannot set team:")
+            func.optional_print("(Fields) Cannot set team:")
             team2.print_obj()
             return False
 
@@ -499,7 +500,7 @@ class Field:
         for _ in range(1, self.abscissa_size + 1):
             stri += "----|"
         stri += "----"
-        print(stri)
+        func.optional_print(stri)
 
     def print_abs_scale(self):
         stri = "  "
@@ -509,18 +510,18 @@ class Field:
             else:
                 stri += " | " + str(j)
         stri += " |"
-        print(stri)
+        func.optional_print(stri)
 
     def print_obj(self):
-        print("************************** FIELD ************************")
-        print("--  ACTIVE SPELLS --")
+        func.optional_print("************************** FIELD ************************")
+        func.optional_print("--  ACTIVE SPELLS --")
         for spell in self.active_spells:
-            print("   -", spell.surname, "(", spell.target_abs, "x", spell.target_ord, ")")
-        print("")
+            func.optional_print("   -", spell.surname, "(", spell.target_abs, "x", spell.target_ord, ")")
+        func.optional_print("")
 
         obs_array = np.transpose(self.obstacles_array)
         char_array = np.transpose(self.characters_array)
-        print("ID:", self.get_id(), ", name:", self.name)
+        func.optional_print("ID:", self.get_id(), ", name:", self.name)
 
         # Top abscissa scale
         self.print_abs_scale()
@@ -550,7 +551,7 @@ class Field:
             stri += " " + str(current_ord)
 
             # Print the whole line
-            print(stri)
+            func.optional_print(stri)
             stri = ""
 
             # Separation line

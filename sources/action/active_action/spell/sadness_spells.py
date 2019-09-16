@@ -2,6 +2,7 @@ import math as math
 import time as time
 from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -57,8 +58,8 @@ class SadnessSpells(Spells):
         if not self.choose_target(True, False, False):
             return False
         
-        print("You have decided to send a ice pick")
-        print("The ice is forming...")
+        func.optional_print("You have decided to send a ice pick")
+        func.optional_print("The ice is forming...")
         time.sleep(3)
         
         self.set_magical_coef()
@@ -86,8 +87,8 @@ class SadnessSpells(Spells):
         if not self.is_able_to_cast():
             return False
         
-        print("You have decided to cast a despair ice storm")
-        print("The storm is forming...")
+        func.optional_print("You have decided to cast a despair ice storm")
+        func.optional_print("The storm is forming...")
         time.sleep(3)
         
         self.set_magical_coef()
@@ -98,7 +99,7 @@ class SadnessSpells(Spells):
         self.print_spell("has a despair storm ready and needs to choose a target", "choosing", True)
         target = self.choose_pos_target()
         if not target:
-            print("Spell cancelled, the magic and stamina spent is lost")
+            func.optional_print("Spell cancelled, the magic and stamina spent is lost")
             return False
 
         self.target_abs = target["abscissa"]

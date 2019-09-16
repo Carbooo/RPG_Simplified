@@ -1,4 +1,5 @@
 import time as time
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -16,7 +17,7 @@ class Actions:
         try:
             read = int(read)
             if read == 0 or read == '0':
-                print("Action cancelled!")
+                func.optional_print("Action cancelled!")
                 time.sleep(1)
                 return True
             return False

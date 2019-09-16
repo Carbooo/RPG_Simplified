@@ -2,6 +2,7 @@ import math as math
 import random as random
 import time as time
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 from sources.character.character_body import CharBody
 from sources.character.character_equipments import CharEquipments
 from sources.character.feeling import Feeling
@@ -296,10 +297,10 @@ class Character:
 
     def check_position(self):
         if self.abscissa not in range(cfg.max_position_area):
-            print("(Characters) Abscissa must be included in [0:", cfg.max_position_area, "]")
+            func.optional_print("(Characters) Abscissa must be included in [0:", cfg.max_position_area, "]")
             return False
         if self.ordinate not in range(cfg.max_position_area):
-            print("(Characters) Ordinate must be included in [0:", cfg.max_position_area, "]")
+            func.optional_print("(Characters) Ordinate must be included in [0:", cfg.max_position_area, "]")
             return False
         return True
 
@@ -349,37 +350,38 @@ class Character:
         avoid_armor_chances = (1 - random.gauss(1, cfg.high_variance) * cover_ratio) * accuracy_ratio
         
         if cover_ratio == 0:
-            print("The player has no armor!")
+            func.optional_print("The player has no armor!", level=2)
             time.sleep(2)
             return 0
         elif random.random() < avoid_armor_chances:
-            print("The hit will avoid the armor!")
+            func.optional_print("The hit will avoid the armor!", level=2)
             time.sleep(2)
             return 0
         else:
-            print("The hit will meet a full armor part")
+            func.optional_print("The hit will meet a full armor part", level=2)
             time.sleep(2)
             return 1
             
     def damages_received(self, enemy, attack_value, accuracy_ratio, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate=1.0):
         enemy.print_basic()
-        print("-- has HIT --", end=' ')
+        func.optional_print("-- has HIT --", end=' ', level=3)
         self.print_basic()
-        print("-- with a power of", int(round(attack_value)))
+        func.optional_print("-- with a power of", int(round(attack_value)), level=3)
         time.sleep(2)        
         
         damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate)
         
         if damage_result > 0:
             if accuracy_ratio != 0 and random.random() / accuracy_ratio < cfg.critical_hit_chance:
-                print("The damages are amplified, because they hit a critical area!")
+                func.optional_print("The damages are amplified, because they hit a critical area!", level=3)
                 damage_result *= cfg.critical_hit_boost
 
             life_ratio = self.body.loose_life(damage_result)
             # Damages received diminish the defender
             if self.body.is_alive():
                 life_ratio = math.pow(2 - life_ratio, 2) - 1
-                print("The shock of the attack delays the player of", round(life_ratio,2), "turn(s) and consume stamina")
+                func.optional_print("The shock of the attack delays the player of", round(life_ratio, 2),
+                                    "turn(s) and consume stamina", level=3)
                 time.sleep(3)
                 self.spend_time(life_ratio)
                 self.spend_stamina(life_ratio * 10, ignore=True)
@@ -444,11 +446,11 @@ class Character:
 
 ##################### PRINTING FUNCTIONS ########################
     def print_basic(self):
-        print("ID:", self.get_id(), ", Name:", self.name, end=' ')
+        func.optional_print("ID:", self.get_id(), ", Name:", self.name, end=' ')
 
     def print_characteristics(self):
-        print("-- CHARACTERISTICS --", end=' ')
-        print("Constitution:", int(round(self.constitution)),
+        func.optional_print("-- CHARACTERISTICS --", end=' ')
+        func.optional_print("Constitution:", int(round(self.constitution)),
               ", Force:", int(round(self.force)),
               ", Agility:", int(round(self.agility)),
               ", Dexterity:", int(round(self.dexterity)),
@@ -459,35 +461,35 @@ class Character:
               ", Empathy:", int(round(self.empathy)))
 
     def print_spells_and_feelings(self):
-        print("--  FEELINGS  --")
+        func.optional_print("--  FEELINGS  --")
         for key in self.feelings:
-            print("   -", end=' ')
+            func.optional_print("   -", end=' ')
             self.feelings[key].print_obj()
-        print("--  ACTIVE SPELLS --")
+        func.optional_print("--  ACTIVE SPELLS --")
         for spell in self.active_spells:
-            print("   -", spell.surname)
+            func.optional_print("   -", spell.surname)
 
     def print_defense(self):
-        print("--   DEFENSE  --", end=' ')
-        print("Dodging:", int(round(self.dodging)),
+        func.optional_print("--   DEFENSE  --", end=' ')
+        func.optional_print("Dodging:", int(round(self.dodging)),
             ", MeleeDefense:", int(round(self.melee_defense)),
             ", RangedDefense:", int(round(self.ranged_defense)),
             ", MagicDefense:", int(round(self.magic_defense)))
 
     def print_attack(self):
-        print("--   ATTACK   --", end=' ')
-        print("MeleeHandiness:", int(round(self.melee_handiness)),
+        func.optional_print("--   ATTACK   --", end=' ')
+        func.optional_print("MeleeHandiness:", int(round(self.melee_handiness)),
             ", MeleePower:", int(round(self.melee_power)),
             ", MeleeRange:", int(round(self.melee_range)),
             ", PenetrationRate:", int(round(self.pen_rate, 2)),
             ", resis_dim_rate:", int(round(self.resis_dim_rate, 2)),
             ", MagicPower:", int(round(self.magic_power)), end=' ')
         if self.ranged_power > 1:
-            print(", RangedAccuracy:", int(round(self.ranged_accuracy)),
+            func.optional_print(", RangedAccuracy:", int(round(self.ranged_accuracy)),
                 ", RangedPower:", int(round(self.ranged_power)),
                 ", RangedRange:", int(round(self.equipments.get_range())))
         else:
-            print("")
+            func.optional_print("")
                  
     def print_time_state(self):
         if self.last_action:
@@ -495,7 +497,7 @@ class Character:
         else:
             last_action = None
 
-        print(", SpeedRatio:", round(self.speed_ratio, 2),
+        func.optional_print(", SpeedRatio:", round(self.speed_ratio, 2),
             ", Timeline:", round(self.timeline, 2),
             ", CurrentAction:", last_action)
 
@@ -505,7 +507,7 @@ class Character:
         self.print_time_state()
 
     def print_detailed_state(self):
-        print("-- BASIC INFO --", end=' ')
+        func.optional_print("-- BASIC INFO --", end=' ')
         self.print_basic()
         self.body.print_obj()
         self.print_time_state()

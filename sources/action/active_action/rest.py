@@ -20,7 +20,7 @@ class Rest(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):
-        print("How much time do you want to rest? (Resting longer make it more efficient)")
+        func.optional_print("How much time do you want to rest? (Resting longer make it more efficient)")
         txt = "--> Number of turns (0 = Cancel): "
         while 1:
             try:
@@ -28,15 +28,15 @@ class Rest(ActiveActions):
                 if Actions.cancel_action(self.nb_of_turns):
                     return False
                 elif self.nb_of_turns < cfg.min_rest_turn:
-                    print("You cannot rest less than ", cfg.min_rest_turn, " turns")
+                    func.optional_print("You cannot rest less than ", cfg.min_rest_turn, " turns")
                 elif self.nb_of_turns > cfg.max_rest_turn:
-                    print("You cannot rest more than ", cfg.max_rest_turn, " turns")
+                    func.optional_print("You cannot rest more than ", cfg.max_rest_turn, " turns")
                 else:
                     break
             except:
-                print("The input is not an integer")
+                func.optional_print("The input is not an integer")
 
-        print("You have decided to rest for ", self.nb_of_turns, " turn(s)")
+        func.optional_print("You have decided to rest for ", self.nb_of_turns, " turn(s)")
         time.sleep(3)
         
         self.resting_ratio = math.pow(self.nb_of_turns, cfg.resting_ratio)

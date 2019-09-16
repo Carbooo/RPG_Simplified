@@ -25,4 +25,5 @@ def test_ranged():
     Fight(cfg.field_list[0], cfg.team_list[10], cfg.team_list[11])
 
 
+func.log_level = 1
 test_ranged()

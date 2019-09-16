@@ -2,6 +2,7 @@ import time as time
 from sources.character.equipments import Armors, MagicalArmors, Weapons, AttackWeapons, MeleeWeapons, \
     Shields, RangedWeapons, Bows, Crossbows, Ammo
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 
 
 #########################################################################
@@ -45,7 +46,7 @@ class CharEquipments:
 
         # Set armor
         if armor_found is False:
-            print("(Bodies) Armor (", armor_name, ") has not been found and therefore cannot be set")
+            func.optional_print("(Bodies) Armor (", armor_name, ") has not been found and therefore cannot be set", level=3)
             return False
         else:
             self.armors.append(armor_found)
@@ -73,7 +74,7 @@ class CharEquipments:
 
         # Check prerequisites
         if not weapon_found:
-            print("(Bodies) Weapon (", weapon_name, ") has not been found and therefore cannot be set")
+            func.optional_print("(Bodies) Weapon (", weapon_name, ") has not been found and therefore cannot be set", level=3)
             return False
 
         # Set weapon
@@ -82,7 +83,7 @@ class CharEquipments:
     
     def set_weapon_in_use(self, weapon):
         if self.free_hands < weapon.hand:
-            print("(Bodies) Weapon (", weapon.name, ") cannot be set, because there are not enough free hands")
+            func.optional_print("(Bodies) Weapon (", weapon.name, ") cannot be set, because there are not enough free hands", level=3)
             return False
 
         # Set weapon
@@ -93,7 +94,7 @@ class CharEquipments:
 
     def remove_weapon(self, weapon, definitive=False):
         if weapon not in self.weapons_in_use:
-            print("(Bodies) Error, cannot remove weapon because it is not equiped")
+            func.optional_print("(Bodies) Error, cannot remove weapon because it is not equiped", level=3)
             return False
         else:
             self.weapons_in_use.remove(weapon)
@@ -118,7 +119,7 @@ class CharEquipments:
                 self.ammo.append(ammo_found.copy())
             return True
 
-        print("(Bodies) Ammo cannot be set because ammo type (", ammo_type, ") has not been found !")
+        func.optional_print("(Bodies) Ammo cannot be set because ammo type (", ammo_type, ") has not been found !", level=3)
         return False
 
     ############################# DAMAGE FUNCTIONS #############################
@@ -137,7 +138,7 @@ class CharEquipments:
                                                penetration_rate, flesh_dam_rate)
                 damage_result = result[1]
                 if result[0] == 0:
-                    print("Your armor \\ID:", armor.get_id(), "\\Name:", armor.name, "has been broken!")
+                    func.optional_print("Your armor \\ID:", armor.get_id(), "\\Name:", armor.name, "has been broken!", level=3)
                     self.remove_armor(armor)
             else:
                 break
@@ -191,7 +192,7 @@ class CharEquipments:
 
     def weapon_absorbed_damage(self, weapon, damage):
         if weapon.decrease(damage) == 0:
-            print("Your weapon \\ID:", weapon.get_id(), "\\Name:", weapon.name, "has been broken!")
+            func.optional_print("Your weapon \\ID:", weapon.get_id(), "\\Name:", weapon.name, "has been broken!", level=3)
             self.weapons_in_use.remove(weapon)
 
     ############################# RANGE FUNCTIONS ###########################
@@ -248,7 +249,7 @@ class CharEquipments:
             if isinstance(weapon, Bows) and weapon.is_reloaded():
                 has_lost = True
                 weapon.unload()
-                print("Your bow has lost its loaded arrow!")
+                func.optional_print("Your bow has lost its loaded arrow!", level=2)
                 time.sleep(2)
         return has_lost
 
@@ -419,28 +420,28 @@ class CharEquipments:
 
     ########################## PRINTING FUNCTIONS #########################
     def print_armors(self):
-        print("   - Armors:")
+        func.optional_print("   - Armors:")
         if not self.armors:
-            print("      \\No armor")
+            func.optional_print("      \\No armor")
             return False
         for armor in self.armors:
-            print("      \\", end=' ')
-            print("ArmorID:", armor.get_id(), ", Armor:", armor.name, ", Defense:", round(armor.defense, 1))
+            func.optional_print("      \\", end=' ')
+            func.optional_print("ArmorID:", armor.get_id(), ", Armor:", armor.name, ", Defense:", round(armor.defense, 1))
         return True
 
     def print_full_armors(self):
-        print("   - Armors:")
+        func.optional_print("   - Armors:")
         if not self.armors:
-            print("      \\No armor")
+            func.optional_print("      \\No armor")
             return False
         for armor in self.armors:
-            print("      \\", end=' ')
+            func.optional_print("      \\", end=' ')
             armor.print_obj()
         return True
         
     @staticmethod
     def print_weapon(weapon):
-        print("WeaponID:", weapon.get_id(), ", Weapon:", weapon.name, ", Defense:", round(weapon.defense, 1),
+        func.optional_print("WeaponID:", weapon.get_id(), ", Weapon:", weapon.name, ", Defense:", round(weapon.defense, 1),
               ", MeleePower:", round(weapon.melee_power, 1), ", NbOfHand(s):", weapon.hand, end=' ')
         
         if isinstance(weapon, RangedWeapons):
@@ -448,61 +449,61 @@ class CharEquipments:
                 ammo_name = weapon.current_ammo.name
             else:
                 ammo_name = None
-            print(", MaxRange:", round(weapon.get_max_range(), 1), ", RangePower:", round(weapon.range_power, 1),
+            func.optional_print(", MaxRange:", round(weapon.get_max_range(), 1), ", RangePower:", round(weapon.range_power, 1),
                   ", CurrentAmmo:", ammo_name)
         else:
-            print("")
+            func.optional_print("")
 
     @staticmethod
     def print_full_weapon(weapon):
         weapon.print_obj()
 
     def print_weapons_stored(self):
-        print("   - Weapons stored:")
+        func.optional_print("   - Weapons stored:")
         if not self.weapons_stored:
-            print("      \\No weapon stored")
+            func.optional_print("      \\No weapon stored")
             return False
         for weapon in self.weapons_stored:
-            print("      \\", end=' ')
+            func.optional_print("      \\", end=' ')
             CharEquipments.print_weapon(weapon)
         return True
 
     def print_full_weapons_stored(self):
-        print("   - Weapons stored:")
+        func.optional_print("   - Weapons stored:")
         if not self.weapons_stored:
-            print("      \\No weapon stored")
+            func.optional_print("      \\No weapon stored")
             return False
         for weapon in self.weapons_stored:
-            print("      \\", end=' ')
+            func.optional_print("      \\", end=' ')
             CharEquipments.print_full_weapon(weapon)
         return True
     
     def print_weapons_in_use(self):
-        print("")
-        print("   - Weapons used:")
+        func.optional_print("")
+        func.optional_print("   - Weapons used:")
         if not self.weapons_in_use:
-            print("      \\No weapon used")
+            func.optional_print("      \\No weapon used")
             return False
         for weapon in self.weapons_in_use:
-            print("      \\", end=' ')
+            func.optional_print("      \\", end=' ')
             CharEquipments.print_weapon(weapon)
         return True
 
     def print_full_weapons_in_use(self):
-        print("")
-        print("   - Weapons used:")
+        func.optional_print("")
+        func.optional_print("   - Weapons used:")
         if self.weapons_in_use:
-            print("      \\No weapon used")
+            func.optional_print("      \\No weapon used")
             return False
         for weapon in self.weapons_in_use:
-            print("      \\", end=' ')
+            func.optional_print("      \\", end=' ')
             CharEquipments.print_full_weapon(weapon)
         return True
     
     def print_ammo(self):
-        print("   - Ammo available:")
+        func.optional_print("   - Ammo available:")
         if not self.ammo:
-            print("      \\No ammo")
+            func.optional_print("      \\No ammo")
             return False
 
         ammo_type_list = {}
@@ -515,20 +516,20 @@ class CharEquipments:
                 ammo_type_list[ammo.name]["ammo_type"] = ammo
 
         for key in ammo_type_list:
-            print("      \\", ammo_type_list[key]["number"], "arrow(s) of ...")
-            print("       ", end=' ')
+            func.optional_print("      \\", ammo_type_list[key]["number"], "arrow(s) of ...")
+            func.optional_print("       ", end=' ')
             ammo_type_list[key]["ammo_type"].print_obj()
         return True
 
     def print_equipments(self):
-        print("-- EQUIPMENTS --")
+        func.optional_print("-- EQUIPMENTS --")
         self.print_armors()
         self.print_weapons_in_use()
         self.print_weapons_stored()
         self.print_ammo()
 
     def print_full_equipments(self):
-        print("-- EQUIPMENTS --")
+        func.optional_print("-- EQUIPMENTS --")
         self.print_full_armors()
         self.print_full_weapons_in_use()
         self.print_full_weapons_stored()

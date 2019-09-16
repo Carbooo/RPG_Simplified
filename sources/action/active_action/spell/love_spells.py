@@ -1,6 +1,7 @@
 import time as time
 from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -53,8 +54,8 @@ class LoveSpells(Spells):
         if not self.choose_target(False, True, False):
             return False
             
-        print("You have decided to set up a shield, protecting your target against damages.")
-        print("The shield will be set up soon!")
+        func.optional_print("You have decided to set up a shield, protecting your target against damages.")
+        func.optional_print("The shield will be set up soon!")
         time.sleep(3)
         
         self.set_magical_coef()
@@ -101,8 +102,8 @@ class LoveSpells(Spells):
         if not self.choose_target(False, True, False):
             return False
         
-        print("You have decided to heal an ally")
-        print("The heal is charging...")
+        func.optional_print("You have decided to heal an ally")
+        func.optional_print("The heal is charging...")
         time.sleep(3)
         
         self.set_magical_coef()

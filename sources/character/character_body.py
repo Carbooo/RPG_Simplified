@@ -1,6 +1,8 @@
 import math as math
 import time as time
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
+
 
 #############################################################
 ###################### BODIES CLASS #########################
@@ -51,19 +53,19 @@ class CharBody:
         damage_ratio = damage / self.life
 
         if damage_ratio < 0.1:
-            print("The attack has only made a flesh wound")
+            func.optional_print("The attack has only made a flesh wound", level=2)
         elif damage_ratio < 0.2:
-            print("The attack has made weak damages")
+            func.optional_print("The attack has made weak damages", level=2)
         elif damage_ratio < 0.4:
-            print("The attack has made medium damages")
+            func.optional_print("The attack has made medium damages", level=2)
         elif damage_ratio < 0.7:
-            print("The attack has made serious damages")
+            func.optional_print("The attack has made serious damages", level=2)
         elif damage_ratio < 0.9:
-            print("The attack has made tremendous damages")
+            func.optional_print("The attack has made tremendous damages", level=2)
         else:
-            print("The attack has made deadly damages!")
+            func.optional_print("The attack has made deadly damages!", level=2)
         time.sleep(2)
-        print("The attack has made", int(round(damage)), "life damages")
+        func.optional_print("The attack has made", int(round(damage)), "life damages", level=3)
         time.sleep(2)
 
         self.update_life(- damage)
@@ -86,7 +88,7 @@ class CharBody:
 
     def spend_stamina(self, coefficient, ignore=False):
         if not ignore and not self.check_stamina(coefficient):
-            print("Error: Stamina below 0")
+            func.optional_print("Error: Stamina below 0", level=3)
         self.update_stamina(- coefficient * cfg.turn_stamina)
 
     def check_stamina(self, coefficient):
@@ -148,7 +150,8 @@ class CharBody:
             self.state = "Dead"
 
         if self.state != old:
-            print("ID:", str(self.character.get_id()), ", Name:", self.character.name, "state is now:", self.state)
+            func.optional_print("ID:", self.character.get_id(), ", Name:", self.character.name,
+                                "state is now:", self.state, level=2)
             time.sleep(3)
 
         # Stamina shape
@@ -167,7 +170,8 @@ class CharBody:
             self.shape = "KO"
 
         if self.shape != old:
-            print("ID:", str(self.character.get_id()), ", Name:", self.character.name, "shape is now:", self.shape)
+            func.optional_print("ID:", self.character.get_id(), ", Name:", self.character.name,
+                                "shape is now:", self.shape, level=2)
             time.sleep(3)
 
         self.character.calculate_characteristic()
@@ -194,13 +198,13 @@ class CharBody:
 
     ########################## PRINTING FUNCTIONS #########################
     def print_life(self):
-        print(", Life:", int(round(self.life)), end=' ')
+        func.optional_print(", Life:", int(round(self.life)), end=' ')
 
     def print_stamina(self):
-        print(", Stamina:", int(round(self.stamina)), end=' ')
+        func.optional_print(", Stamina:", int(round(self.stamina)), end=' ')
 
     def print_states(self):
-        print(", State:", self.state, ", Shape:", self.shape, end=' ')
+        func.optional_print(", State:", self.state, ", Shape:", self.shape, end=' ')
 
     def print_obj(self):
         self.print_life()

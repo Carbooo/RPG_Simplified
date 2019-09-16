@@ -1,6 +1,7 @@
 import math as math
 import random as random
 import sources.miscellaneous.configuration as cfg
+import sources.miscellaneous.global_functions as func
 
 
 #############################################################
@@ -32,7 +33,7 @@ class Feeling:
       
     def use_energy(self, energy):
         if not self.check_energy(energy):
-            print("Error: Energy feeling below 0")
+            func.optional_print("Error: Energy feeling below 0", level=3)
         
         coef = self.energy_ratio * self.mastering_ratio
         self.loose_energy(energy * self.energy_ratio)
@@ -58,27 +59,27 @@ class Feeling:
         elif action == "decrease":
             self.loose_energy(cfg.concentrate_update_coef / self.energy_ratio * ratio)
         else:
-            print("Error: Wrong action for concentrate_energy_update")
+            func.optional_print("Error: Wrong action for concentrate_energy_update")
             
     def die_of_exceeded_energy(self, char):
         if self.energy <= cfg.max_safe_energy:
             if self.warned_of_exceeded_energy:
-                print("Your ", self.type, " energy is now again under control!")
+                func.optional_print("Your ", self.type, " energy is now again under control!", level=3)
                 self.warned_of_exceeded_energy = False
             return False
         
         energy_gap = (self.energy - cfg.max_safe_energy) / (cfg.max_alive_energy - cfg.max_safe_energy)
         if random.random() < energy_gap / char.willpower_ratio / self.mastering_ratio:
             if not self.warned_of_exceeded_energy: 
-                print("Your ", self.type, " energy is overwhelming you and may destroy you!")
+                func.optional_print("Your ", self.type, " energy is overwhelming you and may destroy you!", level=3)
                 self.warned_of_exceeded_energy = True
                 return False
             else:
-                print("Your ", self.type, " energy has overwhelmed you and your life is over!")
+                func.optional_print("Your ", self.type, " energy has overwhelmed you and your life is over!", level=3)
                 char.body.loose_life(100, 1)
                 return True
 
     def print_obj(self):
-        print("Type:", self.type, ", Sensibility:", int(round(self.sensibility)),
+        func.optional_print("Type:", self.type, ", Sensibility:", int(round(self.sensibility)),
               ", Mastering:", int(round(self.mastering)), ", Knowledge:", self.knowledge,
               ", Energy:", int(round(self.energy)))
