@@ -75,7 +75,7 @@ class Concentrate(ActiveActions):
         
         self.concentration_ratio = math.pow(self.nb_of_turns, cfg.concentration_rate)
         self.initiator.nb_of_concentrate += 1
-        self.end_update(0, 1, True)
+        self.end_update(cfg.actions["concentrate"]["stamina"], 1.0, True)
         return True
 
     def execute(self):
@@ -87,5 +87,5 @@ class Concentrate(ActiveActions):
                                                                         )
         self.nb_of_turns -= 1
         if self.nb_of_turns > 0:
-            self.end_update(0, 1, True)
+            self.end_update(cfg.actions["concentrate"]["stamina"], 1.0, True)
         return True

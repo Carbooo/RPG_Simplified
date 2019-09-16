@@ -198,13 +198,13 @@ class CharBody:
 
     ########################## PRINTING FUNCTIONS #########################
     def print_life(self):
-        func.optional_print(", Life:", int(round(self.life)), end=' ')
+        func.optional_print(", Life:", int(round(self.life)), skip_line=True)
 
     def print_stamina(self):
-        func.optional_print(", Stamina:", int(round(self.stamina)), end=' ')
+        func.optional_print(", Stamina:", int(round(self.stamina)), skip_line=True)
 
     def print_states(self):
-        func.optional_print(", State:", self.state, ", Shape:", self.shape, end=' ')
+        func.optional_print(", State:", self.state, ", Shape:", self.shape, skip_line=True)
 
     def print_obj(self):
         self.print_life()

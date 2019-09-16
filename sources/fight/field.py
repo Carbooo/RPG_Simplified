@@ -13,8 +13,7 @@ class Field:
     """Common base class for all fields"""
 
     def __init__(self, name, obstacles_array, reliefs_array):
-        self.ID = len(cfg.field_list)
-        cfg.field_list.append(self)
+        self.ID = len(cfg.field_list) + 1
         self.name = name
         self.abscissa_size = len(obstacles_array[0::, 0])
         self.ordinate_size = len(obstacles_array[0, 0::])
@@ -193,7 +192,7 @@ class Field:
                 if (c_abs == target.abscissa and c_ord == target.ordinate) or \
                         (c_abs == attacker.abscissa and c_ord == attacker.ordinate) or \
                         attacker.calculate_point_distance(c_abs, c_ord) > length or \
-                        attacker.calculate_point_to_enemy_path_distance(pos_p, c_abs, c_ord) >= 0.5:
+                        attacker.calculate_point_to_enemy_path_distance(pos_p.abscissa, pos_p.ordinate, c_abs, c_ord) >= 0.5:
                     continue
 
                 # Shoot out of field or blocked by an obstacle

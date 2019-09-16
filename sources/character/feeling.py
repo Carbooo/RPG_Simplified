@@ -46,10 +46,11 @@ class Feeling:
             return False
             
     def natural_energy_update(self, time):
-        energy = abs(math.pow((self.energy - cfg.default_energy) / cfg.natural_update_ratio, 3) * time)
         if self.energy > cfg.default_energy:
+            energy = math.pow(self.energy / cfg.natural_increase_threshold, 2) * time
             self.gain_energy(energy)
         elif self.energy < cfg.default_energy and self.energy > 0:
+            energy = (cfg.default_energy - self.energy) / cfg.natural_decrease_reference * time
             self.loose_energy(energy)
     
     def concentrate_energy_update(self, action, ratio):
@@ -59,24 +60,28 @@ class Feeling:
         elif action == "decrease":
             self.loose_energy(cfg.concentrate_update_coef / self.energy_ratio * ratio)
         else:
-            func.optional_print("Error: Wrong action for concentrate_energy_update")
+            func.optional_print("Error: Wrong action for concentrate_energy_update", level=3)
             
     def die_of_exceeded_energy(self, char):
         if self.energy <= cfg.max_safe_energy:
             if self.warned_of_exceeded_energy:
-                func.optional_print("Your ", self.type, " energy is now again under control!", level=3)
+                func.optional_print("Your", self.type, "energy is now again under control!", level=3)
                 self.warned_of_exceeded_energy = False
             return False
-        
+
+        if self.energy > cfg.max_alive_energy:
+            func.optional_print("Your", self.type, "energy has overwhelmed you and your life is over!", level=3)
+            char.body.loose_life(1000)
+
         energy_gap = (self.energy - cfg.max_safe_energy) / (cfg.max_alive_energy - cfg.max_safe_energy)
         if random.random() < energy_gap / char.willpower_ratio / self.mastering_ratio:
             if not self.warned_of_exceeded_energy: 
-                func.optional_print("Your ", self.type, " energy is overwhelming you and may destroy you!", level=3)
+                func.optional_print("Your", self.type, "energy is overwhelming you and may destroy you!", level=3)
                 self.warned_of_exceeded_energy = True
                 return False
             else:
-                func.optional_print("Your ", self.type, " energy has overwhelmed you and your life is over!", level=3)
-                char.body.loose_life(100, 1)
+                func.optional_print("Your", self.type, "energy has overwhelmed you and your life is over!", level=3)
+                char.body.loose_life(1000)
                 return True
 
     def print_obj(self):

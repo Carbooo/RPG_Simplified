@@ -40,13 +40,14 @@ stamina_resting_coef = 200.0  # Rest coefficient
 turn_stamina = 1.0  # Stamina reference used
 
 ######################## FEELING CONFIG ######################
-natural_update_ratio = 50  # Energy ratio to naturally update feeling
 concentrate_update_coef = 3  # Energy coef to update feeling with concentration
-max_alive_energy = 1000
-max_safe_energy = 200
+max_alive_energy = 1000.0
+max_safe_energy = 300.0
 feelings_list = ["Wrath", "Joy", "Love", "Hate", "Fear", "Sadness"]
 default_energy = 50.0  # Starting energy for sensibility 10
 medium_energy = 100.0  # Energy reference for spells
+natural_increase_threshold = 150.0  # Energy threshold to increase feeling (with square2)
+natural_decrease_reference = 20.0  # Energy reference to decrease feeling (divided by)
 
 ######################## FIELD CONFIG ######################
 melee_handicap_ratio = 0.5
@@ -84,7 +85,7 @@ melee_fighter_shooting_handicap = 0.75
 ################### MELEE ATTACK CONFIG ###################
 melee_attack_stage = [0, 25, 50, 75]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]
 random_defenser_move_probability = 0.25
-random_attacker_move_probability = 0.5
+random_attacker_move_probability = 0.35
 
 ###################### ACTIONS CONFIG #####################
 # A turn is around 6 seconds

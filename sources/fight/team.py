@@ -22,7 +22,7 @@ class Team:
                 exit(0)
 
         self.name = name
-        self.ID = len(cfg.team_list)
+        self.ID = len(cfg.team_list) + 1
         cfg.team_list.append(self)
 
     def get_id(self):
@@ -75,7 +75,7 @@ class Team:
     def print_obj(self):
         func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
-            func.optional_print("\\", end=' ')
+            func.optional_print("\\", skip_line=True)
             char.print_basic()
             func.optional_print("\\")
 
@@ -89,44 +89,44 @@ class Team:
         func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
             if char.body.state != "Dead":
-                func.optional_print("\\", end=' ')
+                func.optional_print("\\", skip_line=True)
                 char.print_state()
 
     def print_dead_states(self):
         func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
             if char.body.state == "Dead":
-                func.optional_print("\\", end=' ')
+                func.optional_print("\\", skip_line=True)
                 char.print_state()
 
     def print_all_states(self):
         func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
-            func.optional_print("\\", end=' ')
+            func.optional_print("\\", skip_line=True)
             char.print_state()
 
     def print_alive_defense_states(self):
         func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
             if char.body.state != "Dead":
-                func.optional_print("\\", end=' ')
+                func.optional_print("\\", skip_line=True)
                 char.print_defense_state()
 
     def print_all_defense_states(self):
         func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
-            func.optional_print("\\", end=' ')
+            func.optional_print("\\", skip_line=True)
             char.print_defense_state()
 
     def print_alive_attack_states(self):
         func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
             if char.body.state != "Dead":
-                func.optional_print("\\", end=' ')
+                func.optional_print("\\", skip_line=True)
                 char.print_state()
 
     def print_all_attack_states(self):
         func.optional_print("Team name:", self.name, ", Team members:")
         for char in self.characters_list:
-            func.optional_print("\\", end=' ')
+            func.optional_print("\\", skip_line=True)
             char.print_attack_state()

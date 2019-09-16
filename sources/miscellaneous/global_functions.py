@@ -12,10 +12,10 @@ def optional_input(txt):
         return actions.pop(0)
 
 
-def optional_print(*argv, end=None, level=1):
+def optional_print(*argv, skip_line=False, level=1):
     global log_level
     if level >= log_level:
-        if end:
-            print(*argv, end=end)
+        if skip_line:
+            print(*argv, end=' ')
         else:
             print(*argv)

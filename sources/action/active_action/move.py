@@ -89,7 +89,7 @@ class Move(ActiveActions):
         func.optional_print("Next steps are:", self.path)
         func.optional_print("*********************************************************************")
         func.optional_print("")
-        time.sleep(3)
+        time.sleep(2)
         
         # Test if destination is reachex
         if not self.path:
@@ -149,13 +149,13 @@ class Move(ActiveActions):
         func.optional_print("")
         func.optional_print("*********************************************************************")
         func.optional_print("Position:", self.target_abs, "x", self.target_ord, "is no longer reachable")
-        func.optional_print("The move of (", end=' ')
+        func.optional_print("The move of (", skip_line=True)
         self.initiator.print_basic()
         func.optional_print(") has been cancelled !")
         func.optional_print("*********************************************************************")
         func.optional_print("")
         self.path = []
-        time.sleep(5)
+        time.sleep(3)
         return False
 
     ######################## BROWSE PATH ##########################

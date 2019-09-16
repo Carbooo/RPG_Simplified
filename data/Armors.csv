@@ -1,4 +1,4 @@
 Name;Load;Bulk;Resistance;DefCover;Defense
-Leather armor;20;3;5;7;40
-Mail armor;60;6;25;8;200
-Plate armor;100;12;50;9;400
+Leather armor;20;3;5;7;30
+Mail armor;60;6;25;8;100
+Plate armor;100;12;50;9;200

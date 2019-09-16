@@ -104,10 +104,10 @@ class RangedAttack(ActiveActions):
         if not self.fight.field.is_target_reachable(self.initiator, self.target):
             func.optional_print("")
             func.optional_print("*********************************************************************")
-            func.optional_print("The target (", end=' ')
+            func.optional_print("The target (", skip_line=True)
             self.target.print_basic()
             func.optional_print(") is no longer reachable by a ranged attack")
-            func.optional_print("The attack of (", end=' ')
+            func.optional_print("The attack of (", skip_line=True)
             self.initiator.print_basic()
             func.optional_print(") has been cancelled !")
             func.optional_print("*********************************************************************")
@@ -119,11 +119,13 @@ class RangedAttack(ActiveActions):
         func.optional_print("")
         func.optional_print("*********************************************************************")
         self.initiator.print_basic()
-        func.optional_print("is trying to ranged shoot (", end=' ')
+        func.optional_print("is trying to ranged shoot (", skip_line=True)
         self.target.print_basic()
         func.optional_print(")")
         hit_chance = self.shoot_hit_chance()
         func.optional_print("Current hit chance:", round(hit_chance, 2), level=2)
+        func.optional_print("Fighting availability:", self.target.get_fighting_availability(self.initiator.timeline),
+                            level=2)
         func.optional_print("*********************************************************************")
         func.optional_print("")
         time.sleep(3)
@@ -131,7 +133,7 @@ class RangedAttack(ActiveActions):
         target = self.fight.field.shoot_has_hit_another_target(self.initiator, self.target, hit_chance)
         if not target:
             func.optional_print("The shoot has missed its target!", level=2)
-            func.optional_print("No damage has been made")
+            func.optional_print("No damage has been made.")
             time.sleep(3)
 
         elif target is True:
@@ -151,7 +153,7 @@ class RangedAttack(ActiveActions):
         return True
 
     def range_defend(self, hit_chance):
-        self.fight.stop_action(self.target, self.timeline)
+        self.fight.stop_action(self.target, self.initiator.timeline)
 
         # Calculate att coef
         att_coef = self.initiator.power_distance_ratio(self.target) \
@@ -162,22 +164,21 @@ class RangedAttack(ActiveActions):
         attack_power = self.initiator.ranged_power * att_coef
         defense_level = self.target.ranged_defense * self.get_attack_coef(self.target)
         attack_result = attack_power - defense_level
-        resis_dim_rate = self.initiator.resis_dim_rate * self.ammo_used.resis_dim_rate
-        pen_rate = self.initiator.pen_rate * self.ammo_used.pen_rate
 
         # Update availability after computed the result
         self.target.previous_attacks.append((self.initiator.timeline, self))
         
         # Attack result --> Either block or be fully hit
         if attack_result <= cfg.ranged_attack_stage[0]:
-            self.target.all_shields_absorbed_damage(attack_power, resis_dim_rate)
+            self.target.equipments.all_shields_absorbed_damage(attack_power, self.ammo_used.resis_dim_rate)
             func.optional_print("The attack has been fully blocked / avoided by the defender", level=2)
             time.sleep(5)
         else:
             accuracy_ratio = 0.5 + hit_chance  # Between 0,5 and 1,5, similar to melee handiness_ratio
             armor_coef = self.target.get_armor_coef(accuracy_ratio)
-            self.target.damages_received(self.initiator, attack_result, accuracy_ratio, armor_coef, resis_dim_rate,
-                                         pen_rate, self.ammo_used.flesh_damage)
+            self.target.damages_received(self.initiator, attack_result, accuracy_ratio, armor_coef,
+                                         self.ammo_used.resis_dim_rate, self.ammo_used.pen_rate,
+                                         self.ammo_used.flesh_damage)
 
     def shoot_hit_chance(self):
         # Distance = -a*(x-1) + b --> distance min = 1.0, distance max = 0.0

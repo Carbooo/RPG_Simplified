@@ -51,10 +51,10 @@ class MeleeAttack(ActiveActions):
         for char in team.characters_list:
             self.target = char
             if self.initiator.can_melee_attack(self.target):
-                func.optional_print("----------------------------")
-                func.optional_print("----- FIGHTING AVAILABILITY: ",
+                func.optional_print("-----------------------------------------")
+                func.optional_print("----- FIGHTING AVAILABILITY:",
                     self.target.get_fighting_availability(self.timeline),
-                    " -----")
+                    "-----")
                 self.target.print_defense_state()
                 enemy_list.append(self.target)
 
@@ -71,31 +71,40 @@ class MeleeAttack(ActiveActions):
             for char in enemy_list:
                 self.target = char
                 if self.target.get_id() == read:
+                    self.end_update(cfg.actions["melee_attack"]["stamina"], cfg.actions["melee_attack"]["duration"])
                     return True
 
             func.optional_print("ID:", read, "is not available")
-
-        self.end_update(cfg.actions["melee_attack"]["stamina"], cfg.actions["melee_attack"]["duration"])
-        return True
 
     def execute(self):
         if not self.initiator.can_melee_attack(self.target):
             func.optional_print("")
             func.optional_print("*********************************************************************")
-            func.optional_print("The target (", end=' ')
+            func.optional_print("The target (", skip_line=True)
             self.target.print_basic()
             func.optional_print(") is no longer reachable by a melee attack")
-            func.optional_print("The attack of (", end=' ')
+            func.optional_print("The attack of (", skip_line=True)
             self.initiator.print_basic()
             func.optional_print(") has been cancelled !")
             func.optional_print("*********************************************************************")
             func.optional_print("")
             time.sleep(5)
             return False
-            
-        self.fight.stop_action(self.target, self.initiator.timeline)
+
+        func.optional_print("")
+        func.optional_print("*********************************************************************")
+        self.initiator.print_basic()
+        func.optional_print("is melee attacking (", skip_line=True)
+        self.target.print_basic()
+        func.optional_print(")")
+        func.optional_print("Fighting availability:", self.target.get_fighting_availability(self.initiator.timeline),
+                            level=2)
+        func.optional_print("*********************************************************************")
+        func.optional_print("")
+        time.sleep(3)
+
         self.initiator.last_action = None  # To avoid looping on this action
-        
+        self.fight.stop_action(self.target, self.initiator.timeline)
         attack_result = self.melee_defense_result()
         self.melee_attack_type(attack_result)
         
@@ -153,9 +162,11 @@ class MeleeAttack(ActiveActions):
         # Calculate final result
         if self.actual_defense == "Dodge":
             attack_result = dodge_result + defense_result / 3
+            self.target.spend_stamina(cfg.actions["melee_attack"]["stamina"])
             self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level) / 3, self.initiator.resis_dim_rate)
         elif self.actual_defense == "Defense":
             attack_result = defense_result + dodge_result / 3
+            self.target.spend_stamina(cfg.actions["melee_attack"]["stamina"])
             self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level), self.initiator.resis_dim_rate)
         else:
             attack_result = attack_power
@@ -210,18 +221,17 @@ class MeleeAttack(ActiveActions):
 
     def block(self):
         self.target.print_basic()
-        func.optional_print("-- has BLOCKED the attack of --", end=' ', level=2)
+        func.optional_print("-- has BLOCKED the attack of --", skip_line=True, level=2)
         self.initiator.print_basic()
-        time.sleep(2)
+        func.optional_print("")
 
     def delay(self, attack_value):
         attack_value /= cfg.melee_attack_stage[3] / 2
         self.target.spend_time(attack_value)
         self.initiator.print_basic()
-        func.optional_print("-- has DELAYED --", end=' ', level=2)
+        func.optional_print("-- has DELAYED --", skip_line=True, level=2)
         self.target.print_basic()
         func.optional_print("-- of", round(attack_value, 2), "TURN(S) --", level=2)
-        time.sleep(2)
     
     def melee_attack_received(self, attack_value):
         armor_coef = self.target.get_armor_coef(self.initiator.melee_handiness_ratio)

@@ -26,4 +26,7 @@ def test_ranged():
 
 
 func.log_level = 1
-test_ranged()
+# test_ranged()
+
+Fight(cfg.field_list[0], cfg.team_list[12], cfg.team_list[13])
+

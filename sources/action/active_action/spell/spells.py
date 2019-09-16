@@ -239,7 +239,7 @@ class Spells(ActiveActions):
 
         if attack_value <= 0:
             self.target.print_basic()
-            func.optional_print("-- has BLOCKED the attack of --", end=' ', level=3)
+            func.optional_print("-- has BLOCKED the attack of --", skip_line=True, level=3)
             self.initiator.print_basic()
             func.optional_print("")
             time.sleep(4)
@@ -300,7 +300,7 @@ class Spells(ActiveActions):
             func.optional_print("********************** CHOOSING TARGET SPELL ************************")
         func.optional_print("*********************************************************************")
         self.initiator.print_basic()
-        func.optional_print(txt, end=' ')
+        func.optional_print(txt, skip_line=True)
         if not self_spell:
             self.target.print_basic()
         func.optional_print("")

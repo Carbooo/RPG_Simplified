@@ -54,7 +54,7 @@ class Reload(ActiveActions):
                 elif len(ammo_available) > 1:
                     func.optional_print("Choose the ammo to reload:")
                     for ammo in ammo_available:
-                        func.optional_print("\t\\", end=' ')
+                        func.optional_print("\t\\", skip_line=True)
                         ammo.print_obj()
                     ammo_chosen = False
                     while not ammo_chosen:

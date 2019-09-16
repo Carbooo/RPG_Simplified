@@ -176,6 +176,7 @@ class ImportData:
                             cfg.obstacle_types_list[k]:
                         break
                     if k == len(cfg.obstacle_types_list) - 1:
+                        print(i, j)
                         print("Obstacle field import contains ",
                               "non-supported obstacle type:",
                               obstacle_array[i, j])

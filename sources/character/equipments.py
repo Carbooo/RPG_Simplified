@@ -23,14 +23,14 @@ class Equipments:
         self.bulk = self.original_bulk
         self.original_resistance = float(resistance)
         self.resistance = self.original_resistance
-        self.ID = len(cfg.equipments_list)
+        self.ID = len(cfg.equipments_list) + 1
         cfg.equipments_list.append(self)
     
     def print_obj(self):
         func.optional_print("ID:", self.get_id(), ", Name:", self.name, ", Type:",
               self.type, ", Life:", round(self.life), ", Load:",
               round(self.load, 1), ", Bulk:", round(self.bulk, 1),
-              ", Resistance:", round(self.resistance, 1), end=' ')
+              ", Resistance:", round(self.resistance, 1), skip_line=True)
     
     def get_id(self):
         return self.ID
@@ -172,7 +172,7 @@ class Weapons(Equipments):
               round(self.pen_rate, 2), ", Resistance dim. rate:",
               round(self.resis_dim_rate, 2), ", Melee handiness:",
               round(self.melee_handiness, 1), ", Melee range:",
-              round(self.melee_range, 1),  end=' ')
+              round(self.melee_range, 1), skip_line=True)
         
     def decrease(self, damage, def_malus_rate):
         ratio = super().decrease(damage, def_malus_rate)
@@ -309,11 +309,11 @@ class RangedWeapons(AttackWeapons):
     def print_obj(self):
         super().print_obj()
         func.optional_print(", RangePower:", round(self.range_power, 1), ", Accuracy:", round(self.accuracy, 1),
-              ", MaxRange:", self.get_max_range(), ", ReloadTime:", round(self.reload_time, 1), ", Ammo:", end=' ')
+              ", MaxRange:", self.get_max_range(), ", ReloadTime:", round(self.reload_time, 1), ", Ammo:", skip_line=True)
         if self.current_ammo:
-            func.optional_print(self.current_ammo.name, end=' ')
+            func.optional_print(self.current_ammo.name, skip_line=True)
         else:
-            func.optional_print("--None--", end=' ')
+            func.optional_print("--None--", skip_line=True)
     
     def decrease(self, damage):
         ratio = super().decrease(damage)

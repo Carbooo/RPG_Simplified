@@ -1,6 +1,7 @@
 import math as math
 import random as random
 import time as time
+import copy as copy
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
 from sources.character.character_body import CharBody
@@ -22,7 +23,7 @@ class Character:
                  abscissa, ordinate):
         
         # Set ID
-        self.ID = len(cfg.char_list)
+        self.ID = len(cfg.char_list) + 1
         cfg.char_list.append(self)
         self.name = name
 
@@ -364,7 +365,7 @@ class Character:
             
     def damages_received(self, enemy, attack_value, accuracy_ratio, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate=1.0):
         enemy.print_basic()
-        func.optional_print("-- has HIT --", end=' ', level=3)
+        func.optional_print("-- has HIT --", skip_line=True, level=3)
         self.print_basic()
         func.optional_print("-- with a power of", int(round(attack_value)), level=3)
         time.sleep(2)        
@@ -437,19 +438,30 @@ class Character:
 
     def calculate_point_to_enemy_path_angle(self, enemy, abscissa, ordinate):
         angle = math.acos(
-            self.calculate_point_to_enemy_path_cos_angle(enemy, abscissa, ordinate))
+            self.calculate_point_to_enemy_path_cos_angle(enemy.abscissa, enemy.ordinate, abscissa, ordinate))
 
         if ordinate < self.ordinate:
             angle = 2 * math.pi - angle
 
         return angle
 
+    def set_target_pos_variation(self, enemy, variation):
+        # Calculate angle between enemy and abscissa axis
+        c = copy.copy(self)  # Is used for abscissa axis
+        c.abscissa += 1
+        angle = self.calculate_point_to_enemy_path_angle(c, enemy.abscissa, enemy.ordinate)
+
+        # Set the variated position
+        angle += math.radians(variation)
+        enemy.abscissa += int(round(self.equipments.get_range() * math.cos(angle)))
+        enemy.ordinate += int(round(self.equipments.get_range() * math.sin(angle)))
+
 ##################### PRINTING FUNCTIONS ########################
     def print_basic(self):
-        func.optional_print("ID:", self.get_id(), ", Name:", self.name, end=' ')
+        func.optional_print("ID:", self.get_id(), ", Name:", self.name, skip_line=True)
 
     def print_characteristics(self):
-        func.optional_print("-- CHARACTERISTICS --", end=' ')
+        func.optional_print("-- CHARACTERISTICS --", skip_line=True)
         func.optional_print("Constitution:", int(round(self.constitution)),
               ", Force:", int(round(self.force)),
               ", Agility:", int(round(self.agility)),
@@ -463,27 +475,27 @@ class Character:
     def print_spells_and_feelings(self):
         func.optional_print("--  FEELINGS  --")
         for key in self.feelings:
-            func.optional_print("   -", end=' ')
+            func.optional_print("   -", skip_line=True)
             self.feelings[key].print_obj()
         func.optional_print("--  ACTIVE SPELLS --")
         for spell in self.active_spells:
             func.optional_print("   -", spell.surname)
 
     def print_defense(self):
-        func.optional_print("--   DEFENSE  --", end=' ')
+        func.optional_print("--   DEFENSE  --", skip_line=True)
         func.optional_print("Dodging:", int(round(self.dodging)),
             ", MeleeDefense:", int(round(self.melee_defense)),
             ", RangedDefense:", int(round(self.ranged_defense)),
             ", MagicDefense:", int(round(self.magic_defense)))
 
     def print_attack(self):
-        func.optional_print("--   ATTACK   --", end=' ')
+        func.optional_print("--   ATTACK   --", skip_line=True)
         func.optional_print("MeleeHandiness:", int(round(self.melee_handiness)),
             ", MeleePower:", int(round(self.melee_power)),
             ", MeleeRange:", int(round(self.melee_range)),
             ", PenetrationRate:", int(round(self.pen_rate, 2)),
             ", resis_dim_rate:", int(round(self.resis_dim_rate, 2)),
-            ", MagicPower:", int(round(self.magic_power)), end=' ')
+            ", MagicPower:", int(round(self.magic_power)), skip_line=True)
         if self.ranged_power > 1:
             func.optional_print(", RangedAccuracy:", int(round(self.ranged_accuracy)),
                 ", RangedPower:", int(round(self.ranged_power)),
@@ -507,7 +519,7 @@ class Character:
         self.print_time_state()
 
     def print_detailed_state(self):
-        func.optional_print("-- BASIC INFO --", end=' ')
+        func.optional_print("-- BASIC INFO --", skip_line=True)
         self.print_basic()
         self.body.print_obj()
         self.print_time_state()

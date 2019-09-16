@@ -87,6 +87,7 @@ class Fight:
                 
             elif isinstance(next_event, Character):
                 if isinstance(next_event.last_action, Move) \
+                or isinstance(next_event.last_action, MeleeAttack) \
                 or isinstance(next_event.last_action, RangedAttack) \
                 or (isinstance(next_event.last_action, Rest) and next_event.last_action.nb_of_turns > 0) \
                 or (isinstance(next_event.last_action, Concentrate) and next_event.last_action.nb_of_turns > 0) \
@@ -139,7 +140,7 @@ class Fight:
         time.sleep(2)
         
         for char in self.char_order:
-            if char.exceeded_feelings_check():
+            if char.body.is_alive() and char.exceeded_feelings_check():
                 self.field.remove_dead_char(char)
         
     def print_new_turn(self):
@@ -215,17 +216,19 @@ class Fight:
         
         time_diff = self.current_timeline - self.last_timeline
         for char in self.char_order:
-            char.body.turn_rest(time_diff)
+            if char.body.is_alive():
+                char.body.turn_rest(time_diff)
+
+                for type in char.feelings:
+                    char.feelings[type].natural_energy_update(time_diff)
+
+                previous_attacks = copy.copy(char.previous_attacks)
+                for attack_timeline, attack in previous_attacks:
+                    if self.current_timeline >= attack_timeline + cfg.defense_time / char.speed_ratio:
+                        char.previous_attacks.remove((attack_timeline, attack))
+
             self.field.remove_dead_char(char)
-            
-            for type in char.feelings:
-                char.feelings[type].natural_energy_update(time_diff)
-            
-            previous_attacks = copy.copy(char.previous_attacks)
-            for attack_timeline, attack in previous_attacks:
-                if self.current_timeline >= attack_timeline + cfg.defense_time / char.speed_ratio:
-                    char.previous_attacks.remove((attack_timeline, attack))
-    
+
     def update_team_morale(self, team):
         total_ratio = 0
         for char in team.characters_list:

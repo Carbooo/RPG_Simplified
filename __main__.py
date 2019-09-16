@@ -19,6 +19,5 @@ ImportData("ObstaclesField", "data/LongObstacles.csv")
 ##################### FIGHT #####################
 func.log_level = 1
 
-# Fights(Fields.list[3], Teams.list[0], Teams.list[1])
-# Fights(Fields.list[0], Teams.list[8], Teams.list[9])
-Fight(cfg.field_list[0], cfg.team_list[10], cfg.team_list[11])
+Fight(cfg.field_list[3], cfg.team_list[0], cfg.team_list[1])  # Melee vs Ranged
+# Fight(cfg.field_list[0], cfg.team_list[10], cfg.team_list[11])

@@ -425,7 +425,7 @@ class CharEquipments:
             func.optional_print("      \\No armor")
             return False
         for armor in self.armors:
-            func.optional_print("      \\", end=' ')
+            func.optional_print("      \\", skip_line=True)
             func.optional_print("ArmorID:", armor.get_id(), ", Armor:", armor.name, ", Defense:", round(armor.defense, 1))
         return True
 
@@ -435,14 +435,14 @@ class CharEquipments:
             func.optional_print("      \\No armor")
             return False
         for armor in self.armors:
-            func.optional_print("      \\", end=' ')
+            func.optional_print("      \\", skip_line=True)
             armor.print_obj()
         return True
         
     @staticmethod
     def print_weapon(weapon):
         func.optional_print("WeaponID:", weapon.get_id(), ", Weapon:", weapon.name, ", Defense:", round(weapon.defense, 1),
-              ", MeleePower:", round(weapon.melee_power, 1), ", NbOfHand(s):", weapon.hand, end=' ')
+              ", MeleePower:", round(weapon.melee_power, 1), ", NbOfHand(s):", weapon.hand, skip_line=True)
         
         if isinstance(weapon, RangedWeapons):
             if weapon.current_ammo is not None:
@@ -464,7 +464,7 @@ class CharEquipments:
             func.optional_print("      \\No weapon stored")
             return False
         for weapon in self.weapons_stored:
-            func.optional_print("      \\", end=' ')
+            func.optional_print("      \\", skip_line=True)
             CharEquipments.print_weapon(weapon)
         return True
 
@@ -474,7 +474,7 @@ class CharEquipments:
             func.optional_print("      \\No weapon stored")
             return False
         for weapon in self.weapons_stored:
-            func.optional_print("      \\", end=' ')
+            func.optional_print("      \\", skip_line=True)
             CharEquipments.print_full_weapon(weapon)
         return True
     
@@ -485,7 +485,7 @@ class CharEquipments:
             func.optional_print("      \\No weapon used")
             return False
         for weapon in self.weapons_in_use:
-            func.optional_print("      \\", end=' ')
+            func.optional_print("      \\", skip_line=True)
             CharEquipments.print_weapon(weapon)
         return True
 
@@ -496,7 +496,7 @@ class CharEquipments:
             func.optional_print("      \\No weapon used")
             return False
         for weapon in self.weapons_in_use:
-            func.optional_print("      \\", end=' ')
+            func.optional_print("      \\", skip_line=True)
             CharEquipments.print_full_weapon(weapon)
         return True
     
@@ -517,7 +517,7 @@ class CharEquipments:
 
         for key in ammo_type_list:
             func.optional_print("      \\", ammo_type_list[key]["number"], "arrow(s) of ...")
-            func.optional_print("       ", end=' ')
+            func.optional_print("       ", skip_line=True)
             ammo_type_list[key]["ammo_type"].print_obj()
         return True
 
