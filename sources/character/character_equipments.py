@@ -151,7 +151,7 @@ class CharEquipments:
             return True
         return False
 
-    def all_weapons_absorbed_damage(self, damage):
+    def all_weapons_absorbed_damage(self, damage, resis_dim_rate):
         weapons_list = []
         defense = 0
         for weapon in self.weapons_in_use:
@@ -160,26 +160,32 @@ class CharEquipments:
                 weapons_list.append(weapon)
             except:
                 pass
+        
+        damage *= resis_dim_rate
         for weapon in weapons_list:
             self.weapon_absorbed_damage(weapon, damage * weapon.defense / defense)
 
-    def all_melee_weapons_absorbed_damage(self, damage):
+    def all_melee_weapons_absorbed_damage(self, damage, resis_dim_rate):
         weapons_list = []
         defense = 0
         for weapon in self.weapons_in_use:
             if isinstance(weapon, MeleeWeapons):
                 defense += weapon.defense
                 weapons_list.append(weapon)
+        
+        damage *= resis_dim_rate
         for weapon in weapons_list:
             self.weapon_absorbed_damage(weapon, damage * weapon.defense / defense)
 
-    def all_shields_absorbed_damage(self, damage):
+    def all_shields_absorbed_damage(self, damage, resis_dim_rate):
         weapons_list = []
         defense = 0
         for weapon in self.weapons_in_use:
             if isinstance(weapon, Shields):
                 defense += weapon.defense
                 weapons_list.append(weapon)
+        
+        damage *= resis_dim_rate
         for weapon in weapons_list:
             self.weapon_absorbed_damage(weapon, damage * weapon.defense / defense)
 

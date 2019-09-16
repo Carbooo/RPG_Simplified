@@ -232,7 +232,7 @@ class Spells(ActiveActions):
 
         if can_use_shield:
             attack_value -= self.target.magic_defense_with_shields * self.get_attack_coef(self.target)
-            self.target.equipments.all_shields_absorbed_damage(attack_value)
+            self.target.equipments.all_shields_absorbed_damage(attack_value, resis_dim_rate)
         else:
             attack_value -= self.target.magic_defense * self.get_attack_coef(self.target)
 

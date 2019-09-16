@@ -153,16 +153,13 @@ class MeleeAttack(ActiveActions):
         # Calculate final result
         if self.actual_defense == "Dodge":
             attack_result = dodge_result + defense_result / 3
-            self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level) / 3)
-            self.initiator.equipments.all_melee_weapons_absorbed_damage(min(attack_power, defense_level) / 9)
+            self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level) / 3, self.initiator.resis_dim_rate)
         elif self.actual_defense == "Defense":
             attack_result = defense_result + dodge_result / 3
-            self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level))
-            self.initiator.equipments.all_melee_weapons_absorbed_damage(min(attack_power, defense_level) / 3)
+            self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level), self.initiator.resis_dim_rate)
         else:
             attack_result = attack_power
-            self.initiator.equipments.all_melee_weapons_absorbed_damage(min(attack_power, defense_level) / 3)
-
+            
         return attack_result
 
     def melee_attack_type(self, attack_value):

@@ -9,8 +9,8 @@ variance = 0.1  # Gauss variance
 high_variance = 0.25  # Gauss variance
 
 ######################## EQUIPMENTS CONFIG ######################
-armor_def_malus_rate = 0.1  # Armor def lost when being hit
-shield_def_malus_rate = 0.01  # Armor def lost when defending
+armor_def_malus_rate = 2.0  # Armor def lost when being hit
+shield_def_malus_rate = 0.1  # Armor def lost when defending
 attack_weapon_def_malus_rate = 0.01  # Attack weapon def lost when defending
 
 ######################## CHARACTER CONFIG ######################

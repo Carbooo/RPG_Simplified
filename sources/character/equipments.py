@@ -105,7 +105,7 @@ class Armors(Equipments):
         
         print("Damages absorbed by", self.name, ":", int(round(absorbed_damages)))
         time.sleep(2)
-        ratio = self.decrease(absorbed_damages)
+        ratio = self.decrease(absorbed_damages * resis_dim_rate)
             
         if total_damages == 0:
             print("The", self.name, "has absorbed the damages and no life has been lost")

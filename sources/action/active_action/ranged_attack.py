@@ -162,20 +162,20 @@ class RangedAttack(ActiveActions):
         attack_power = self.initiator.ranged_power * att_coef
         defense_level = self.target.ranged_defense * self.get_attack_coef(self.target)
         attack_result = attack_power - defense_level
+        resis_dim_rate = self.initiator.resis_dim_rate * self.ammo_used.resis_dim_rate
+        pen_rate = self.initiator.pen_rate * self.ammo_used.pen_rate
 
         # Update availability after computed the result
         self.target.previous_attacks.append((self.initiator.timeline, self))
         
         # Attack result --> Either block or be fully hit
         if attack_result <= cfg.ranged_attack_stage[0]:
-            self.target.all_shields_absorbed_damage(attack_power)
+            self.target.all_shields_absorbed_damage(attack_power, resis_dim_rate)
             print("The attack has been fully blocked / avoided by the defender")
             time.sleep(5)
         else:
             accuracy_ratio = 0.5 + hit_chance  # Between 0,5 and 1,5, similar to melee handiness_ratio
             armor_coef = self.target.get_armor_coef(accuracy_ratio)
-            resis_dim_rate = self.initiator.resis_dim_rate * self.ammo_used.resis_dim_rate
-            pen_rate = self.initiator.pen_rate * self.ammo_used.pen_rate
             self.target.damages_received(self.initiator, attack_result, accuracy_ratio, armor_coef, resis_dim_rate,
                                          pen_rate, self.ammo_used.flesh_damage)
 
