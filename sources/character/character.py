@@ -245,7 +245,10 @@ class Character:
         
         # Set defenses
         self.melee_defense = self.get_global_ratio() * melee_coef * weapons_defense["melee_defense"]
-        self.ranged_defense = self.get_global_ratio() * ranged_coef * weapons_defense["ranged_defense"]
+        if weapons_defense["ranged_defense"]:
+            self.ranged_defense = self.get_global_ratio() * ranged_coef * weapons_defense["ranged_defense"]
+        else:
+            self.ranged_defense = self.get_global_ratio() * ranged_coef  # To have some def, even without a shield
         self.magic_defense = self.get_global_ratio() * magic_coef * 10.0
         self.magic_defense_with_shields = self.magic_defense + weapons_defense["magic_defense"]
         
@@ -393,14 +396,6 @@ class Character:
     def calculate_point_distance(self, abscissa, ordinate):
         return math.sqrt(math.pow(self.abscissa - abscissa, 2) + math.pow(self.ordinate - ordinate, 2))
         
-    def power_distance_ratio(self, enemy):
-        return max(0.25,
-                   1 - self.calculate_point_distance(enemy.abscissa, enemy.ordinate) / self.equipments.get_range())
-
-    @staticmethod
-    def power_hit_chance_ratio(hit_chance):
-        return math.sqrt(hit_chance / 0.5)
-    
     def is_distance_reachable(self, enemy):        
         if self.calculate_point_distance(enemy.abscissa, enemy.ordinate) <= self.equipments.get_range():
             return True
@@ -469,7 +464,7 @@ class Character:
               ", Reflex:", int(round(self.reflex)),
               ", Willpower:", int(round(self.willpower)),
               ", Spirit:", int(round(self.spirit)),
-              ", morale:", int(round(self.morale)),
+              ", Morale:", int(round(self.morale)),
               ", Empathy:", int(round(self.empathy)))
 
     def print_spells_and_feelings(self):

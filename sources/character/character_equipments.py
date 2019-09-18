@@ -200,7 +200,7 @@ class CharEquipments:
         max_range = 10000
         for weapon in self.weapons_in_use:
             if isinstance(weapon, RangedWeapons):
-                max_range = min(max_range, weapon.get_max_range())
+                max_range = min(max_range, weapon.get_range())
 
         if max_range == 10000:
             return 0

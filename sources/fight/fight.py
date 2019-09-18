@@ -178,6 +178,7 @@ class Fight:
         self.field.print_obj()
         func.optional_print("")
         self.scheduler[0].print_basic()
+        func.optional_print("Timeline:", self.scheduler[0].timeline)
         func.optional_print("")
         
     def print_ko_state_rest(self, character):

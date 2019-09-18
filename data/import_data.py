@@ -75,12 +75,12 @@ class ImportData:
 
     def import_ammo(self):
         for row in self.my_csv:
-            if len(row) != 9:
+            if len(row) != 8:
                 print("Ammo import does not contain the right number of columns")
                 return False
             else:
                 Ammo(row[0], float(row[1]), float(row[2]), float(row[3]),
-                     row[4], float(row[5]), float(row[6]), float(row[7]), float(row[8]))
+                     row[4], float(row[5]), float(row[6]), float(row[7]))
         return True
 
     def import_ranged_weapons(self):

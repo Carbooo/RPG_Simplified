@@ -31,6 +31,12 @@ class RangedAttack(ActiveActions):
         elif self.initiator.equipments.is_using_a_ranged_weapon() is False:
             func.optional_print("You are not using a ranged weapon")
             return False
+        elif self.initiator.equipments.has_ammo() is False:
+            func.optional_print("No ammo for a ranged attack")
+            return False
+        elif self.initiator.equipments.has_reloaded() is False:
+            func.optional_print("Ranged weapons are not reloaded")
+            return False
         elif self.can_ranged_attack() is False:
             func.optional_print("No enemy can be reached by a ranged attack")
             time.sleep(2)
@@ -47,6 +53,7 @@ class RangedAttack(ActiveActions):
 
         func.optional_print("--------- TARGETS -----------")
         func.optional_print("Choose one of the reachable enemies:")
+        
         enemy_list = []
         hit_chance_list = []
         for char in team.characters_list:
@@ -66,9 +73,11 @@ class RangedAttack(ActiveActions):
                     hit_chance = hit_chance_list_bis[j]
                     hit_number = j
             self.target = enemy_list_bis.pop(hit_number)
-            func.optional_print("----- HIT CHANCE:", round(hit_chance_list_bis.pop(hit_number), 2),
-                  "-- FIGHTING AVAILABILITY:", self.target.get_fighting_availability(self.timeline),
-                  " -----")
+            hit_chance_list_bis.pop(hit_number)
+            func.optional_print("-- HIT CHANCE:", round(hit_chance, 2),
+                                "-- RANGE POWER:", int(round(self.get_range_power(hit_chance))),
+                                "-- FIGHTING AVAILABILITY:", round(self.target.get_fighting_availability(self.timeline), 2),
+                                "--")
             self.target.print_defense_state()
 
         while 1:
@@ -124,7 +133,8 @@ class RangedAttack(ActiveActions):
         func.optional_print(")")
         hit_chance = self.shoot_hit_chance()
         func.optional_print("Current hit chance:", round(hit_chance, 2), level=2)
-        func.optional_print("Fighting availability:", self.target.get_fighting_availability(self.initiator.timeline),
+        func.optional_print("Range power:", int(round(self.get_range_power(hit_chance))), level=2)
+        func.optional_print("Fighting availability:", round(self.target.get_fighting_availability(self.initiator.timeline), 2),
                             level=2)
         func.optional_print("*********************************************************************")
         func.optional_print("")
@@ -156,9 +166,7 @@ class RangedAttack(ActiveActions):
         self.fight.stop_action(self.target, self.initiator.timeline)
 
         # Calculate att coef
-        att_coef = self.initiator.power_distance_ratio(self.target) \
-                   * Character.power_hit_chance_ratio(hit_chance) \
-                   * self.get_attack_coef(self.initiator)
+        att_coef = self.get_range_power(hit_chance) * self.get_attack_coef(self.initiator)
 
         # Range defense result
         attack_power = self.initiator.ranged_power * att_coef
@@ -182,8 +190,10 @@ class RangedAttack(ActiveActions):
 
     def shoot_hit_chance(self):
         # Distance = -a*(x-1) + b --> distance min = 1.0, distance max = 0.0
-        h_dist = max(0, (self.initiator.calculate_point_distance(self.target.abscissa,
-                                                                 self.target.ordinate) - 1) / self.initiator.equipments.get_range() * -1 + 1)
+        h_dist = max(cfg.min_dist_ratio,
+                     1.0 -
+                     (self.initiator.calculate_point_distance(self.target.abscissa, self.target.ordinate) - 1.0)
+                     * cfg.decrease_hit_chance_per_case)
         h_obs = self.fight.field.calculate_ranged_obstacle_ratio(self.initiator, self.target.abscissa, self.target.ordinate)
         h_action = self.get_ranged_action_ratio()
         return self.initiator.ranged_accuracy_ratio * h_dist * h_obs * h_action
@@ -203,16 +213,21 @@ class RangedAttack(ActiveActions):
             coef *= cfg.moving_char_shooting_handicap
 
         return coef
+    
+    @staticmethod
+    def range_power_hit_chance_ratio(hit_chance):
+        return math.pow(hit_chance / 0.5, 1.0/3.0)
+    
+    def range_power_distance_ratio(self):
+        return max(cfg.min_range_power_ratio,
+                   1 - self.initiator.calculate_point_distance(self.target.abscissa, self.target.ordinate)
+                   / self.equipments.get_range())
+
+    def get_range_power(self, hit_chance):
+        return self.initiator.range_power_distance_ratio() \
+                   * RangedAttack.range_power_hit_chance_ratio(hit_chance) \
 
     def can_ranged_attack(self):
-        if self.initiator.equipments.has_ammo() is False:
-            func.optional_print("No ammo for a ranged attack")
-            return False
-
-        if self.initiator.equipments.has_reloaded() is False:
-            func.optional_print("Ranged weapons are not reloaded")
-            return False
-
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:
             team = self.fight.team2
         else:

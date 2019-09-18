@@ -145,7 +145,7 @@ class Field:
 
                     if self.obstacles_array[min_abs + i, min_ord + j] == cfg.ranged_obstacle or \
                             self.obstacles_array[min_abs + i, min_ord + j] == cfg.full_obstacle or \
-                            self.characters_array[min_abs + i, min_ord + j] is None is False:
+                            self.characters_array[min_abs + i, min_ord + j] is not None:
                         return 0
 
                     if self.obstacles_array[min_abs + i, min_ord + j] == cfg.ranged_handicap or \

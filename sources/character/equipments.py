@@ -252,12 +252,10 @@ class MeleeWeapons(AttackWeapons):
 class Ammo(Equipments):
     """Common sub class of equipments for all ammo"""
     
-    def __init__(self, name, load, bulk, resistance, ranged_weapon_type, stability,
+    def __init__(self, name, load, bulk, resistance, ranged_weapon_type,
                  flesh_damage, pen_rate, resis_dim_rate):
         super().__init__(name, load, bulk, resistance)
         self.type = "Arrow"
-        self.original_stability = float(stability)
-        self.stability = self.original_stability
         self.original_flesh_damage = float(flesh_damage)
         self.flesh_damage = self.original_flesh_damage
         self.original_pen_rate = float(pen_rate) / 10.0
@@ -272,20 +270,17 @@ class Ammo(Equipments):
 
     def print_obj(self):
         super().print_obj()
-        func.optional_print(", stability:", round(self.stability, 1),
-              ", flesh damage:", round(self.flesh_damage, 1),
-              ", Penetration rate:", round(self.pen_rate, 2))
+        func.optional_print(", flesh damage:", round(self.flesh_damage, 1),
+                            ", Penetration rate:", round(self.pen_rate, 2),
+                            ", Resistance dim rate:", round(self.resis_dim_rate, 2))
 
     def decrease(self, damage):
         ratio = super().decrease(self, damage)
-        self.stability = self.original_stability * math.pow(ratio, 1.0/3)
         self.flesh_damage = self.original_flesh_damage * math.pow(ratio, 1.0/2)
         self.pen_rate = self.original_pen_rate * math.pow(ratio, 1.0/2)
+        self.resis_dim_rate = self.original_resis_dim_rate * math.pow(ratio, 1.0/2)
         return ratio
 
-    def stability_ratio(self):
-        return self.stability / 10.0
-                
                 
 #############################################################
 ################## RANGED WEAPONS CLASS #####################
@@ -294,10 +289,10 @@ class RangedWeapons(AttackWeapons):
     """Common sub class of attack weapons for all ranged weapons"""
     
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power,
-                 pen_rate, resis_dim_rate, melee_handiness, melee_range, range_power,
-                 accuracy, reload_time):
-        super().__init__(name, load, bulk, resistance, hand, defense,
-                         melee_handiness, melee_range, melee_power, pen_rate, resis_dim_rate)
+                 pen_rate, resis_dim_rate, melee_handiness, melee_range, 
+                 range_power, accuracy, reload_time):
+        super().__init__(name, load, bulk, resistance, hand, defense, melee_handiness, 
+                         melee_range, melee_power, pen_rate, resis_dim_rate)
         self.type = "RangedWeapon"
         self.original_range_power = float(range_power)
         self.range_power = self.original_range_power
@@ -317,7 +312,8 @@ class RangedWeapons(AttackWeapons):
     
     def decrease(self, damage):
         ratio = super().decrease(damage)
-        self.accuracy = self.original_accuracy * math.pow(ratio, 1.0/3)
+        self.range_power = self.original_range_power * math.pow(ratio, 1.0/2.0)
+        self.accuracy = self.original_accuracy * math.pow(ratio, 1.0/2.0)
         return ratio
 
     def is_reloaded(self):
@@ -345,14 +341,13 @@ class RangedWeapons(AttackWeapons):
         
     def get_accuracy_ratio(self):
         return self.get_accuracy() / 10.0
-
-    def get_max_range(self):
-        if not self.current_ammo:
-            return 0.0
-        else:
-            return math.pow(self.current_ammo.stability_ratio(), 1.0 / 1.75) * 10 \
-                * self.get_accuracy_ratio() 
-
+        
+    def get_range(self):
+        # 1 range power = 10 meters
+        # 1 case = 2 meters
+        # range gives as number of cases
+        return self.range_power * 10.0 / 2.0
+        
 
 #############################################################
 ####################### BOW CLASS ###########################

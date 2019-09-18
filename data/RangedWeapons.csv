@@ -1,5 +1,5 @@
 Name;Load;Bulk;Resistance;Hand;Defense;Damage;Penetration Rate;Resistance Diminution Rate;Melee handiness;Melee range;Range power;Accuracy;Reload time;isACrossbow
-Short bow;6;1.5;0.5;2;1;1;2;1;11;8;7.5;9;0.5;0
-Long bow;9;2;0.5;2;1.5;1.25;2;1;11;8.5;10;9;0.5;0
-Light crossbow;9;2;1;2;2;1.5;3;2;11;9;15;11;3;1
-Strong crossbow;12;3;1;2;2.5;2;3;2;11;9.5;20;10;4;1
+Short bow;6;1.5;0.5;2;1;1;2;1;11;8;10;9;0.5;0
+Long bow;9;2;0.5;2;1.5;1.25;2;1;11;8.5;15;8;0.5;0
+Light crossbow;9;2;1;2;2;1.5;3;2;11;9;25;12;3;1
+Strong crossbow;12;3;1;2;2.5;2;3;2;11;9.5;35;12;5;1
