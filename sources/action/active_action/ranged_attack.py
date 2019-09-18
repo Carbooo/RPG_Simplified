@@ -3,7 +3,6 @@ import math as math
 import time as time
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
-from sources.character.character import Character
 from sources.action.action import Actions
 from sources.action.active_action.active_action import ActiveActions
 from sources.action.active_action.move import Move
@@ -74,11 +73,12 @@ class RangedAttack(ActiveActions):
                     hit_number = j
             self.target = enemy_list_bis.pop(hit_number)
             hit_chance_list_bis.pop(hit_number)
-            func.optional_print("-- HIT CHANCE:", round(hit_chance, 2),
-                                "-- RANGE POWER:", int(round(self.get_range_power(hit_chance))),
-                                "-- FIGHTING AVAILABILITY:", round(self.target.get_fighting_availability(self.timeline), 2),
-                                "--")
+            func.optional_print("--------------------------------------------------------------------")
             self.target.print_defense_state()
+            func.optional_print("--   HIT CHANCE:", round(hit_chance, 2),
+                                "---- RANGE POWER:", int(round(self.get_range_power(hit_chance))),
+                                "---- FIGHTING AVAILABILITY:", round(self.target.get_fighting_availability(self.timeline), 2),
+                                "--")
 
         while 1:
             try:
@@ -165,11 +165,8 @@ class RangedAttack(ActiveActions):
     def range_defend(self, hit_chance):
         self.fight.stop_action(self.target, self.initiator.timeline)
 
-        # Calculate att coef
-        att_coef = self.get_range_power(hit_chance) * self.get_attack_coef(self.initiator)
-
         # Range defense result
-        attack_power = self.initiator.ranged_power * att_coef
+        attack_power = self.get_range_power(hit_chance) * self.get_attack_coef(self.initiator)
         defense_level = self.target.ranged_defense * self.get_attack_coef(self.target)
         attack_result = attack_power - defense_level
 
@@ -190,13 +187,13 @@ class RangedAttack(ActiveActions):
 
     def shoot_hit_chance(self):
         # Distance = -a*(x-1) + b --> distance min = 1.0, distance max = 0.0
-        h_dist = max(cfg.min_dist_ratio,
+        h_dist = max(cfg.min_distance_ratio,
                      1.0 -
                      (self.initiator.calculate_point_distance(self.target.abscissa, self.target.ordinate) - 1.0)
-                     * cfg.decrease_hit_chance_per_case)
+                     * cfg.decrease_hit_chance_per_case / self.initiator.ranged_accuracy_ratio)
         h_obs = self.fight.field.calculate_ranged_obstacle_ratio(self.initiator, self.target.abscissa, self.target.ordinate)
         h_action = self.get_ranged_action_ratio()
-        return self.initiator.ranged_accuracy_ratio * h_dist * h_obs * h_action
+        return h_dist * h_obs * h_action
 
     def get_ranged_action_ratio(self):
         nb_of_attacks = 0
@@ -221,11 +218,12 @@ class RangedAttack(ActiveActions):
     def range_power_distance_ratio(self):
         return max(cfg.min_range_power_ratio,
                    1 - self.initiator.calculate_point_distance(self.target.abscissa, self.target.ordinate)
-                   / self.equipments.get_range())
+                   / self.initiator.equipments.get_range())
 
     def get_range_power(self, hit_chance):
-        return self.initiator.range_power_distance_ratio() \
-                   * RangedAttack.range_power_hit_chance_ratio(hit_chance) \
+        return self.initiator.ranged_power \
+                * self.range_power_distance_ratio() \
+                * RangedAttack.range_power_hit_chance_ratio(hit_chance) \
 
     def can_ranged_attack(self):
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:

@@ -449,7 +449,7 @@ class CharEquipments:
                 ammo_name = weapon.current_ammo.name
             else:
                 ammo_name = None
-            func.optional_print(", MaxRange:", round(weapon.get_max_range(), 1), ", RangePower:", round(weapon.range_power, 1),
+            func.optional_print(", MaxRange:", round(weapon.get_range(), 1), ", RangePower:", round(weapon.range_power, 1),
                   ", CurrentAmmo:", ammo_name)
         else:
             func.optional_print("")

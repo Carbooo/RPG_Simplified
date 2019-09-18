@@ -11,7 +11,7 @@ import sources.miscellaneous.global_functions as func
 class Save(Actions):
     """Class to save a fight"""
     
-    save_path = 'saves\\'
+    save_path = 'saves/'
     save_extension = '.sav'
     
     def __init__(self, fight, filename=None):

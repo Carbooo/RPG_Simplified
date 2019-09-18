@@ -1,7 +1,7 @@
-from data.import_data import ImportData
-from sources.fight.fight import Fight
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
+from data.import_data import ImportData
+from sources.fight.fight import Fight
 
 ##################### SET UP ###################
 ImportData("Armors", "data/Armors.csv")

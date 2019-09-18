@@ -178,7 +178,7 @@ class Fight:
         self.field.print_obj()
         func.optional_print("")
         self.scheduler[0].print_basic()
-        func.optional_print("Timeline:", self.scheduler[0].timeline)
+        func.optional_print(", Timeline:", round(self.scheduler[0].timeline, 2))
         func.optional_print("")
         
     def print_ko_state_rest(self, character):
@@ -436,7 +436,7 @@ class Fight:
             func.optional_print("Your defense is diminished!", level=2)
             time.sleep(2)
 
-            func.optional_print("Your current action (", char.last_action.name, ") is also canceled!", level=2)
+            func.optional_print("Your current action is also canceled!", level=2)
             time.sleep(2)
             char.last_action = None
             char.timeline = timeline

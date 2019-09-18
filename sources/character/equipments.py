@@ -304,7 +304,7 @@ class RangedWeapons(AttackWeapons):
     def print_obj(self):
         super().print_obj()
         func.optional_print(", RangePower:", round(self.range_power, 1), ", Accuracy:", round(self.accuracy, 1),
-              ", MaxRange:", self.get_max_range(), ", ReloadTime:", round(self.reload_time, 1), ", Ammo:", skip_line=True)
+              ", MaxRange:", self.get_range(), ", ReloadTime:", round(self.reload_time, 1), ", Ammo:", skip_line=True)
         if self.current_ammo:
             func.optional_print(self.current_ammo.name, skip_line=True)
         else:

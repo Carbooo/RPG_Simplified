@@ -20,13 +20,16 @@ ImportData("ObstaclesField", "data/LongObstacles.csv")
 
 ##################### TESTING ###################
 def test_ranged():
-    func.automatic = True
+    func.log_level = 1
+    func.automatic = False
     func.actions = ["EQP", 236]
     Fight(cfg.field_list[0], cfg.team_list[10], cfg.team_list[11])
 
 
-func.log_level = 1
-# test_ranged()
+def test_magic():
+    func.automatic = True
+    func.actions = ["EQP", 236]
+    # Fight(cfg.field_list[0], cfg.team_list[12], cfg.team_list[13])
 
-Fight(cfg.field_list[0], cfg.team_list[12], cfg.team_list[13])
 
+test_ranged()

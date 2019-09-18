@@ -82,7 +82,8 @@ max_move_per_action = 15  # To prevent eternal stupid moving
 ranged_attack_stage = [25, 50]  # [Blocked", "Hit", "Hit & stopped"]
 moving_char_shooting_handicap = 0.66
 melee_fighter_shooting_handicap = 0.75
-decrease_hit_chance_per_case = 0.01
+decrease_hit_chance_per_case = 0.01  # Every case, the distance hit chance diminishes by this ratio
+min_distance_ratio = 0.1  # The distance hit chance cannot go lower than that
 
 ################### MELEE ATTACK CONFIG ###################
 melee_attack_stage = [0, 25, 50, 75]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]
