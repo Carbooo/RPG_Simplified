@@ -215,7 +215,7 @@ wrath_spells_power = {
         "force": 2.0,
         "reflex": 0.8,
         "dexterity": 0.6,
-        "duration": 5.0
+        "duration": 10.0
     },
     "FBL": {
         "attack_value": 50.0,
@@ -267,7 +267,7 @@ joy_spells_power = {
     "EGY": {
         "moral_increase": 1.15,
         "stamina_restored": 20.0,
-        "duration": 5.0
+        "duration": 10.0
     },
     "LGT": {
         "attack_value": 20.0,
@@ -375,6 +375,57 @@ sadness_spells_power = {
         "moral_dim_rate": 0.5,
         "stamina_dim_rate": 3.0,
         "speed_dim_rate": 0.3,
-        "duration": 10
+        "duration": 15.0
+    }
+}
+
+##################### FEAR SPELLS CONFIG ###################
+fear_spells = {
+    "description": "Fear spells",
+    "code": "FEA",
+    "list": []
+}
+fear_opposing_winds = {
+    "description": "Improve your strength",
+    "code": "OWI"
+}
+fear_gigantic_fist = {
+    "description": "Throw a fireball",
+    "code": "FBL"
+}
+spells.append(fear_spells)
+fear_spells["list"].append(fear_opposing_winds)
+fear_spells["list"].append(fear_gigantic_fist)
+
+fear_spells_energy = {
+    "OWI": 15.0,
+    "MFI": 22.5
+}
+fear_spells_time = {
+    "OWI": 1.25,
+    "MFI": 1.75
+}
+fear_spells_stamina = {
+    "OWI": 1.5,
+    "MFI": 3.0
+}
+fear_spells_hands = {
+    "OWI": 2,
+    "MFI": 1
+}
+fear_spells_knowledge = {
+    "OWI": 2,
+    "MFI": 3
+}
+fear_spells_power = {
+    "OWI": {
+        "slowing_down": 17.5,
+        "duration": 10.0
+    },
+    "MFI": {
+        "attack_value": 27.5,
+        "resis_dim_rate": 0.25,
+        "pen_rate": 0.5,
+        "min_damage_for_moving": 15.0
     }
 }

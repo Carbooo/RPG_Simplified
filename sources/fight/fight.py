@@ -19,6 +19,8 @@ from sources.action.active_action.spell.wrath_spells import WrathSpells
 from sources.action.active_action.spell.joy_spells import JoySpells
 from sources.action.active_action.spell.love_spells import LoveSpells
 from sources.action.active_action.spell.sadness_spells import SadnessSpells
+from sources.action.active_action.spell.fear_spells import FearSpells
+
 
 #############################################################
 ##################### FIGHTS CLASS ##########################
@@ -404,6 +406,8 @@ class Fight:
             action = LoveSpells(self, character, spell_code)
         elif spell_type == "SAD":
             action = SadnessSpells(self, character, spell_code)
+        elif spell_type == "FEA":
+            action = FearSpells(self, character, spell_code)
 
         if not action.is_a_success:
             return False
