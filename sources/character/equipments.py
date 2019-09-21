@@ -77,12 +77,12 @@ class Equipments:
 class Armors(Equipments):
     """Common sub class of equipments for all armors"""
     
-    def __init__(self, name, load, bulk, resistance, def_cover, defense):
+    def __init__(self, name, load, bulk, resistance, def_cover):
         super().__init__(name, load, bulk, resistance)
         self.type = "Armor"
         self.original_def_cover = float(def_cover)
         self.def_cover = self.original_def_cover
-        self.original_defense = float(defense)
+        self.original_defense = self.resistance * 10.0
         self.defense = self.original_defense
         
     def print_obj(self):
@@ -116,13 +116,13 @@ class Armors(Equipments):
             
 
 #############################################################
-#################### ARMORS CLASS ###########################
+#################### MAGICAL ARMORS CLASS ###################
 #############################################################
 class MagicalArmors(Armors):
     """Common sub class of equipments for all purely magical armors"""
     
-    def __init__(self, name, defense):
-        super().__init__(name, 0.0, 0.0, 0.0, 10.0, defense)
+    def __init__(self, name, resistance):
+        super().__init__(name, 0.0, 0.0, resistance, 10.0)
         self.type = "MagicalArmor"
         
     def damage_absorbed(self, damage, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate):
@@ -138,8 +138,44 @@ class MagicalArmors(Armors):
             return 0
         else:
             return 1
-            
 
+        
+#############################################################
+######################## AMMO CLASS #########################
+#############################################################
+class Ammo(Equipments):
+    """Common sub class of equipments for all ammo"""
+    
+    def __init__(self, name, load, bulk, resistance, ranged_weapon_type,
+                 flesh_damage, pen_rate, resis_dim_rate):
+        super().__init__(name, load, bulk, resistance)
+        self.type = "Arrow"
+        self.original_flesh_damage = float(flesh_damage)
+        self.flesh_damage = self.original_flesh_damage
+        self.original_pen_rate = float(pen_rate) / 10.0
+        self.pen_rate = self.original_pen_rate
+        self.original_resis_dim_rate = float(resis_dim_rate) / 10.0
+        self.resis_dim_rate = self.original_resis_dim_rate
+        self.ranged_weapon_type = False
+        if ranged_weapon_type == "Bow":
+            self.ranged_weapon_type = Bows
+        elif ranged_weapon_type == "Crossbow":
+            self.ranged_weapon_type = Crossbows
+
+    def print_obj(self):
+        super().print_obj()
+        func.optional_print(", flesh damage:", round(self.flesh_damage, 1),
+                            ", Penetration rate:", round(self.pen_rate, 2),
+                            ", Resistance dim rate:", round(self.resis_dim_rate, 2))
+
+    def decrease(self, damage):
+        ratio = super().decrease(self, damage)
+        self.flesh_damage = self.original_flesh_damage * math.pow(ratio, 1.0/2)
+        self.pen_rate = self.original_pen_rate * math.pow(ratio, 1.0/2)
+        self.resis_dim_rate = self.original_resis_dim_rate * math.pow(ratio, 1.0/2)
+        return ratio
+
+                
 #############################################################
 ##################### WEAPONS CLASS #########################
 #############################################################
@@ -164,6 +200,10 @@ class Weapons(Equipments):
         self.melee_handiness = self.original_melee_handiness
         self.original_melee_range = float(melee_range)
         self.melee_range = self.original_melee_range
+        self.attack_ratio = 1.0
+        self.melee_defend_ratio = 1.0
+        self.ranged_defend_ratio = 1.0
+        self.magic_defend_ratio = 1.0
 
     def print_obj(self):
         super().print_obj()
@@ -207,6 +247,28 @@ class Shields(Weapons):
     
 
 #############################################################
+##################### MAGICAL SHIELDS CLASS #################
+#############################################################
+class MagicalShields(Shields):
+    """Common sub class of weapons for all shields"""
+    
+    def __init__(self, name, defense, attack_ratio, melee_def_ratio, ranged_def_ratio, magic_def_ratio):
+        super().__init__(name, 0.0, 0.0, 0.0, 0, defense, 0.0, 0.0, 0.0, 0.0, 0.0)
+        self.type = "MagicalShield"
+        self.attack_ratio = attack_ratio
+        self.melee_defend_ratio = melee_def_ratio
+        self.ranged_defend_ratio = ranged_def_ratio
+        self.magic_defend_ratio = magic_def_ratio
+        
+    def print_obj(self):
+        super().print_obj()
+        func.optional_print("")
+
+    def decrease(self, damage):
+        return 1
+    
+
+#############################################################
 ################## ATTACK WEAPONS CLASS #####################
 #############################################################
 class AttackWeapons(Weapons):
@@ -216,6 +278,8 @@ class AttackWeapons(Weapons):
                  pen_rate, resis_dim_rate, melee_handiness, melee_range):
         super().__init__(name, load, bulk, resistance, hand, defense,
                          melee_power, pen_rate, resis_dim_rate, melee_handiness, melee_range)
+        self.ranged_defend_ratio = 0.0
+        self.magic_defend_ratio = 0.0
         
     def print_obj(self):
         super().print_obj()
@@ -246,42 +310,7 @@ class MeleeWeapons(AttackWeapons):
         return ratio
 
 
-#############################################################
-######################## AMMO CLASS #########################
-#############################################################
-class Ammo(Equipments):
-    """Common sub class of equipments for all ammo"""
-    
-    def __init__(self, name, load, bulk, resistance, ranged_weapon_type,
-                 flesh_damage, pen_rate, resis_dim_rate):
-        super().__init__(name, load, bulk, resistance)
-        self.type = "Arrow"
-        self.original_flesh_damage = float(flesh_damage)
-        self.flesh_damage = self.original_flesh_damage
-        self.original_pen_rate = float(pen_rate) / 10.0
-        self.pen_rate = self.original_pen_rate
-        self.original_resis_dim_rate = float(resis_dim_rate) / 10.0
-        self.resis_dim_rate = self.original_resis_dim_rate
-        self.ranged_weapon_type = False
-        if ranged_weapon_type == "Bow":
-            self.ranged_weapon_type = Bows
-        elif ranged_weapon_type == "Crossbow":
-            self.ranged_weapon_type = Crossbows
 
-    def print_obj(self):
-        super().print_obj()
-        func.optional_print(", flesh damage:", round(self.flesh_damage, 1),
-                            ", Penetration rate:", round(self.pen_rate, 2),
-                            ", Resistance dim rate:", round(self.resis_dim_rate, 2))
-
-    def decrease(self, damage):
-        ratio = super().decrease(self, damage)
-        self.flesh_damage = self.original_flesh_damage * math.pow(ratio, 1.0/2)
-        self.pen_rate = self.original_pen_rate * math.pow(ratio, 1.0/2)
-        self.resis_dim_rate = self.original_resis_dim_rate * math.pow(ratio, 1.0/2)
-        return ratio
-
-                
 #############################################################
 ################## RANGED WEAPONS CLASS #####################
 #############################################################

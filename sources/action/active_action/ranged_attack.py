@@ -75,10 +75,9 @@ class RangedAttack(ActiveActions):
             hit_chance_list_bis.pop(hit_number)
             func.optional_print("--------------------------------------------------------------------")
             self.target.print_defense_state()
-            func.optional_print("--   HIT CHANCE:", round(hit_chance, 2),
+            func.optional_print("----   HIT CHANCE:", round(hit_chance, 2),
                                 "---- RANGE POWER:", int(round(self.get_range_power(hit_chance))),
-                                "---- FIGHTING AVAILABILITY:", round(self.target.get_fighting_availability(self.timeline), 2),
-                                "--")
+                                "----")
 
         while 1:
             try:
@@ -173,7 +172,7 @@ class RangedAttack(ActiveActions):
         # Update availability after computed the result
         self.target.previous_attacks.append((self.initiator.timeline, self))
         
-        # Attack result --> Either block or be fully hit
+        # Attack result --> Either block or be hit
         if attack_result <= cfg.ranged_attack_stage[0]:
             self.target.equipments.all_shields_absorbed_damage(attack_power, self.ammo_used.resis_dim_rate)
             func.optional_print("The attack has been fully blocked / avoided by the defender", level=2)

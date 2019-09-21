@@ -43,12 +43,11 @@ class ImportData:
 
     def import_armors(self):
         for row in self.my_csv:
-            if len(row) != 6:
+            if len(row) != 5:
                 print("Armors import does not contain the right number of columns")
                 return False
             else:
-                Armors(row[0], float(row[1]), float(row[2]), float(row[3]),
-                       float(row[4]), float(row[5]))
+                Armors(row[0], float(row[1]), float(row[2]), float(row[3]), float(row[4]))
         return True
 
     def import_shields(self):

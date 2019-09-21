@@ -52,9 +52,6 @@ class MeleeAttack(ActiveActions):
             self.target = char
             if self.initiator.can_melee_attack(self.target):
                 func.optional_print("-----------------------------------------")
-                func.optional_print("----- FIGHTING AVAILABILITY:",
-                    self.target.get_fighting_availability(self.timeline),
-                    "-----")
                 self.target.print_defense_state()
                 enemy_list.append(self.target)
 

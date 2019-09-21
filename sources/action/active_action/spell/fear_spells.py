@@ -20,6 +20,7 @@ class FearSpells(Spells):
         self.spell_hands = cfg.joy_spells_hands[self.spell_code]
         self.spell_knowledge = cfg.joy_spells_knowledge[self.spell_code]
         self.spell_power = cfg.joy_spells_power[self.spell_code]
+        self.shield = None
         self.is_a_success = self.start()
         
     def start(self):
@@ -51,7 +52,7 @@ class FearSpells(Spells):
         if not self.is_able_to_cast():
             return False
         
-        func.optional_print("You have decided to generate strong winds around you, making you harder to reach with a ranged attack.")
+        func.optional_print("You have decided to generate strong winds around you, making you harder to reach.")
         func.optional_print("The effect will start soon!")
         time.sleep(3)
             
@@ -65,7 +66,10 @@ class FearSpells(Spells):
         self.remove_identical_active_spell()
 
         self.magical_coef *= self.initiator.magic_power_ratio
-        # To be done
+        self.initiator.equipments.set_magical_shield("Opposing winds shield", 
+                                                     self.spell_power["defense"], 0.0, 
+                                                     self.spell_power["melee_def_ratio"], 
+                                                     1.0, 0.0)
 
         self.add_lasting_spell("Opposing winds",
                               self.spell_power["duration"] * math.sqrt(self.magical_coef))
@@ -73,9 +77,9 @@ class FearSpells(Spells):
     
     def end_opposing_winds(self, is_canceled):
         if not is_canceled:
-            self.print_spell("has no longer strong winds protecting them against ranged attacks", "ending", True)
+            self.print_spell("has no longer strong winds protecting them against attacks", "ending", True)
 
-        # to be done 
+        self.initiator.equipments.remove_weapon(self.shield, definitive=True)
         
         self.end_lasting_spell()
         return True

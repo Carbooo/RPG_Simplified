@@ -424,7 +424,6 @@ class Fight:
             time.sleep(2)
             char.last_action = None
             char.timeline = timeline
-            char.spend_time(cfg.defense_time / 2)
             return False
         
         # Stop action with penalty
@@ -434,21 +433,20 @@ class Fight:
                 or isinstance(char.last_action, Rest) \
                 or isinstance(char.last_action, Concentrate) \
                 or isinstance(char.last_action, Spells):
-            char.previous_attacks.append((timeline, char.last_action))
+            
             func.optional_print("The attack surprises you during your current action(",
                                 char.last_action.name, ")!", level=2)
             func.optional_print("Your defense is diminished!", level=2)
             time.sleep(2)
-
             func.optional_print("Your current action is also canceled!", level=2)
             time.sleep(2)
-            char.last_action = None
-            char.timeline = timeline
-            char.spend_time(cfg.defense_time / 2)
-
+            
             if isinstance(char.last_action, Reload):
                 func.optional_print("You loose the ammo being used for reloading!", level=2)
                 time.sleep(2)
                 char.ammo.remove(char.last_action.ammo_to_load)
             
+            char.last_action = None  # Has to be done after the unreload
+            char.timeline = timeline
+            char.spend_time(cfg.defense_time)
             return True

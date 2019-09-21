@@ -1,6 +1,6 @@
 import time as time
 from sources.character.equipments import Armors, MagicalArmors, Weapons, AttackWeapons, MeleeWeapons, \
-    Shields, RangedWeapons, Bows, Crossbows, Ammo
+    Shields, MagicalShields, RangedWeapons, Bows, Crossbows, Ammo
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
 
@@ -91,6 +91,10 @@ class CharEquipments:
         self.weapons_in_use.append(weapon)
         self.free_hands -= weapon.hand
         return True
+        
+    def set_magical_shield(self, name, defense, attack_ratio, melee_def_ratio, ranged_def_ratio, magic_def_ratio):
+        new_shield = MagicalShield(name, defense, attack_ratio, melee_def_ratio, ranged_def_ratio, magic_def_ratio)
+        self.set_weapon_in_use(new_shield)
 
     def remove_weapon(self, weapon, definitive=False):
         if weapon not in self.weapons_in_use:
@@ -344,10 +348,10 @@ class CharEquipments:
         nb_of_weapon = 0.0
 
         for weapon in self.weapons_in_use:
-            nb_of_weapon += 1.0
-            accuracies["melee_weapons"] += weapon.melee_handiness
+            nb_of_weapon += weapon.attack_ratio
+            accuracies["melee_weapons"] += weapon.melee_handiness * weapon.attack_ratio
             if isinstance(weapon, RangedWeapons):
-                accuracies["ranged_weapons"] += weapon.accuracy
+                accuracies["ranged_weapons"] += weapon.accuracy * weapon.attack_ratio
 
         # Free hands melee power
         accuracies["melee_weapons"] += self.free_hands * cfg.free_hand_melee_handiness
@@ -361,8 +365,8 @@ class CharEquipments:
         melee_range = 0.0
         nb_of_weapon = 0.0
         for weapon in self.weapons_in_use:
-            melee_range += weapon.melee_range
-            nb_of_weapon += 1.0
+            melee_range += weapon.melee_range * weapon.attack_ratio
+            nb_of_weapon += weapon.attack_ratio
 
         # Free hands melee range
         if self.free_hands == 2:
@@ -381,12 +385,12 @@ class CharEquipments:
         nb_of_weapons = 0.0
 
         for weapon in self.weapons_in_use:
-            nb_of_weapons += 1
-            attack_powers["melee_power"] += weapon.melee_power
-            attack_powers["pen_rate"] += weapon.pen_rate
-            attack_powers["resis_dim_rate"] += weapon.resis_dim_rate
+            nb_of_weapons += weapon.attack_ratio
+            attack_powers["melee_power"] += weapon.melee_power * weapon.attack_ratio
+            attack_powers["pen_rate"] += weapon.pen_rate * weapon.attack_ratio
+            attack_powers["resis_dim_rate"] += weapon.resis_dim_rate * weapon.attack_ratio
             if isinstance(weapon, RangedWeapons) and self.ranged_weapon_has_ammo(weapon):
-                attack_powers["ranged_power"] += weapon.range_power
+                attack_powers["ranged_power"] += weapon.range_power * weapon.attack_ratio
 
         # Free hands melee attack power
         attack_powers["melee_power"] += self.free_hands * cfg.free_hand_melee_power
@@ -406,12 +410,9 @@ class CharEquipments:
         }
 
         for weapon in self.weapons_in_use:
-            if isinstance(weapon, Shields):
-                defenses["melee_defense"] += weapon.defense
-                defenses["ranged_defense"] += weapon.defense
-                defenses["magic_defense"] += weapon.defense
-            elif isinstance(weapon, AttackWeapons):
-                defenses["melee_defense"] += weapon.defense
+            defenses["melee_defense"] += weapon.defense * weapon.melee_defend_ratio
+            defenses["ranged_defense"] += weapon.defense * weapon.ranged_defend_ratio
+            defenses["magic_defense"] += weapon.defense * weapon.magic_defend_ratio
 
         # Free hands melee defense
         defenses["melee_defense"] += self.free_hands * cfg.free_hand_melee_defense

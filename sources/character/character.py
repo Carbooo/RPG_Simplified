@@ -323,16 +323,22 @@ class Character:
             self.ordinate = -1
             return False
 
+###################### MELEE FUNCTIONS ########################
     def get_fighting_availability(self, timeline):
-        char_defense_time = cfg.defense_time * self.speed_ratio
+        char_defense_time = cfg.defense_time / self.speed_ratio
         total_time = 0
+        
+        # Calculate fighting recovery from previous attack
         for attack_timeline, attack in self.previous_attacks:
             time = attack_timeline + char_defense_time - timeline
             if time > 0:
                 total_time += time
+        
+        # Calculate fighting readiness regarding char timeline
+        total_time += max(0.0, char.timeline - timeline)
+        
         return 1.0 / (1.0 + total_time / char_defense_time)
-
-###################### MELEE FUNCTIONS ########################
+    
     @staticmethod
     def get_melee_attack(melee_handiness, melee_power):
         return math.pow(melee_power * math.pow(melee_handiness, 1.0/3), 0.75)

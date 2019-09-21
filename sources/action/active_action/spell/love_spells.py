@@ -70,8 +70,7 @@ class LoveSpells(Spells):
                 
         self.remove_identical_active_spell()
         self.magical_coef *= self.initiator.magic_power_ratio
-        self.spell_power["defense"] *= self.magical_coef
-        self.armor = self.target.equipments.set_magical_armor("Love shield", self.spell_power["defense"])
+        self.armor = self.target.equipments.set_magical_armor("Love shield", self.spell_power["resistance"] * self.magical_coef)
         
         self.add_lasting_spell("Magic love shield", cfg.recurrent_spell_frequency)
         return True

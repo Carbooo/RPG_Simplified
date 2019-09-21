@@ -318,7 +318,7 @@ love_spells_knowledge = {
 }
 love_spells_power = {
     "SHD": {
-        "defense": 100.0,
+        "resistance": 10.0,
         "turn_decay": 10.0
     },
     "HEA": {
@@ -419,7 +419,8 @@ fear_spells_knowledge = {
 }
 fear_spells_power = {
     "OWI": {
-        "slowing_down": 17.5,
+        "melee_def_ratio": 0.4,
+        "defense": 15.0
         "duration": 10.0
     },
     "MFI": {
