@@ -480,7 +480,6 @@ class CharEquipments:
         return True
     
     def print_weapons_in_use(self):
-        func.optional_print("")
         func.optional_print("   - Weapons used:")
         if not self.weapons_in_use:
             func.optional_print("      \\No weapon used")
@@ -491,7 +490,6 @@ class CharEquipments:
         return True
 
     def print_full_weapons_in_use(self):
-        func.optional_print("")
         func.optional_print("   - Weapons used:")
         if self.weapons_in_use:
             func.optional_print("      \\No weapon used")

@@ -337,7 +337,7 @@ sadness_throw_ice_pick = {
     "code": "IPK"
 }
 sadness_despair_storm = {
-    "description": "Create a cloud generating despair",
+    "description": "Create a storm slowing and generating despair",
     "code": "DST"
 }
 spells.append(sadness_spells)
@@ -420,7 +420,7 @@ fear_spells_knowledge = {
 fear_spells_power = {
     "OWI": {
         "melee_def_ratio": 0.4,
-        "defense": 15.0
+        "defense": 15.0,
         "duration": 10.0
     },
     "MFI": {

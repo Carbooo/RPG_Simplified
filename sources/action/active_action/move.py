@@ -83,13 +83,12 @@ class Move(ActiveActions):
         if not self.fight.field.move_character(self.initiator, self.target_abs, self.target_ord):
             return self.cancel_move()
 
-        func.optional_print("")
-        func.optional_print("*********************************************************************")
-        func.optional_print(self.initiator.print_basic(), "has moved to", self.target_abs, "x", self.target_ord)
-        func.optional_print("Next steps are:", self.path)
-        func.optional_print("*********************************************************************")
-        func.optional_print("")
-        time.sleep(2)
+        func.optional_print("", level=0)
+        func.optional_print("*********************************************************************", level=0)
+        func.optional_print(self.initiator.print_basic(), "has moved to", self.target_abs, "x", self.target_ord, level=0)
+        func.optional_print("Next steps are:", self.path, level=0)
+        func.optional_print("*********************************************************************", level=0)
+        func.optional_print("", level=0)
         
         # Test if destination is reachex
         if not self.path:

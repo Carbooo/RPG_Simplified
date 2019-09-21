@@ -152,9 +152,9 @@ class Ammo(Equipments):
         self.type = "Arrow"
         self.original_flesh_damage = float(flesh_damage)
         self.flesh_damage = self.original_flesh_damage
-        self.original_pen_rate = float(pen_rate) / 10.0
+        self.original_pen_rate = float(pen_rate) / 100.0
         self.pen_rate = self.original_pen_rate
-        self.original_resis_dim_rate = float(resis_dim_rate) / 10.0
+        self.original_resis_dim_rate = float(resis_dim_rate) / 100.0
         self.resis_dim_rate = self.original_resis_dim_rate
         self.ranged_weapon_type = False
         if ranged_weapon_type == "Bow":

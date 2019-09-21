@@ -94,7 +94,8 @@ class MeleeAttack(ActiveActions):
         func.optional_print("is melee attacking (", skip_line=True)
         self.target.print_basic()
         func.optional_print(")")
-        func.optional_print("Fighting availability:", self.target.get_fighting_availability(self.initiator.timeline),
+        func.optional_print("Fighting availability:", round(
+                            self.target.get_fighting_availability(self.initiator.timeline), 2),
                             level=2)
         func.optional_print("*********************************************************************")
         func.optional_print("")

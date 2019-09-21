@@ -143,7 +143,7 @@ class RangedAttack(ActiveActions):
         if not target:
             func.optional_print("The shoot has missed its target!", level=2)
             func.optional_print("No damage has been made.")
-            time.sleep(3)
+            time.sleep(4)
 
         elif target is True:
             func.optional_print("The shoot has hit its target!", level=2)

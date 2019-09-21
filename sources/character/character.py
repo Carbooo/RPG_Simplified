@@ -335,8 +335,11 @@ class Character:
                 total_time += time
         
         # Calculate fighting readiness regarding char timeline
-        total_time += max(0.0, char.timeline - timeline)
-        
+        readiness_time = self.timeline - timeline
+        if self.last_action and self.last_action.name == "Melee attacking":  # Do not count "counter" attack
+            readiness_time = max(0.0, readiness_time - cfg.actions["melee_attack"]["duration"] / self.speed_ratio)
+
+        total_time += readiness_time
         return 1.0 / (1.0 + total_time / char_defense_time)
     
     @staticmethod
@@ -377,15 +380,16 @@ class Character:
         func.optional_print("-- has HIT --", skip_line=True, level=3)
         self.print_basic()
         func.optional_print("-- with a power of", int(round(attack_value)), level=3)
-        time.sleep(2)        
-        
+        time.sleep(2)
+
+        if accuracy_ratio != 0 and random.random() / accuracy_ratio < cfg.critical_hit_chance:
+            func.optional_print("The damages are amplified, because they hit a critical area!", level=3)
+            time.sleep(2)
+            attack_value *= cfg.critical_hit_boost
+
         damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate)
         
         if damage_result > 0:
-            if accuracy_ratio != 0 and random.random() / accuracy_ratio < cfg.critical_hit_chance:
-                func.optional_print("The damages are amplified, because they hit a critical area!", level=3)
-                damage_result *= cfg.critical_hit_boost
-
             life_ratio = self.body.loose_life(damage_result)
             # Damages received diminish the defender
             if self.body.is_alive():
