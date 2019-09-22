@@ -12,8 +12,9 @@ class JoySpells(Spells):
     """Class to cast joy spells"""
  
     def __init__(self, fight, initiator, spell_code):
-        super().__init__(fight, initiator, "Joy", spell_code)
+        super().__init__(fight, initiator, spell_code)
         self.name = "Casting a Joy spell"
+        self.feeling_type = "Joy"
         self.spell_stamina = cfg.joy_spells_stamina[self.spell_code]
         self.spell_time = cfg.joy_spells_time[self.spell_code]
         self.spell_energy = cfg.joy_spells_energy[self.spell_code]

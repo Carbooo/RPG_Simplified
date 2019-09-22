@@ -15,6 +15,7 @@ class Reload(ActiveActions):
     def __init__(self, fight, initiator):
         super().__init__(fight, initiator)
         self.name = "Reloading"
+        self.type = "Reload"
         self.weapon_to_reload = None
         self.ammo_to_load = None
         self.is_a_success = self.start()

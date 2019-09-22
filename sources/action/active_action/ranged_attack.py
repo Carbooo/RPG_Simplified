@@ -5,7 +5,6 @@ import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
 from sources.action.action import Actions
 from sources.action.active_action.active_action import ActiveActions
-from sources.action.active_action.move import Move
 
 
 #############################################################
@@ -17,6 +16,7 @@ class RangedAttack(ActiveActions):
     def __init__(self, fight, initiator):
         super().__init__(fight, initiator)
         self.name = "Ranged attacking"
+        self.type = "RangedAttack"
         self.target = None
         self.ammo_used = self.initiator.equipments.get_current_ammo()
         self.shooting_time = 1
@@ -189,10 +189,11 @@ class RangedAttack(ActiveActions):
         h_dist = max(cfg.min_distance_ratio,
                      1.0 -
                      (self.initiator.calculate_point_distance(self.target.abscissa, self.target.ordinate) - 1.0)
-                     * cfg.decrease_hit_chance_per_case / self.initiator.ranged_accuracy_ratio)
+                     * cfg.decrease_hit_chance_per_case
+                     / self.get_ranged_action_ratio()
+                     / self.initiator.ranged_accuracy_ratio)
         h_obs = self.fight.field.calculate_ranged_obstacle_ratio(self.initiator, self.target.abscissa, self.target.ordinate)
-        h_action = self.get_ranged_action_ratio()
-        return h_dist * h_obs * h_action
+        return h_dist * h_obs
 
     def get_ranged_action_ratio(self):
         nb_of_attacks = 0
@@ -205,7 +206,7 @@ class RangedAttack(ActiveActions):
         else:
             coef = 1
 
-        if isinstance(self.target.last_action, Move):
+        if self.target.last_action and self.target.last_action.type == "Move":
             coef *= cfg.moving_char_shooting_handicap
 
         return coef

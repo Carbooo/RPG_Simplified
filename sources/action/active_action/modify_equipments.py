@@ -16,6 +16,7 @@ class ModifyEquipments(ActiveActions):
     def __init__(self, fight, initiator):
         super().__init__(fight, initiator)
         self.name = "Modifying equipment"
+        self.type = "Equip"
         self.next_equipment = []
         self.next_unequipment = []
         self.equip_time = 0.0

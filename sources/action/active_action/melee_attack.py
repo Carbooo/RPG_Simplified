@@ -17,6 +17,7 @@ class MeleeAttack(ActiveActions):
     def __init__(self, fight, initiator):
         super().__init__(fight, initiator)
         self.name = "Melee attacking"
+        self.type = "MeleeAttack"
         self.target = None
         self.actual_defense = "None"  # Can be "Dodge", "Defense" or "No defense"
         self.is_a_success = self.start()

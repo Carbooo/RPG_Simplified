@@ -15,6 +15,7 @@ class Move(ActiveActions):
     def __init__(self, fight, initiator):
         super().__init__(fight, initiator)
         self.name = "Moving"
+        self.type = "Move"
         self.target_abs = -1
         self.target_ord = -1
         self.path = []

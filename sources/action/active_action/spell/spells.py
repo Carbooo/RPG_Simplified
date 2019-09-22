@@ -13,12 +13,13 @@ import sources.miscellaneous.global_functions as func
 class Spells(ActiveActions):
     """Super class for all spells"""
 
-    def __init__(self, fight, initiator, type, spell_code):
+    def __init__(self, fight, initiator, spell_code):
         super().__init__(fight, initiator)
         self.name = "Generic spell action"
         self.surname = "Generic spell name"
+        self.type = "Spell"
         self.target = None
-        self.type = type
+        self.feeling_type = None
         self.spell_code = spell_code
         self.magical_coef = 0
         self.spell_stamina = 0
@@ -40,7 +41,7 @@ class Spells(ActiveActions):
 
     def set_magical_coef(self):
         self.magical_coef = random.gauss(1, cfg.high_variance) \
-                            * self.initiator.feelings[self.type].use_energy(self.spell_energy)
+                            * self.initiator.feelings[self.feeling_type].use_energy(self.spell_energy)
 
     def get_stamina_with_coef(self):
         return self.spell_stamina / math.pow(self.magical_coef, 1.0 / 4.0)
@@ -49,7 +50,7 @@ class Spells(ActiveActions):
         return self.spell_time / math.pow(self.magical_coef, 1.0 / 4.0)
 
     def is_able_to_cast(self):
-        if not self.initiator.feelings[self.type].check_energy(self.spell_energy):
+        if not self.initiator.feelings[self.feeling_type].check_energy(self.spell_energy):
             func.optional_print("You don't have enough energy (", self.spell_energy, ") to cast this spell")
             return False
 
@@ -61,7 +62,7 @@ class Spells(ActiveActions):
             func.optional_print("You don't have enough free hands (", self.spell_hands, ") to cast this spell")
             return False
 
-        if self.initiator.feelings[self.type].knowledge < self.spell_knowledge:
+        if self.initiator.feelings[self.feeling_type].knowledge < self.spell_knowledge:
             func.optional_print("You don't have the required knowledge (", self.spell_knowledge, ") to cast this spell")
             return False
 
@@ -279,7 +280,7 @@ class Spells(ActiveActions):
         
     def identical_active_spell(self):
         for spell in self.target.active_spells:
-            if spell.type == self.type and spell.spell_code == self.spell_code:
+            if spell.type == self.feeling_type and spell.spell_code == self.spell_code:
                 return spell
         return False
 

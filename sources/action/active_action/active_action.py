@@ -15,6 +15,7 @@ class ActiveActions(Actions):
     def __init__(self, fight, initiator):
         super().__init__(fight)
         self.name = "Generic active actions"
+        self.feeling_type = None
         self.initiator = initiator
         self.timeline = self.initiator.timeline
 

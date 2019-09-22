@@ -15,6 +15,7 @@ class Rest(ActiveActions):
     def __init__(self, fight, initiator):
         super().__init__(fight, initiator)
         self.name = "Resting"
+        self.type = "Rest"
         self.nb_of_turns = -1
         self.resting_ratio = 1
         self.is_a_success = self.start()

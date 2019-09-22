@@ -12,8 +12,9 @@ class WrathSpells(Spells):
     """Class to cast wrath spells"""
  
     def __init__(self, fight, initiator, spell_code):
-        super().__init__(fight, initiator, "Wrath", spell_code)
+        super().__init__(fight, initiator, spell_code)
         self.name = "Casting a Wrath spell"
+        self.feeling_type = "Wrath"
         self.spell_stamina = cfg.wrath_spells_stamina[self.spell_code]
         self.spell_time = cfg.wrath_spells_time[self.spell_code]
         self.spell_energy = cfg.wrath_spells_energy[self.spell_code]

@@ -34,6 +34,9 @@ free_hand_resis_dim_rate = 0.01  # Armor diminution of hits with free hands
 free_hand_melee_defense = 0.75  # Melee defense for each free hand
 team_state_effect_on_moral = 1.0 / 4.0  # Math.pow(team state, this value) as morale
 min_range_power_ratio = 0.1  # range power coef cannot go lower
+melee_attack_fighting_availability = 1.0  # impact coef on fighting availability
+ranged_attack_fighting_availability = 0.25
+magic_attack_fighting_availability = 0.35
 
 ########################## BODY CONFIG #######################
 life_resting_coef = 14400.0  # Rest coefficient
@@ -80,10 +83,10 @@ max_move_per_action = 15  # To prevent eternal stupid moving
 
 ################### RANGED ATTACK CONFIG ##################
 ranged_attack_stage = [25, 50]  # [Blocked", "Hit", "Hit & stopped"]
-moving_char_shooting_handicap = 0.66
-melee_fighter_shooting_handicap = 0.75
+moving_char_shooting_handicap = 0.5
+melee_fighter_shooting_handicap = 0.5
 decrease_hit_chance_per_case = 0.01  # Every case, the distance hit chance diminishes by this ratio
-min_distance_ratio = 0.1  # The distance hit chance cannot go lower than that
+min_distance_ratio = 0.05  # The distance hit chance cannot go lower than that
 
 ################### MELEE ATTACK CONFIG ###################
 melee_attack_stage = [0, 25, 50, 75]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]

@@ -332,11 +332,18 @@ class Character:
         for attack_timeline, attack in self.previous_attacks:
             time = attack_timeline + char_defense_time - timeline
             if time > 0:
-                total_time += time
-        
+                if attack.type == "MeleeAttack":
+                    total_time += time * cfg.melee_attack_fighting_availability
+                elif attack.type == "RangedAttack":
+                    total_time += time * cfg.ranged_attack_fighting_availability
+                elif attack.type == "Spell":
+                    total_time += time * cfg.magic_attack_fighting_availability
+                else:
+                    print("Error: Fighting availability type (", attack.type, ") not expected!")
+
         # Calculate fighting readiness regarding char timeline
         readiness_time = self.timeline - timeline
-        if self.last_action and self.last_action.name == "Melee attacking":  # Do not count "counter" attack
+        if self.last_action and self.last_action.type == "MeleeAttack":  # Do not count "counter" attack
             readiness_time = max(0.0, readiness_time - cfg.actions["melee_attack"]["duration"] / self.speed_ratio)
 
         total_time += readiness_time

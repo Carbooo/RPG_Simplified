@@ -12,8 +12,9 @@ class SadnessSpells(Spells):
     """Class to cast sadness spells"""
  
     def __init__(self, fight, initiator, spell_code):
-        super().__init__(fight, initiator, "Sadness", spell_code)
+        super().__init__(fight, initiator, spell_code)
         self.name = "Casting a Sadness spell"
+        self.feeling_type = "Sadness"
         self.spell_stamina = cfg.sadness_spells_stamina[self.spell_code]
         self.spell_time = cfg.sadness_spells_time[self.spell_code]
         self.spell_energy = cfg.sadness_spells_energy[self.spell_code]

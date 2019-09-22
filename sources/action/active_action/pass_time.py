@@ -13,6 +13,7 @@ class PassTime(ActiveActions):
     def __init__(self, fight, initiator):
         super().__init__(fight, initiator)
         self.name = "Passing time"
+        self.type = "Waiting"
         self.is_a_success = self.start()
         
     def start(self):

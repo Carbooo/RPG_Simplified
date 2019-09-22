@@ -11,8 +11,9 @@ class LoveSpells(Spells):
     """Class to cast love spells"""
  
     def __init__(self, fight, initiator, spell_code):
-        super().__init__(fight, initiator, "Love", spell_code)
+        super().__init__(fight, initiator, spell_code)
         self.name = "Casting a Love spell"
+        self.feeling_type = "Love"
         self.spell_stamina = cfg.love_spells_stamina[self.spell_code]
         self.spell_time = cfg.love_spells_time[self.spell_code]
         self.spell_energy = cfg.love_spells_energy[self.spell_code]

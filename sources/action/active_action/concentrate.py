@@ -15,6 +15,7 @@ class Concentrate(ActiveActions):
     def __init__(self, fight, initiator):
         super().__init__(fight, initiator)
         self.name = "Concentrating"
+        self.type = "Concentrate"
         self.nb_of_turns = -1
         self.concentration_ratio = 1
         self.feeling = ""
