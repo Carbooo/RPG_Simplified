@@ -145,8 +145,17 @@ class Field:
 
                     if self.obstacles_array[min_abs + i, min_ord + j] == cfg.ranged_obstacle or \
                             self.obstacles_array[min_abs + i, min_ord + j] == cfg.full_obstacle or \
-                            (i not in (0, 1) and j not in (0, 1) and  # Very closed allies do not count as obstacles
-                            self.characters_array[min_abs + i, min_ord + j] is not None):
+                            (self.characters_array[min_abs + i, min_ord + j] is not None and (
+                                # Very closed, not busy, allies do not count as obstacles
+                                not (i in (0, 1) and j in (0, 1) and (
+                                    self.characters_array[min_abs + i, min_ord + j].last_action is None or
+                                    self.characters_array[min_abs + i, min_ord + j].last_action.type == "Waiting"
+                                ))
+                                or
+                                # If path is at the border of the case, the character is not an obstacle
+                                attacker.calculate_point_to_enemy_path_distance(target_abs, target_ord,
+                                                                                min_abs + i, min_ord + j) < 0.25
+                            )):
                         return 0
 
                     if self.obstacles_array[min_abs + i, min_ord + j] == cfg.ranged_handicap or \

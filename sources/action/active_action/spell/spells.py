@@ -104,7 +104,7 @@ class Spells(ActiveActions):
 
             func.optional_print("Spell type:", read, "is not recognized")
 
-    def choose_pos_target(self, is_obstacle_free=False)
+    def choose_pos_target(self, is_obstacle_free=False):
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:
             team = self.fight.team2
         else:
