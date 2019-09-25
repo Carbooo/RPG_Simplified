@@ -105,8 +105,8 @@ class RangedAttack(ActiveActions):
             func.optional_print("ID:", read, "is not available")
 
     def shoot_speed(self, hit_chance):
-        # Harder is the target to hit, longer it takes to aim and shoot (between 0.66 to 2)
-        return 0.66 + 1.34 * (1 - hit_chance)
+        # Harder is the target to hit, longer it takes to aim and shoot (between 0.75 to 2)
+        return 0.75 + 1.34 * (1 - hit_chance)
 
     def execute(self):
         if not self.fight.field.is_target_reachable(self.initiator, self.target):
