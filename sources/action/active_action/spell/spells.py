@@ -104,7 +104,7 @@ class Spells(ActiveActions):
 
             func.optional_print("Spell type:", read, "is not recognized")
 
-    def choose_pos_target(self):
+    def choose_pos_target(self, is_obstacle_free=False)
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:
             team = self.fight.team2
         else:
@@ -130,9 +130,14 @@ class Spells(ActiveActions):
             except:
                 func.optional_print("The input is not an integer")
 
-            if not self.fight.field.is_pos_magically_reachable(self.initiator, abscissa, ordinate):
-                func.optional_print("Target is not magically reachable")
-                continue
+            if is_obstacle_free:
+                if not self.initiator.is_distance_magically_reachable(abscissa, ordinate):
+                    func.optional_print("Target is not magically reachable")
+                    continue
+            else:
+                if not self.fight.field.is_pos_magically_reachable(self.initiator, abscissa, ordinate):
+                    func.optional_print("Target is not magically reachable")
+                    continue
 
             target = {
                 "abscissa": abscissa,

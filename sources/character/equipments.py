@@ -362,14 +362,8 @@ class RangedWeapons(AttackWeapons):
         self.current_ammo = None
         return ammo_used
         
-    def get_accuracy(self):
-        if not self.current_ammo:
-            return 0.0
-        else:
-            return self.accuracy * self.current_ammo.stability_ratio()
-        
     def get_accuracy_ratio(self):
-        return self.get_accuracy() / 10.0
+        return self.accuracy / 10.0
         
     def get_range(self):
         # 1 range power = 10 meters

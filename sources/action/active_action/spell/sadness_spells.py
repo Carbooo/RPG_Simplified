@@ -98,7 +98,7 @@ class SadnessSpells(Spells):
     
     def throw_despair_storm(self):
         self.print_spell("has a despair storm ready and needs to choose a target", "choosing", True)
-        target = self.choose_pos_target()
+        target = self.choose_pos_target(is_obstacle_free=True)
         if not target:
             func.optional_print("Spell cancelled, the magic and stamina spent is lost")
             return False
