@@ -53,15 +53,10 @@ class Feeling:
             energy = (cfg.default_energy - self.energy) / cfg.natural_decrease_reference * time
             self.loose_energy(energy)
     
-    def concentrate_energy_update(self, action, ratio):
+    def concentrate_energy_update(self, ratio):
         ratio *= self.mastering_ratio
-        if action == "increase":
-            self.gain_energy(cfg.concentrate_update_coef * self.energy_ratio * ratio)
-        elif action == "decrease":
-            self.loose_energy(cfg.concentrate_update_coef / self.energy_ratio * ratio)
-        else:
-            func.optional_print("Error: Wrong action for concentrate_energy_update", level=3)
-            
+        self.gain_energy(cfg.concentrate_update_coef * self.energy_ratio * ratio)
+
     def die_of_exceeded_energy(self, char):
         if self.energy <= cfg.max_safe_energy:
             if self.warned_of_exceeded_energy:

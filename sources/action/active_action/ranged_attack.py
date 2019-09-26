@@ -216,14 +216,13 @@ class RangedAttack(ActiveActions):
         return math.pow(hit_chance / 0.5, 1.0/3.0)
     
     def range_power_distance_ratio(self):
-        return max(cfg.min_range_power_ratio,
-                   1 - self.initiator.calculate_point_distance(self.target.abscissa, self.target.ordinate)
-                   / self.initiator.equipments.get_range())
+        return 1 - self.initiator.calculate_point_distance(self.target.abscissa, self.target.ordinate) \
+               / self.initiator.equipments.get_range()
 
     def get_range_power(self, hit_chance):
         return self.initiator.ranged_power \
                 * self.range_power_distance_ratio() \
-                * RangedAttack.range_power_hit_chance_ratio(hit_chance) \
+                * RangedAttack.range_power_hit_chance_ratio(hit_chance)
 
     def can_ranged_attack(self):
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:

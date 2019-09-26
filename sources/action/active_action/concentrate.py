@@ -37,22 +37,6 @@ class Concentrate(ActiveActions):
                 func.optional_print("The feeling is not recognized")
 
         func.optional_print("")
-        func.optional_print("Do you want to increase (INC) or decrease (DEC) the feeling?")
-        txt = "--> INC / DEC (0 = Cancel): "
-        while 1:
-            self.action = func.optional_input(txt)
-            if Actions.cancel_action(self.action):
-                return False
-            elif self.action == "INC":
-                self.action = "increase"
-                break
-            elif self.action == "DEC":
-                self.action = "decrease"
-                break
-            else:
-                func.optional_print("Command invalid. You must choose between increase (INC) and decrease (DEC).")
-
-        func.optional_print("")
         func.optional_print("How much time do you want to concentrate? (Concentrating longer make it more efficient)")
         func.optional_print("Beware that each new concentration is less efficient than the previous ones!")
         txt = "--> Number of turns (0 = Cancel): "
@@ -71,7 +55,7 @@ class Concentrate(ActiveActions):
                 func.optional_print("The input is not an integer")
 
         func.optional_print("")
-        func.optional_print("You have decided to", self.action, "your", self.feeling, "for", self.nb_of_turns, "turns")
+        func.optional_print("You have decided to increase your", self.feeling, "for", self.nb_of_turns, "turns")
         time.sleep(3)
         
         self.concentration_ratio = math.pow(self.nb_of_turns, cfg.concentration_rate)
@@ -80,7 +64,7 @@ class Concentrate(ActiveActions):
         return True
 
     def execute(self):
-        self.initiator.feelings[self.feeling].concentrate_energy_update(self.action, self.concentration_ratio *
+        self.initiator.feelings[self.feeling].concentrate_energy_update(self.concentration_ratio *
                                                                         min(1.0,
                                                                             cfg.deconcentration_rate /
                                                                             self.initiator.nb_of_concentrate

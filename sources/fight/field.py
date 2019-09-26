@@ -526,7 +526,7 @@ class Field:
         func.optional_print("--  ACTIVE SPELLS --")
         for spell in self.active_spells:
             func.optional_print("   -", spell.surname, "(", spell.target_abs, "x", spell.target_ord, ") : ",
-                                int(round(self.spell_power["spread_distance"] * self.magical_coef)), "cases")
+                                int(round(spell.spell_power["spread_distance"] * spell.magical_coef)), "cases")
         func.optional_print("")
 
         obs_array = np.transpose(self.obstacles_array)

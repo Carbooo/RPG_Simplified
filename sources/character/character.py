@@ -481,7 +481,6 @@ class Character:
               ", Reflex:", int(round(self.reflex)),
               ", Willpower:", int(round(self.willpower)),
               ", Spirit:", int(round(self.spirit)),
-              ", Morale:", int(round(self.morale)),
               ", Empathy:", int(round(self.empathy)))
 
     def print_spells_and_feelings(self):
@@ -516,6 +515,7 @@ class Character:
             func.optional_print("")
                  
     def print_time_state(self):
+        func.optional_print(", Morale:", round(self.morale, 1), skip_line=True)
         if self.last_action:
             last_action = self.last_action.name
         else:

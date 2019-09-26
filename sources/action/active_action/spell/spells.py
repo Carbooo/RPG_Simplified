@@ -312,4 +312,4 @@ class Spells(ActiveActions):
         func.optional_print("")
         func.optional_print("*********************************************************************")
         func.optional_print("")
-        time.sleep(3)
+        time.sleep(2)
