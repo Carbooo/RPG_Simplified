@@ -366,10 +366,10 @@ class RangedWeapons(AttackWeapons):
         return self.accuracy / 10.0
         
     def get_range(self):
-        # 1 range power = 10 meters
+        # 1 range power = 20 meters
         # 1 case = 2 meters
         # range gives as number of cases
-        return self.range_power * 10.0 / 2.0
+        return self.range_power * 10.0
         
 
 #############################################################
