@@ -75,6 +75,7 @@ class Move(ActiveActions):
                 func.optional_print("")
                 continue
 
+            print("Moving:", self.get_move_coef() * cfg.actions["move"]["duration"])
             self.end_update(self.get_move_coef() * cfg.actions["move"]["stamina"],
                             self.get_move_coef() * cfg.actions["move"]["duration"])
             return True
