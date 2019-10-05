@@ -340,52 +340,25 @@ class CharEquipments:
         return bulk
 
     ########################## CHARACTERISTICS FUNCTIONS #########################
-    def calculate_accuracies(self):
-        accuracies = {
-            "melee_weapons": 0.0,
-            "ranged_weapons": 0.0
-        }
-        nb_of_weapon = 0.0
-
-        for weapon in self.weapons_in_use:
-            nb_of_weapon += weapon.attack_ratio
-            accuracies["melee_weapons"] += weapon.melee_handiness * weapon.attack_ratio
-            if isinstance(weapon, RangedWeapons):
-                accuracies["ranged_weapons"] += weapon.accuracy * weapon.attack_ratio
-
-        # Free hands melee power
-        accuracies["melee_weapons"] += self.free_hands * cfg.free_hand_melee_handiness
-        nb_of_weapon += self.free_hands
-
-        accuracies["melee_weapons"] /= nb_of_weapon
-        accuracies["ranged_weapons"] /= nb_of_weapon
-        return accuracies
-
-    def calculate_attack_power(self):
+    def calculate_attack(self):
         attack_powers = {
             "melee_power": 0.0,
-            "ranged_power": 0.0,
-            "pen_rate": 0.0,
-            "resis_dim_rate": 0.0
+            "melee_handiness": 0.0,
+            "range_power": 0.0,
+            "range_accuracy": 0.0,
         }
-        nb_of_weapons = 0.0
 
         for weapon in self.weapons_in_use:
-            nb_of_weapons += weapon.attack_ratio
             attack_powers["melee_power"] += weapon.melee_power * weapon.attack_ratio
-            attack_powers["pen_rate"] += weapon.pen_rate * weapon.attack_ratio
-            attack_powers["resis_dim_rate"] += weapon.resis_dim_rate * weapon.attack_ratio
+            attack_powers["melee_handiness"] += weapon.melee_handiness * weapon.attack_ratio
             if isinstance(weapon, RangedWeapons) and self.ranged_weapon_has_ammo(weapon):
-                attack_powers["ranged_power"] += weapon.range_power * weapon.attack_ratio
+                attack_powers["range_power"] += weapon.range_power * weapon.attack_ratio
+                attack_powers["range_accuracy"] += weapon.accuracy * weapon.attack_ratio
 
         # Free hands melee attack power
         attack_powers["melee_power"] += self.free_hands * cfg.free_hand_melee_power
-        attack_powers["pen_rate"] += self.free_hands * cfg.free_hand_pen_rate
-        attack_powers["resis_dim_rate"] += self.free_hands * cfg.free_hand_resis_dim_rate
-        nb_of_weapons += self.free_hands
+        attack_powers["melee_handiness"] += self.free_hands * cfg.free_hand_melee_handiness
 
-        attack_powers["pen_rate"] /= nb_of_weapons
-        attack_powers["resis_dim_rate"] /= nb_of_weapons
         return attack_powers
 
     def calculate_defense(self):
@@ -428,21 +401,28 @@ class CharEquipments:
         
     @staticmethod
     def print_weapon(weapon):
-        func.optional_print("WeaponID:", weapon.get_id(), ", Weapon:", weapon.name,
-                            ", Defense:", round(weapon.defense, 1), ", MeleePower:", round(weapon.melee_power, 1),
-                            ", MeleeHandiness:", round(weapon.melee_power, 1), ", NbOfHand(s):", weapon.hand,
-                            skip_line=True)
-        
         if isinstance(weapon, RangedWeapons):
-            if weapon.current_ammo is not None:
-                ammo_name = weapon.current_ammo.name
-            else:
-                ammo_name = None
-            func.optional_print(", MaxRange:", round(weapon.get_range(), 1),
+            func.optional_print("WeaponID:", weapon.get_id(), ", Weapon:", weapon.name, ", NbOfHand(s):", weapon.hand,
+                                ", ReloadTime:", round(weapon.reload_time, 1),
                                 ", RangePower:", round(weapon.range_power, 1),
-                                ", CurrentAmmo:", ammo_name)
+                                ", Accuracy:", round(weapon.accuracy, 1), skip_line=True)
+
+            if weapon.current_ammo is None:
+                func.optional_print(", Reloaded: No")
+            else:
+                func.optional_print(", Reloaded: Yes",
+                                    ", DamageLifeRate:", round(weapon.current_ammo.damage_life_rate, 2),
+                                    ", IgnoringArmorRate:", round(weapon.current_ammo.ignoring_armor_rate, 2),
+                                    ", PenetrationRate:", round(weapon.current_ammo.pen_rate, 2))
+
         else:
-            func.optional_print("")
+            func.optional_print("WeaponID:", weapon.get_id(), ", Weapon:", weapon.name, ", NbOfHand(s):", weapon.hand,
+                                ", Defense:", round(weapon.defense, 1),
+                                ", MeleePower:", round(weapon.melee_power, 1),
+                                ", MeleeHandiness:", round(weapon.melee_handiness, 1),
+                                ", DamageLifeRate:", round(weapon.damage_life_rate, 2),
+                                ", IgnoringArmorRate:", round(weapon.ignoring_armor_rate, 2),
+                                ", PenetrationRate:", round(weapon.pen_rate, 2))
 
     @staticmethod
     def print_full_weapon(weapon):
