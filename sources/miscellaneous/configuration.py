@@ -28,7 +28,6 @@ critical_hit_boost = 6.0  # Coef boost when doing a critical hit
 max_magic_distance = 100.0  # Around 200 meters
 free_hand_melee_handiness = 15.0  # Melee handiness for each free hand
 free_hand_melee_power = 0.75  # Melee power for each free hand
-free_hand_melee_range = 5.0  # Melee range if no weapon
 free_hand_pen_rate = 0.3  # Penetration of hits with free hands
 free_hand_resis_dim_rate = 0.01  # Armor diminution of hits with free hands
 free_hand_melee_defense = 0.75  # Melee defense for each free hand

@@ -361,20 +361,6 @@ class CharEquipments:
         accuracies["ranged_weapons"] /= nb_of_weapon
         return accuracies
 
-    def calculate_melee_range(self):
-        melee_range = 0.0
-        nb_of_weapon = 0.0
-        for weapon in self.weapons_in_use:
-            melee_range += weapon.melee_range * weapon.attack_ratio
-            nb_of_weapon += weapon.attack_ratio
-
-        # Free hands melee range
-        if self.free_hands == 2:
-            melee_range = cfg.free_hand_melee_range
-            nb_of_weapon = 1.0
-
-        return melee_range / nb_of_weapon
-
     def calculate_attack_power(self):
         attack_powers = {
             "melee_power": 0.0,
@@ -442,16 +428,19 @@ class CharEquipments:
         
     @staticmethod
     def print_weapon(weapon):
-        func.optional_print("WeaponID:", weapon.get_id(), ", Weapon:", weapon.name, ", Defense:", round(weapon.defense, 1),
-              ", MeleePower:", round(weapon.melee_power, 1), ", NbOfHand(s):", weapon.hand, skip_line=True)
+        func.optional_print("WeaponID:", weapon.get_id(), ", Weapon:", weapon.name,
+                            ", Defense:", round(weapon.defense, 1), ", MeleePower:", round(weapon.melee_power, 1),
+                            ", MeleeHandiness:", round(weapon.melee_power, 1), ", NbOfHand(s):", weapon.hand,
+                            skip_line=True)
         
         if isinstance(weapon, RangedWeapons):
             if weapon.current_ammo is not None:
                 ammo_name = weapon.current_ammo.name
             else:
                 ammo_name = None
-            func.optional_print(", MaxRange:", round(weapon.get_range(), 1), ", RangePower:", round(weapon.range_power, 1),
-                  ", CurrentAmmo:", ammo_name)
+            func.optional_print(", MaxRange:", round(weapon.get_range(), 1),
+                                ", RangePower:", round(weapon.range_power, 1),
+                                ", CurrentAmmo:", ammo_name)
         else:
             func.optional_print("")
 

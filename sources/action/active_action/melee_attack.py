@@ -147,8 +147,7 @@ class MeleeAttack(ActiveActions):
             self.actual_defense = "Defense"
 
         # Calculate attack and defend values
-        attack_accuracy = math.pow(self.initiator.melee_handiness * math.pow(self.initiator.melee_range, 1.0 / 3), 0.75) \
-                        * self.get_attack_coef(self.initiator)
+        attack_accuracy = math.pow(self.initiator.melee_handiness, 0.75) * self.get_attack_coef(self.initiator)
         attack_power = Character.get_melee_attack(attack_accuracy, self.initiator.melee_power) \
                        * self.get_attack_coef(self.initiator)
                      

@@ -102,7 +102,6 @@ class Character:
         self.melee_handiness_ratio = 0.0
         self.ranged_accuracy = 0.0
         self.ranged_accuracy_ratio = 0.0
-        self.melee_range = 0.0
         self.pen_rate = 0.0
         self.resis_dim_rate = 0.0
         self.melee_power = 0.0
@@ -211,10 +210,7 @@ class Character:
         self.melee_handiness_ratio = self.melee_handiness / cfg.accuracy_mean
         self.ranged_accuracy = self.get_global_ratio() * ranged_coef * weapons_accuracies["ranged_weapons"]
         self.ranged_accuracy_ratio = self.ranged_accuracy / cfg.accuracy_mean
-         
-    def calculate_melee_range(self):
-        self.melee_range = self.equipments.calculate_melee_range()
-     
+
     def calculate_attack_power(self):
         attack_powers = self.equipments.calculate_attack_power()
             
@@ -267,7 +263,6 @@ class Character:
         self.calculate_agility()
         
         self.calculate_accuracies()
-        self.calculate_melee_range()
         self.calculate_attack_power()
 
         self.calculate_defense()
@@ -503,9 +498,8 @@ class Character:
         func.optional_print("--   ATTACK   --", skip_line=True)
         func.optional_print("MeleeHandiness:", int(round(self.melee_handiness)),
             ", MeleePower:", int(round(self.melee_power)),
-            ", MeleeRange:", int(round(self.melee_range)),
             ", PenetrationRate:", int(round(self.pen_rate, 2)),
-            ", resis_dim_rate:", int(round(self.resis_dim_rate, 2)),
+            ", Resis_dim_rate:", int(round(self.resis_dim_rate, 2)),
             ", MagicPower:", int(round(self.magic_power)), skip_line=True)
         if self.ranged_power > 1:
             func.optional_print(", RangedAccuracy:", int(round(self.ranged_accuracy)),

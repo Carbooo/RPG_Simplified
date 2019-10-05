@@ -1,5 +1,5 @@
-Name,Load,Bulk,Resistance,Hand,Defense,Attack Handiness,Attack power,Damage Life Rate,Ignoring Armor Rate,Penetration Rate,Resistance Diminution Rate,Range power,Accuracy,Reload time,isACrossbow
-Short bow,6,1.5,0.5,2,1,7.5,1,0.1,0.1,1,0.1,10,9,0.5,0
-Long bow,9,2,0.5,2,1.5,7.5,1.5,0.1,0.1,1,0.1,12.5,8,0.5,0
-Light crossbow,9,2,1,2,2,5,2,0.1,0.5,2.5,1,15,12,3,1
-Strong crossbow,12,3,1,2,2.5,5,2.5,0.1,0.5,2.5,1,17.5,12,5,1
+Name,Load,Bulk,Resistance,Hand,Defense,Melee power,Melee Handiness,Damage Life Rate,Ignoring Armor Rate,Penetration Rate,Resistance Diminution Rate,Range power,Accuracy,Reload time,isACrossbow
+Short bow,6,1.5,0.5,2,1,1,7.5,0.1,0.1,1,0.1,10,9,0.5,0
+Long bow,9,2,0.5,2,1.5,1.5,7.5,0.1,0.1,1,0.1,12.5,8,0.5,0
+Light crossbow,9,2,1,2,2,2,5,0.1,0.5,2.5,1,15,12,3,1
+Strong crossbow,12,3,1,2,2.5,2.5,5,0.1,0.5,2.5,1,17.5,12,5,1

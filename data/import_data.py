@@ -52,51 +52,51 @@ class ImportData:
 
     def import_shields(self):
         for row in self.my_csv:
-            if len(row) != 11:
+            if len(row) != 12:
                 print("Shields import does not contain the right number of columns")
                 return False
             else:
                 Shields(row[0], float(row[1]), float(row[2]), float(row[3]),
                         int(row[4]), float(row[5]), float(row[6]), float(row[7]),
-                        float(row[8]), float(row[9]), float(row[10]))
+                        float(row[8]), float(row[9]), float(row[10]), float(row[11]))
         return True
 
     def import_melee_weapons(self):
         for row in self.my_csv:
-            if len(row) != 11:
+            if len(row) != 12:
                 print("Melee weapons import does not contain the right number of columns")
                 return False
             else:
-                MeleeWeapons(row[0], float(row[1]), float(row[2]),
-                             float(row[3]), int(row[4]), float(row[5]), float(row[6]),
-                             float(row[7]), float(row[8]), float(row[9]), float(row[10]))
+                MeleeWeapons(row[0], float(row[1]), float(row[2]), float(row[3]),
+                             int(row[4]), float(row[5]), float(row[6]), float(row[7]),
+                             float(row[8]), float(row[9]), float(row[10]), float(row[11]))
         return True
 
     def import_ammo(self):
         for row in self.my_csv:
-            if len(row) != 8:
+            if len(row) != 9:
                 print("Ammo import does not contain the right number of columns")
                 return False
             else:
                 Ammo(row[0], float(row[1]), float(row[2]), float(row[3]),
-                     row[4], float(row[5]), float(row[6]), float(row[7]))
+                     row[4], float(row[5]), float(row[6]), float(row[7]), float(row[8]))
         return True
 
     def import_ranged_weapons(self):
         for row in self.my_csv:
-            if len(row) != 15:
+            if len(row) != 16:
                 print("Ranged weapons import does not contain the right number of columns")
                 return False
-            elif int(row[14]) == 0:
+            elif int(row[15]) == 0:
                 Bows(row[0], float(row[1]), float(row[2]), float(row[3]),
                      int(row[4]), float(row[5]), float(row[6]), float(row[7]),
                      float(row[8]), float(row[9]), float(row[10]), float(row[11]),
-                     float(row[12]), float(row[13]))
-            elif int(row[14]) == 1:
+                     float(row[12]), float(row[13]), float(row[14]))
+            elif int(row[15]) == 1:
                 Crossbows(row[0], float(row[1]), float(row[2]), float(row[3]),
                           int(row[4]), float(row[5]), float(row[6]), float(row[7]),
                           float(row[8]), float(row[9]), float(row[10]), float(row[11]),
-                          float(row[12]), float(row[13]))
+                          float(row[12]), float(row[13]), float(row[14]))
             else:
                 print("Ranged weapons is neither defined as a bow or a crossbow")
                 return False
