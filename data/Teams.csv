@@ -1,15 +1,15 @@
-Name;Character 1;Character 2;Character 3;Character 4;Character 5;Character 6
-Melee;a0;a1;a2;a3;a4;a5;a6
-Ranged;b0;b1;b2;b3;b4;b5;b6
-TestMelee1;m0;m1
-TestMelee2;m2;m3
-TestRanged1;r0;r1
-TestRanged2;r2;r3
-TestMixed1;m1;r1
-TestMixed2;m2;r2
-TestShort1;t0
-TestShort2;t1
-TestShortRanged1;r0
-TestShortRanged2;r1
-TestMage1;a6
-TestMage2;b6
+Name,Character 1,Character 2,Character 3,Character 4,Character 5,Character 6
+Melee,a0,a1,a2,a3,a4,a5,a6
+Ranged,b0,b1,b2,b3,b4,b5,b6
+TestMelee1,m0,m1
+TestMelee2,m2,m3
+TestRanged1,r0,r1
+TestRanged2,r2,r3
+TestMixed1,m1,r1
+TestMixed2,m2,r2
+TestShort1,t0
+TestShort2,t1
+TestShortRanged1,r0
+TestShortRanged2,r1
+TestMage1,a6
+TestMage2,b6

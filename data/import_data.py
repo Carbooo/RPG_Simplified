@@ -15,7 +15,7 @@ class ImportData:
 
     def __init__(self, import_type, file_path):
         self.my_csv = csv.reader(
-            open(file_path, 'rt'), delimiter=';')
+            open(file_path, 'rt'), delimiter=',')
         next(self.my_csv)
 
         self.name = file_path.split("\\")
