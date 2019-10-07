@@ -195,40 +195,34 @@ class Character:
     def calculate_speed_ratio(self):
         self.speed_ratio = max(cfg.min_speed, self.get_global_ratio() * self.coef_speed_ratio)
 
-    def calculate_accuracies(self):
-        weapons_accuracies = self.equipments.calculate_accuracies()
-        
-        # Calculate accuracy coefs
-        melee_coef = (self.dexterity + self.agility/2 + self.force/3) / (1 + 1.0/2 + 1.0/3)
-        if self.equipments.is_using_a_crossbow():
-            ranged_coef = (self.dexterity + self.agility/3 + self.reflex/3) / (1 + 2.0/3)
-        else:
-            ranged_coef = (self.dexterity + self.force/2 + self.agility/3 + self.reflex/3) / (1 + 1.0/2 + 2.0/3)
-        
-        # Set accuracies
-        self.melee_handiness = self.get_global_ratio() * melee_coef * weapons_accuracies["melee_weapons"]
-        self.melee_handiness_ratio = self.melee_handiness / cfg.accuracy_mean
-        self.ranged_accuracy = self.get_global_ratio() * ranged_coef * weapons_accuracies["ranged_weapons"]
-        self.ranged_accuracy_ratio = self.ranged_accuracy / cfg.accuracy_mean
-
-    def calculate_attack_power(self):
-        attack_powers = self.equipments.calculate_attack_power()
+    def calculate_attack(self):
+        attack = self.equipments.calculate_attack()
             
         # Calculate power coefs
-        melee_coef = (self.force + self.agility/2 + self.willpower/3) / (1 + 1.0/2 + 1.0/3)
-        ranged_coef = (self.force + self.dexterity/2 + self.willpower/3) / (1 + 1.0/2 + 1.0/3)
-        magical_coef = (self.spirit + self.willpower/2) / (1 + 1.0/2)
-            
-        # Set attack powers
-        self.pen_rate = attack_powers["pen_rate"]
-        self.resis_dim_rate = attack_powers["resis_dim_rate"]
-        self.melee_power = self.get_global_ratio() * melee_coef * attack_powers["melee_power"]
+        melee_power_coef = (self.force + self.agility/2 + self.willpower/3) / (1 + 1.0/2 + 1.0/3)
+        melee_handiness_coef = (self.dexterity + self.agility / 2 + self.force / 3) / (1 + 1.0 / 2 + 1.0 / 3)
         if self.equipments.is_using_a_crossbow():
-            self.ranged_power = 10.0 * attack_powers["ranged_power"]  # Physical state doesn't influence crossbow power
+            ranged_accuracy_coef = (self.dexterity + self.agility / 3 + self.reflex / 3) / (1 + 2.0/3)
         else:
-            self.ranged_power = self.get_global_ratio() * ranged_coef * attack_powers["ranged_power"]
+            ranged_power_coef = (self.force + self.dexterity / 2 + self.willpower / 3) / (1 + 1.0 / 2 + 1.0 / 3)
+            ranged_accuracy_coef = (self.dexterity + self.force / 2 + self.agility / 3 + self.reflex / 3) / (
+                        1 + 1.0/2 + 2.0/3)
+        magical_coef = (self.spirit + self.willpower/2) / (1 + 1.0/2)
+
+        # Set attack powers
+        self.melee_power = self.get_global_ratio() * melee_power_coef * attack["melee_power"]
+        if self.equipments.is_using_a_crossbow():
+            self.ranged_power = 10.0 * attack["range_power"]  # Physical state and stats don't influence crossbow power
+        else:
+            self.ranged_power = self.get_global_ratio() * ranged_power_coef * attack["range_power"]
         self.magic_power = self.get_global_ratio() * magical_coef * 10.0
         self.magic_power_ratio = self.magic_power / 100.0
+
+        # Set accuracies
+        self.melee_handiness = self.get_global_ratio() * melee_handiness_coef * attack["melee_handiness"]
+        self.melee_handiness_ratio = self.melee_handiness / cfg.accuracy_mean
+        self.ranged_accuracy = self.get_global_ratio() * ranged_accuracy_coef * attack["range_accuracy"]
+        self.ranged_accuracy_ratio = self.ranged_accuracy / cfg.accuracy_mean
     
     def calculate_defense(self):
         weapons_defense = self.equipments.calculate_defense()
@@ -261,13 +255,11 @@ class Character:
         self.calculate_bulk_ratios()
         self.calculate_morale()
         self.calculate_agility()
-        
-        self.calculate_accuracies()
-        self.calculate_attack_power()
+        self.calculate_speed_ratio()
 
+        self.calculate_attack()
         self.calculate_defense()
         self.calculate_dodging()
-        self.calculate_speed_ratio()
 
     def movement_handicap_ratio(self):
         return math.sqrt(

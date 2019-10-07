@@ -198,7 +198,7 @@ class Weapons(Equipments):
         self.melee_handiness = self.original_melee_handiness
         self.original_damage_life_rate = float(damage_life_rate)
         self.damage_life_rate = self.original_damage_life_rate
-        self.original_ignoring_armor_rate = float(ignoring_armor_rate)
+        self.original_ignoring_armor_rate = float(ignoring_armor_rate) / 100.0
         self.ignoring_armor_rate = self.original_ignoring_armor_rate
         self.original_pen_rate = float(pen_rate) / 100.0
         self.pen_rate = self.original_pen_rate
@@ -218,7 +218,7 @@ class Weapons(Equipments):
                             ", Damage life rate:", round(self.damage_life_rate, 2),
                             ", Ignoring armor rate:", round(self.ignoring_armor_rate, 2),
                             ", Penetration rate:", round(self.pen_rate, 2),
-                            ", Resistance dim. rate:", round(self.resis_dim_rate, 1), skip_line=True)
+                            ", Resistance dim. rate:", round(self.resis_dim_rate, 2), skip_line=True)
         
     def decrease(self, damage, def_malus_rate):
         ratio = super().decrease(damage, def_malus_rate)
@@ -340,11 +340,16 @@ class RangedWeapons(AttackWeapons):
     def print_obj(self):
         super().print_obj()
         func.optional_print(", RangePower:", round(self.range_power, 1), ", Accuracy:", round(self.accuracy, 1),
-              ", MaxRange:", self.get_range(), ", ReloadTime:", round(self.reload_time, 1), ", Ammo:", skip_line=True)
+                            ", MaxRange:", self.get_range(), ", ReloadTime:", round(self.reload_time, 1),
+                            ", Ammo:", skip_line=True)
         if self.current_ammo:
-            func.optional_print(self.current_ammo.name, skip_line=True)
+            func.optional_print(self.current_ammo.name,
+                                ", DamageLifeRate:", round(self.damage_life_rate, 2),
+                                ", IgnoringArmorRate:", round(self.ignoring_armor_rate, 2),
+                                ", PenetrationRate:", round(self.pen_rate, 2),
+                                ", ResistanceDimRate:", round(self.resis_dim_rate, 2))
         else:
-            func.optional_print("--None--", skip_line=True)
+            func.optional_print("--None--")
     
     def decrease(self, damage):
         ratio = super().decrease(damage)
@@ -393,10 +398,6 @@ class Bows(RangedWeapons):
                          range_power, accuracy, reload_time)
         self.type = "Bow"
 
-    def print_obj(self):
-        super().print_obj()
-        func.optional_print("")
-
 
 #############################################################
 ##################### CROSSBOW CLASS ########################
@@ -411,7 +412,3 @@ class Crossbows(RangedWeapons):
                          damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate,
                          range_power, accuracy, reload_time)
         self.type = "Crossbow"
-
-    def print_obj(self):
-        super().print_obj()
-        func.optional_print("")
