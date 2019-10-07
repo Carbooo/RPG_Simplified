@@ -11,10 +11,10 @@ ImportData("Ammo", "data/Ammo.csv")
 ImportData("RangedWeapons", "data/RangedWeapons.csv")
 ImportData("Characters", "data/Characters.csv")
 ImportData("Teams", "data/Teams.csv")
-ImportData("ObstaclesField", "data/Short.csv")
-ImportData("ObstaclesField", "data/ShortObstacles.csv")
-ImportData("ObstaclesField", "data/TwoBridges.csv")
-ImportData("ObstaclesField", "data/LongObstacles.csv")
+ImportData("ObstaclesField", "data/maps/Short.csv")
+ImportData("ObstaclesField", "data/maps/ShortObstacles.csv")
+ImportData("ObstaclesField", "data/maps/TwoBridges.csv")
+ImportData("ObstaclesField", "data/maps/LongObstacles.csv")
 
 ##################### FIGHT #####################
 func.log_level = 1

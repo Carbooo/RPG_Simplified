@@ -11,5 +11,5 @@ TestShort1,t0
 TestShort2,t1
 TestShortRanged1,r0
 TestShortRanged2,r1
-TestMage1,a6
-TestMage2,b6
+TestShortMage1,a6
+TestShortMage2,b6

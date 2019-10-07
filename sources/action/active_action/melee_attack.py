@@ -115,6 +115,7 @@ class MeleeAttack(ActiveActions):
         # Update availability after computed the result
         self.target.previous_attacks.append((self.timeline, self))
         self.initiator.previous_attacks.append((self.timeline, self))
+        self.fight.scheduler.remove(self)
         
         abscissa = self.target.abscissa
         ordinate = self.target.ordinate

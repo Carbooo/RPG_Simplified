@@ -98,10 +98,11 @@ class Armors(Equipments):
     def cover_ratio(self):
         return self.def_cover / 10.0
 
-    def damage_absorbed(self, damages, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate):
+    def damage_absorbed(self, damages, armor_coef, resis_dim_rate, pen_rate, damage_life_rate, ignoring_armor_rate):
+        # damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate
         absorbed_damages = min(damages, self.defense * armor_coef)
         pen_damages = absorbed_damages * pen_rate
-        direct_damages = (damages - absorbed_damages) * flesh_dam_rate
+        direct_damages = (damages - absorbed_damages) * damage_life_rate
         total_damages = pen_damages + direct_damages
         
         func.optional_print("Damages absorbed by", self.name, ":", int(round(absorbed_damages)), level=3)
