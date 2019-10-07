@@ -238,10 +238,12 @@ class Spells(ActiveActions):
             self.fight.stop_action(self.target, self.initiator.timeline)
 
         if can_use_shield:
-            attack_value -= self.target.magic_defense_with_shields * self.get_attack_coef(self.target)
+            attack_value -= self.target.magic_defense_with_shields \
+                            * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
             self.target.equipments.all_shields_absorbed_damage(attack_value, resis_dim_rate)
         else:
-            attack_value -= self.target.magic_defense * self.get_attack_coef(self.target)
+            attack_value -= self.target.magic_defense \
+                            * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
 
         if attack_value <= 0:
             self.target.print_basic()

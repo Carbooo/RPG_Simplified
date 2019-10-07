@@ -343,17 +343,9 @@ class Character:
 
         total_time += readiness_time
         return 1.0 / (1.0 + total_time / char_defense_time)
-    
-    @staticmethod
-    def get_melee_attack(melee_handiness, melee_power):
-        return math.pow(melee_power * math.pow(melee_handiness, 1.0/3), 0.75)
-    
-    @staticmethod
-    def get_melee_accuracy(melee_handiness, melee_power):
-        return math.pow(melee_power * math.pow(melee_handiness, 1.0/3), 0.75)    
         
     def can_melee_attack(self, enemy):
-        if enemy.body.is_alive() and \
+        if self.body.is_active() and enemy.body.is_alive() and \
                 enemy.abscissa in range(self.abscissa - 1, self.abscissa + 2) and \
                 enemy.ordinate in range(self.ordinate - 1, self.ordinate + 2):
             return True

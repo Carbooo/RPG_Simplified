@@ -86,10 +86,13 @@ class Fight:
             # Terminate / Update active spell
             elif isinstance(next_event, Spells):
                 next_event.end()
+
+            # Result of a melee attack (no matter the current state of the attacker)
+            elif isinstance(next_event, MeleeAttack):
+                next_event.execute()
                 
             elif isinstance(next_event, Character):
                 if isinstance(next_event.last_action, Move) \
-                or isinstance(next_event.last_action, MeleeAttack) \
                 or isinstance(next_event.last_action, RangedAttack) \
                 or (isinstance(next_event.last_action, Rest) and next_event.last_action.nb_of_turns > 0) \
                 or (isinstance(next_event.last_action, Concentrate) and next_event.last_action.nb_of_turns > 0) \

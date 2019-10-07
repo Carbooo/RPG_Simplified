@@ -26,6 +26,6 @@ class ActiveActions(Actions):
         else:
             self.initiator.spend_time(time)
 
-    def get_attack_coef(self, char):
-        return random.gauss(1, cfg.high_variance) \
-             * char.get_fighting_availability(self.initiator.timeline)
+    @staticmethod
+    def get_attack_coef(char, timeline):
+        return random.gauss(1, cfg.high_variance) * char.get_fighting_availability(timeline)

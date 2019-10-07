@@ -165,8 +165,10 @@ class RangedAttack(ActiveActions):
         self.fight.stop_action(self.target, self.initiator.timeline)
 
         # Range defense result
-        attack_power = self.get_range_power(hit_chance) * self.get_attack_coef(self.initiator)
-        defense_level = self.target.ranged_defense * self.get_attack_coef(self.target)
+        attack_power = self.get_range_power(hit_chance) \
+                       * ActiveActions.get_attack_coef(self.initiator, self.initiator.timeline)
+        defense_level = self.target.ranged_defense \
+                       * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
         attack_result = attack_power - defense_level
 
         # Update availability after computed the result

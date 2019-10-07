@@ -70,6 +70,8 @@ class MeleeAttack(ActiveActions):
                 self.target = char
                 if self.target.get_id() == read:
                     self.end_update(cfg.actions["melee_attack"]["stamina"], cfg.actions["melee_attack"]["duration"])
+                    self.timeline += cfg.actions["melee_attack"]["duration"] * 0.9  # To execute the attack before char get their turn
+                    self.fight.scheduler.append(self)
                     return True
 
             func.optional_print("ID:", read, "is not available")
@@ -95,21 +97,24 @@ class MeleeAttack(ActiveActions):
         func.optional_print("is melee attacking (", skip_line=True)
         self.target.print_basic()
         func.optional_print(")")
-        func.optional_print("Fighting availability:", round(
-                            self.target.get_fighting_availability(self.initiator.timeline), 2),
+        func.optional_print("Initiator fighting availability:", round(
+                            self.initiator.get_fighting_availability(self.timeline), 2),
+                            level=2)
+        func.optional_print("Target fighting availability:", round(
+                            self.target.get_fighting_availability(self.timeline), 2),
                             level=2)
         func.optional_print("*********************************************************************")
         func.optional_print("")
         time.sleep(3)
 
         self.initiator.last_action = None  # To avoid looping on this action
-        self.fight.stop_action(self.target, self.initiator.timeline)
+        self.fight.stop_action(self.target, self.timeline)
         attack_result = self.melee_defense_result()
         self.melee_attack_type(attack_result)
         
         # Update availability after computed the result
-        self.target.previous_attacks.append((self.initiator.timeline, self))
-        self.initiator.previous_attacks.append((self.initiator.timeline, self))
+        self.target.previous_attacks.append((self.timeline, self))
+        self.initiator.previous_attacks.append((self.timeline, self))
         
         abscissa = self.target.abscissa
         ordinate = self.target.ordinate
@@ -135,9 +140,10 @@ class MeleeAttack(ActiveActions):
 
     def melee_defense_result(self):
         # Choose between dodge and def
-        dodge_result = self.initiator.melee_handiness - self.target.dodging
-        defense_result = Character.get_melee_attack(self.initiator.melee_handiness, self.initiator.melee_power) \
-                         - self.target.melee_defense
+        dodge_result = self.initiator.melee_handiness + self.initiator.melee_power/3 \
+                       - self.target.dodging - self.target.melee_defense/3
+        defense_result = self.initiator.melee_power + self.initiator.melee_handiness/3 \
+                         - self.target.melee_defense - self.target.dodging/3
         if not self.target.check_stamina(cfg.actions["melee_attack"]["stamina"]):
             func.optional_print("Defender does not have enough stamina (", self.target.body.get_current_stamina(), ") to defend")
             self.actual_defense = "No defense"
@@ -146,13 +152,16 @@ class MeleeAttack(ActiveActions):
         else:
             self.actual_defense = "Defense"
 
-        # Calculate attack and defend values
-        attack_accuracy = math.pow(self.initiator.melee_handiness, 0.75) * self.get_attack_coef(self.initiator)
-        attack_power = Character.get_melee_attack(attack_accuracy, self.initiator.melee_power) \
-                       * self.get_attack_coef(self.initiator)
+        # Calculate real attack and defend values
+        attack_accuracy = (self.initiator.melee_handiness + self.initiator.melee_power/3) \
+                          * ActiveActions.get_attack_coef(self.initiator, self.timeline)
+        attack_power = (self.initiator.melee_power + self.initiator.melee_handiness/3) \
+                       * ActiveActions.get_attack_coef(self.initiator, self.timeline)
                      
-        dodge_level = self.target.dodging * self.get_attack_coef(self.target)
-        defense_level = self.target.melee_defense * self.get_attack_coef(self.target)
+        dodge_level = (self.target.dodging - self.target.melee_defense/3) \
+                      * ActiveActions.get_attack_coef(self.target, self.timeline)
+        defense_level = (self.target.melee_defense - self.target.dodging/3) \
+                        * ActiveActions.get_attack_coef(self.target, self.timeline)
                       
         dodge_result = attack_accuracy - dodge_level
         defense_result = attack_power - defense_level
@@ -173,11 +182,11 @@ class MeleeAttack(ActiveActions):
 
     def melee_attack_type(self, attack_value):
         if attack_value < cfg.melee_attack_stage[0]:
-            # Only block for very low damages
+            # Only block for very weak attack
             self.block()
             time.sleep(3)
         elif attack_value < cfg.melee_attack_stage[1]:
-            # Block or delay for low damages
+            # Block or delay for weak attack
             r = random.random()
             if r < 0.5:
                 self.delay(attack_value)
@@ -185,7 +194,7 @@ class MeleeAttack(ActiveActions):
                 self.block()
             time.sleep(3)
         elif attack_value < cfg.melee_attack_stage[2]:
-            # Hit or delay for medium damages
+            # Hit or delay for medium attack
             r = random.random()
             if r < 0.5:
                 self.delay(attack_value)
@@ -194,7 +203,7 @@ class MeleeAttack(ActiveActions):
                 func.optional_print("The attack is a normal hit", level=2)
                 self.melee_attack_received(attack_value)
         elif attack_value < cfg.melee_attack_stage[3]:
-            # Big hit or hit + delay for high damages
+            # Big hit or hit + delay for strong attack
             r = random.random()
             if r < 0.5:
                 func.optional_print("The attack will hit and slightly delay the player!", level=2)
@@ -205,7 +214,7 @@ class MeleeAttack(ActiveActions):
                 func.optional_print("The attack is a strong hit!", level=2)
                 self.melee_attack_received(attack_value * 4 / 3)
         else:
-            # Big hit + delay or huge hit
+            # Big hit + delay or huge hit for huge attack
             r = random.random()
             if r < 0.5:
                 func.optional_print("The attack will hit AND delay the player!", level=2)
