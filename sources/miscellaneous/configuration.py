@@ -26,11 +26,13 @@ accuracy_mean = 100.0  # Accuracy reference for characters
 critical_hit_chance = 0.083  # Chances to hit the head or other key areas (1 / 12)
 critical_hit_boost = 6.0  # Coef boost when doing a critical hit
 max_magic_distance = 100.0  # Around 200 meters
+free_hand_melee_defense = 0.75  # Melee defense for each free hand
 free_hand_melee_handiness = 7.5  # Melee handiness for each free hand
 free_hand_melee_power = 0.75  # Melee power for each free hand
-free_hand_pen_rate = 0.3  # Penetration of hits with free hands
+free_hand_damage_life_rate = 1.0  # extra life damages of hits with free hands
+free_hand_ignoring_armor_rate = 0.1  # ignoring armor rate of hits with free hands
+free_hand_pen_rate = 0.05  # Penetration of hits with free hands
 free_hand_resis_dim_rate = 0.01  # Armor diminution of hits with free hands
-free_hand_melee_defense = 0.75  # Melee defense for each free hand
 team_state_effect_on_moral = 1.0 / 4.0  # Math.pow(team state, this value) as morale
 melee_attack_fighting_availability = 1.0  # impact coef on fighting availability
 ranged_attack_fighting_availability = 0.25
@@ -221,8 +223,10 @@ wrath_spells_power = {
     "FBL": {
         "attack_value": 50.0,
         "spread_distance": 1,
-        "resis_dim_rate": 0.5,
-        "pen_rate": 0.25
+        "damage_life_rate": 1.5,
+        "ignoring_armor_rate": 0.15,
+        "pen_rate": 0.1,
+        "resis_dim_rate": 0.5
     }
 }
 
@@ -272,8 +276,10 @@ joy_spells_power = {
     },
     "LGT": {
         "attack_value": 20.0,
+        "damage_life_rate": 1.25,
+        "ignoring_armor_rate": 0.0,
+        "pen_rate": 0.2,
         "resis_dim_rate": 0.33,
-        "pen_rate": 0.1,
         "delay": 1.5,
         "min_damage_for_delay": 5.0
     }
@@ -368,8 +374,10 @@ sadness_spells_knowledge = {
 sadness_spells_power = {
     "IPK": {
         "attack_value": 50.0,
-        "resis_dim_rate": 0.2,
-        "pen_rate": 0.35
+        "damage_life_rate": 1.5,
+        "ignoring_armor_rate": 0.1,
+        "pen_rate": 0.3,
+        "resis_dim_rate": 0.2
     },
     "DST": {
         "spread_distance": 3,
@@ -426,8 +434,10 @@ fear_spells_power = {
     },
     "MFI": {
         "attack_value": 27.5,
+        "damage_life_rate": 1.0,
+        "ignoring_armor_rate": 0.85,
+        "pen_rate": 0.05,
         "resis_dim_rate": 0.25,
-        "pen_rate": 0.5,
         "min_damage_for_moving": 15.0
     }
 }

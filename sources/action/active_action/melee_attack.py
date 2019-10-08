@@ -1,6 +1,7 @@
 import math as math
 import random as random
 import time as time
+import copy as copy
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
 from sources.character.character import Character
@@ -77,6 +78,8 @@ class MeleeAttack(ActiveActions):
             func.optional_print("ID:", read, "is not available")
 
     def execute(self):
+        self.fight.scheduler.remove(self)
+
         if not self.initiator.can_melee_attack(self.target):
             func.optional_print("")
             func.optional_print("*********************************************************************")
@@ -115,7 +118,6 @@ class MeleeAttack(ActiveActions):
         # Update availability after computed the result
         self.target.previous_attacks.append((self.timeline, self))
         self.initiator.previous_attacks.append((self.timeline, self))
-        self.fight.scheduler.remove(self)
         
         abscissa = self.target.abscissa
         ordinate = self.target.ordinate
@@ -242,14 +244,54 @@ class MeleeAttack(ActiveActions):
         func.optional_print("-- of", round(attack_value, 2), "TURN(S) --", level=2)
     
     def melee_attack_received(self, attack_value):
-        armor_coef = self.target.get_armor_coef(self.initiator.melee_handiness_ratio)
+        ### Choose which weapon has hit the target ###
+        # List all weapons
+        weapons = copy.copy(self.initiator.equipments.weapons_in_use)
+        for i in range(self.initiator.equipments.free_hands):
+            weapons.append("free_hand")
+
+        # Find the "best" weapon
+        best_weapon = "free_hand"
+        melee_power = cfg.free_hand_melee_power
+        for weapon in weapons:
+            if weapon != "free_hand" and weapon.melee_power > melee_power:
+                best_weapon = weapon
+                melee_power = weapon.melee_power
+
+        # Select the weapon (higher attack value = higher chance of better weapon)
+        ratio = attack_value / cfg.melee_attack_stage[3]
+        hitting_weapon = best_weapon
+        if random.random() > ratio:  # Choose the worst weapon
+            for weapon in weapons:
+                if weapon != best_weapon:
+                    hitting_weapon = weapon
+                    break
+
+        ### Calculate weapon stats ###
+        if hitting_weapon == "free_hand":
+            handiness_ratio = cfg.free_hand_melee_handiness / cfg.accuracy_mean
+            damage_life_rate = cfg.free_hand_damage_life_rate
+            ignoring_armor_rate = cfg.free_hand_ignoring_armor_rate
+            pen_rate = cfg.free_hand_pen_rate
+            resis_dim_rate = cfg.free_hand_resis_dim_rate
+        else:
+            handiness_ratio = hitting_weapon.melee_handiness / cfg.accuracy_mean
+            damage_life_rate = hitting_weapon.damage_life_rate
+            ignoring_armor_rate = hitting_weapon.ignoring_armor_rate
+            pen_rate = hitting_weapon.pen_rate
+            resis_dim_rate = hitting_weapon.resis_dim_rate
+
+        ### Hitting result ###
+        armor_coef = self.target.get_armor_coef(handiness_ratio)
         self.target.damages_received(
             self.initiator, 
             attack_value, 
-            self.initiator.melee_handiness_ratio, 
+            handiness_ratio,
             armor_coef, 
-            self.initiator.resis_dim_rate, 
-            self.initiator.pen_rate
+            damage_life_rate,
+            ignoring_armor_rate,
+            pen_rate,
+            resis_dim_rate
         )
 
     def can_melee_attack(self):

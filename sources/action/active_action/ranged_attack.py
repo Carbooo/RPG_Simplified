@@ -182,9 +182,13 @@ class RangedAttack(ActiveActions):
         else:
             accuracy_ratio = 0.5 + hit_chance  # Between 0,5 and 1,5, similar to melee handiness_ratio
             armor_coef = self.target.get_armor_coef(accuracy_ratio)
+            "damage_life_rate"
+            "ignoring_armor_rate"
+            "pen_rate"
+            "resis_dim_rate"
             self.target.damages_received(self.initiator, attack_result, accuracy_ratio, armor_coef,
-                                         self.ammo_used.resis_dim_rate, self.ammo_used.pen_rate,
-                                         self.ammo_used.flesh_damage)
+                                         self.ammo_used.damage_life_rate, self.ammo_used.ignoring_armor_rate,
+                                         self.ammo_used.pen_rate, self.ammo_used.resis_dim_rate)
 
     def shoot_hit_chance(self):
         # Distance = -a*(x-1) + b --> distance min = 1.0, distance max = 0.0

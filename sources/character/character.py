@@ -99,7 +99,6 @@ class Character:
         self.use_bulk_ratio = 0.0
         self.speed_ratio = 0.0
         self.melee_handiness = 0.0
-        self.melee_handiness_ratio = 0.0
         self.ranged_accuracy = 0.0
         self.ranged_accuracy_ratio = 0.0
         self.pen_rate = 0.0
@@ -220,7 +219,6 @@ class Character:
 
         # Set accuracies
         self.melee_handiness = self.get_global_ratio() * melee_handiness_coef * attack["melee_handiness"]
-        self.melee_handiness_ratio = self.melee_handiness / cfg.accuracy_mean
         self.ranged_accuracy = self.get_global_ratio() * ranged_accuracy_coef * attack["range_accuracy"]
         self.ranged_accuracy_ratio = self.ranged_accuracy / cfg.accuracy_mean
     
@@ -361,7 +359,8 @@ class Character:
             time.sleep(2)
             return 1
             
-    def damages_received(self, enemy, attack_value, accuracy_ratio, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate=1.0):
+    def damages_received(self, enemy, attack_value, accuracy_ratio, armor_coef, damage_life_rate,
+                         ignoring_armor_rate, pen_rate, resis_dim_rate):
         enemy.print_basic()
         func.optional_print("-- has HIT --", skip_line=True, level=3)
         self.print_basic()
@@ -373,7 +372,8 @@ class Character:
             time.sleep(2)
             attack_value *= cfg.critical_hit_boost
 
-        damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate)
+        damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, damage_life_rate,
+                                                              ignoring_armor_rate, pen_rate, resis_dim_rate)
         
         if damage_result > 0:
             life_ratio = self.body.loose_life(damage_result)

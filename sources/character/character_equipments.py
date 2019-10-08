@@ -1,5 +1,5 @@
 import time as time
-from sources.character.equipments import Armors, MagicalArmors, Weapons, AttackWeapons, MeleeWeapons, \
+from sources.character.equipments import Armors, MagicalArmors, Weapons, MeleeWeapons, \
     Shields, MagicalShields, RangedWeapons, Bows, Crossbows, Ammo
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
@@ -93,7 +93,7 @@ class CharEquipments:
         return True
         
     def set_magical_shield(self, name, defense, attack_ratio, melee_def_ratio, ranged_def_ratio, magic_def_ratio):
-        new_shield = MagicalShield(name, defense, attack_ratio, melee_def_ratio, ranged_def_ratio, magic_def_ratio)
+        new_shield = MagicalShields(name, defense, attack_ratio, melee_def_ratio, ranged_def_ratio, magic_def_ratio)
         self.set_weapon_in_use(new_shield)
 
     def remove_weapon(self, weapon, definitive=False):
@@ -133,13 +133,12 @@ class CharEquipments:
         else:
             return self.armors[0].def_cover
 
-    def armor_damage_absorbed(self, damage, armor_coef, resistance_dim_rate, penetration_rate, flesh_dam_rate):
+    def armor_damage_absorbed(self, damage, armor_coef, damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
         damage_result = damage
         armors = self.armors.copy()
         for armor in armors:
             if damage_result > 0:
-                result = armor.damage_absorbed(damage_result, armor_coef, resistance_dim_rate,
-                                               penetration_rate, flesh_dam_rate)
+                result = armor.damage_absorbed(damage_result, armor_coef, damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate)
                 damage_result = result[1]
                 if result[0] == 0:
                     func.optional_print("Your armor \\ID:", armor.get_id(), "\\Name:", armor.name, "has been broken!", level=3)

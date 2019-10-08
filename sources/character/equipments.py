@@ -98,12 +98,22 @@ class Armors(Equipments):
     def cover_ratio(self):
         return self.def_cover / 10.0
 
-    def damage_absorbed(self, damages, armor_coef, resis_dim_rate, pen_rate, damage_life_rate, ignoring_armor_rate):
-        # damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate
-        absorbed_damages = min(damages, self.defense * armor_coef)
-        pen_damages = absorbed_damages * pen_rate
-        direct_damages = (damages - absorbed_damages) * damage_life_rate
-        total_damages = pen_damages + direct_damages
+    def damage_absorbed(self, damages, armor_coef, damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
+        pen_damages = damages * pen_rate
+        defense_value = self.defense * armor_coef
+        absorbed_damages = min(pen_damages, defense_value)
+        remaining_damages_ratio = max(0, (1 - defense_value / pen_damages))
+        direct_life_damages = damages * remaining_damages_ratio * damage_life_rate
+        ignoring_armor_damages = damages * (1 - remaining_damages_ratio) * ignoring_armor_rate * (1 - pen_rate)
+        total_damages = direct_life_damages + ignoring_armor_damages
+
+        """
+        print("pen_damages", pen_damages)
+        print("defense_value", defense_value)
+        print("remaining_damages_ratio", remaining_damages_ratio)
+        print("direct_life_damages", direct_life_damages)
+        print("ignoring_armor_damages", ignoring_armor_damages)
+        """
         
         func.optional_print("Damages absorbed by", self.name, ":", int(round(absorbed_damages)), level=3)
         time.sleep(2)
@@ -126,9 +136,9 @@ class MagicalArmors(Armors):
         super().__init__(name, 0.0, 0.0, resistance, 10.0)
         self.type = "MagicalArmor"
         
-    def damage_absorbed(self, damage, armor_coef, resis_dim_rate, pen_rate, flesh_dam_rate):
+    def damage_absorbed(self, damage, armor_coef, damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
         # Same parameters as parent for consistency
-        ratio, damage_result = super().damage_absorbed(damage, 1, 0, 0, 1)
+        ratio, damage_result = super().damage_absorbed(damage, 1, 0, 0, 1, 0)
         ratio = self.decrease(damage)
         return ratio, damage_result
     
@@ -153,7 +163,7 @@ class Ammo(Equipments):
         self.type = "Arrow"
         self.original_damage_life_rate = float(damage_life_rate)
         self.damage_life_rate = self.original_damage_life_rate
-        self.original_ignoring_armor_rate = float(ignoring_armor_rate)
+        self.original_ignoring_armor_rate = float(ignoring_armor_rate) / 100.0
         self.ignoring_armor_rate = self.original_ignoring_armor_rate
         self.original_pen_rate = float(pen_rate) / 100.0
         self.pen_rate = self.original_pen_rate

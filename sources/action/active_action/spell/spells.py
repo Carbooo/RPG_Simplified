@@ -233,7 +233,8 @@ class Spells(ActiveActions):
 
         return char_list
 
-    def magical_attack_received(self, attack_value, is_localized, can_use_shield, resis_dim_rate, pen_rate):
+    def magical_attack_received(self, attack_value, is_localized, can_use_shield, damage_life_rate,
+                                ignoring_armor_rate, pen_rate, resis_dim_rate):
         if self.target != self.initiator:
             self.fight.stop_action(self.target, self.initiator.timeline)
 
@@ -256,12 +257,14 @@ class Spells(ActiveActions):
                 accuracy_ratio = self.fight.field.get_magical_accuracy(self.initiator, self.target)
                 armor_coef = self.target.get_armor_coef(accuracy_ratio)
                 attack_value = self.target.damages_received(self.initiator, attack_value, accuracy_ratio, armor_coef,
-                                                           resis_dim_rate, pen_rate)
+                                                            damage_life_rate, ignoring_armor_rate, pen_rate,
+                                                            resis_dim_rate)
             else:
                 # Non localized attack cannot avoid armor (use cover ratio instead) or do critical hit
                 attack_value = self.target.damages_received(self.initiator, attack_value, 0,
                                                            self.target.equipments.get_armor_cover_ratio(),
-                                                           resis_dim_rate, pen_rate)
+                                                            damage_life_rate, ignoring_armor_rate, pen_rate,
+                                                            resis_dim_rate)
 
         self.target.previous_attacks.append((self.initiator.timeline, self))
         return max(0.0, attack_value)

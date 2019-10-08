@@ -116,8 +116,10 @@ class JoySpells(Spells):
             attack_value,
             False,  # is_localized
             True,  # can_use_shield
-            self.spell_power["resis_dim_rate"], 
-            self.spell_power["pen_rate"]
+            self.spell_power["damage_life_rate"],
+            self.spell_power["ignoring_armor_rate"],
+            self.spell_power["pen_rate"],
+            self.spell_power["resis_dim_rate"]
         )
         
         if self.target.body.is_alive() and result >= self.spell_power["min_damage_for_delay"]:
