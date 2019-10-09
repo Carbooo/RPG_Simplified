@@ -101,20 +101,17 @@ class Armors(Equipments):
     def damage_absorbed(self, damages, armor_coef, damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
         pen_damages = damages * pen_rate
         defense_value = self.defense * armor_coef
-        absorbed_damages = min(pen_damages, defense_value)
         remaining_damages_ratio = max(0, (1 - defense_value / pen_damages))
         direct_life_damages = damages * remaining_damages_ratio * damage_life_rate
         ignoring_armor_damages = damages * (1 - remaining_damages_ratio) * ignoring_armor_rate * (1 - pen_rate)
+        absorbed_damages = damages - direct_life_damages - ignoring_armor_damages
         total_damages = direct_life_damages + ignoring_armor_damages
 
-        """
-        print("pen_damages", pen_damages)
-        print("defense_value", defense_value)
-        print("remaining_damages_ratio", remaining_damages_ratio)
-        print("direct_life_damages", direct_life_damages)
-        print("ignoring_armor_damages", ignoring_armor_damages)
-        """
-        
+        func.optional_print("pen_damages", pen_damages, level=3, debug=True)
+        func.optional_print("defense_value", defense_value, level=3, debug=True)
+        func.optional_print("remaining_damages_ratio", remaining_damages_ratio, level=3, debug=True)
+        func.optional_print("direct_life_damages", direct_life_damages, level=3, debug=True)
+        func.optional_print("ignoring_armor_damages", ignoring_armor_damages, level=3, debug=True)
         func.optional_print("Damages absorbed by", self.name, ":", int(round(absorbed_damages)), level=3)
         time.sleep(2)
         ratio = self.decrease(absorbed_damages * resis_dim_rate)

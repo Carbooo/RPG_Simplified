@@ -1,5 +1,6 @@
 automatic = False
 log_level = 1
+log_debug = False
 actions = []
 
 
@@ -12,10 +13,12 @@ def optional_input(txt):
         return actions.pop(0)
 
 
-def optional_print(*argv, skip_line=False, level=1):
+def optional_print(*argv, skip_line=False, level=1, debug=False):
     global log_level
-    if level >= log_level:
-        if skip_line:
-            print(*argv, end=' ')
-        else:
-            print(*argv)
+    global log_debug
+    if not debug or log_debug:
+        if level >= log_level:
+            if skip_line:
+                print(*argv, end=' ')
+            else:
+                print(*argv)

@@ -242,7 +242,7 @@ class Character:
         
     def calculate_dodging(self):
         # The bigger you are, the harder is to dodge
-        dodging_coef = (self.reflex + self.agility) / (1.0 + 1.0) / self.constitution_ratio
+        dodging_coef = (self.reflex + self.agility) / (1.0 + 1.0) / self.constitution_ratio * 10.0
         # More bulky equipment, lower dodge ratio (load ratio already included in agility stat)
         dodging_coef *= math.sqrt(math.pow(self.bulk_ratio, 1.0 / 3) * math.pow(self.use_bulk_ratio, 1.0 / 2))
         self.dodging = self.get_global_ratio() * dodging_coef

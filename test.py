@@ -22,6 +22,7 @@ ImportData("ObstaclesField", "data/maps/LongObstacles.csv")
 def test_melee():
     func.log_level = 1
     func.automatic = False
+    func.log_debug = True
     # func.actions = ["EQP", 236]
     Fight(cfg.field_list[0], cfg.team_list[8], cfg.team_list[9])
 
@@ -29,6 +30,7 @@ def test_melee():
 def test_ranged():
     func.log_level = 1
     func.automatic = False
+    func.log_debug = True
     func.actions = ["EQP", 236]
     Fight(cfg.field_list[0], cfg.team_list[10], cfg.team_list[11])
 
@@ -36,8 +38,9 @@ def test_ranged():
 def test_magic():
     func.log_level = 1
     func.automatic = False
+    func.log_debug = True
     # func.actions = ["EQP", 236]
     Fight(cfg.field_list[0], cfg.team_list[12], cfg.team_list[13])
 
 
-Fight(cfg.field_list[0], cfg.team_list[8], cfg.team_list[9])
+test_melee()
