@@ -82,7 +82,7 @@ class Armors(Equipments):
         self.type = "Armor"
         self.original_def_cover = float(def_cover)
         self.def_cover = self.original_def_cover
-        self.original_defense = self.resistance * 10.0
+        self.original_defense = self.resistance * cfg.armor_resis_def_ratio
         self.defense = self.original_defense
         
     def print_obj(self):
@@ -104,7 +104,7 @@ class Armors(Equipments):
         remaining_damages_ratio = max(0, (1 - defense_value / pen_damages))
         direct_life_damages = damages * remaining_damages_ratio * damage_life_rate
         ignoring_armor_damages = damages * (1 - remaining_damages_ratio) * ignoring_armor_rate * (1 - pen_rate)
-        absorbed_damages = damages - direct_life_damages - ignoring_armor_damages
+        absorbed_damages = damages * (1 - remaining_damages_ratio) - ignoring_armor_damages
         total_damages = direct_life_damages + ignoring_armor_damages
 
         func.optional_print("pen_damages", pen_damages, level=3, debug=True)

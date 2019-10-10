@@ -9,6 +9,7 @@ variance = 0.1  # Gauss variance
 high_variance = 0.25  # Gauss variance
 
 ######################## EQUIPMENTS CONFIG ######################
+armor_resis_def_ratio = 2.0  # Coef apply to resis dim rate to calculate defense
 armor_def_malus_rate = 2.0  # Armor def lost when being hit
 shield_def_malus_rate = 0.1  # Armor def lost when defending
 attack_weapon_def_malus_rate = 0.01  # Attack weapon def lost when defending

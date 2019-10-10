@@ -274,6 +274,14 @@ class MeleeAttack(ActiveActions):
                     hitting_weapon = weapon
                     break
 
+        # Print weapon name
+        if hitting_weapon == "free_hand":
+            weapon_name = "his/her free hand"
+        else:
+            weapon_name = hitting_weapon.name
+        self.initiator.print_basic()
+        func.optional_print("-- is hitting with --", weapon_name.upper(), level=2)
+
         ### Calculate weapon stats ###
         if hitting_weapon == "free_hand":
             handiness_ratio = cfg.free_hand_melee_handiness / cfg.accuracy_mean
