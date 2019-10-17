@@ -42,7 +42,7 @@ magic_attack_fighting_availability = 0.35
 ########################## BODY CONFIG #######################
 life_resting_coef = 14400.0  # Rest coefficient
 stamina_resting_coef = 200.0  # Rest coefficient
-turn_stamina = 1.0  # Stamina reference used
+turn_stamina = 0.5  # Stamina reference used
 
 ######################## FEELING CONFIG ######################
 concentrate_update_coef = 3  # Energy coef to update feeling with concentration

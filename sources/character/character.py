@@ -327,7 +327,7 @@ class Character:
                     print("Error: Fighting availability type (", attack.type, ") not expected!")
 
         # Calculate fighting readiness regarding char timeline
-        readiness_time = self.timeline - timeline
+        readiness_time = max(0.0, self.timeline - timeline)
         if self.last_action and self.last_action.type == "MeleeAttack":  # Do not count "counter" attack
             readiness_time = max(0.0, readiness_time - cfg.actions["melee_attack"]["duration"] / self.speed_ratio)
 

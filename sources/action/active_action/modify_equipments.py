@@ -25,7 +25,7 @@ class ModifyEquipments(ActiveActions):
     def start(self):
         if not self.initiator.check_stamina(cfg.actions["modify_equip"]["stamina"]):
             func.optional_print("You do not have enough stamina (",
-                  self.initiator.body.get_current_stamina(), ") to modify your equipment")
+                  round(self.initiator.body.stamina, 2), ") to modify your equipment")
             return False
         
         if self.initiator.equipments.free_hands == 0 or (

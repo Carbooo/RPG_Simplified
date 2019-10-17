@@ -25,7 +25,7 @@ class RangedAttack(ActiveActions):
     def start(self):  # Choose ranged target and shoot mode
         if self.initiator.check_stamina(cfg.actions["ranged_attack"]["stamina"]) is False:
             func.optional_print("You do not have enough stamina (",
-                  self.initiator.body.get_current_stamina(), ") for a ranged attack")
+                  round(self.initiator.body.stamina, 2), ") for a ranged attack")
             return False
         elif self.initiator.equipments.is_using_a_ranged_weapon() is False:
             func.optional_print("You are not using a ranged weapon")

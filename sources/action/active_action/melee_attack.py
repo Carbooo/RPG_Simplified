@@ -26,7 +26,7 @@ class MeleeAttack(ActiveActions):
 
     def start(self):
         if not self.initiator.check_stamina(cfg.actions["melee_attack"]["stamina"]):
-            func.optional_print("You do not have enough stamina (", self.initiator.body.get_current_stamina(), ") for a melee attack")
+            func.optional_print("You do not have enough stamina (", round(self.initiator.body.stamina, 2), ") for a melee attack")
             return False
         elif not self.choose_target():
             return False
@@ -154,7 +154,7 @@ class MeleeAttack(ActiveActions):
         dodge_result = attack_accuracy - self.target.dodging
         defense_result = attack_power - self.target.melee_defense
         if not self.target.check_stamina(cfg.actions["melee_attack"]["stamina"]):
-            func.optional_print("The defender does not have enough stamina (", self.target.body.get_current_stamina(),
+            func.optional_print("The defender does not have enough stamina (", round(self.target.body.stamina, 2),
                                 ") to defend")
             self.actual_defense = "No defense"
         elif dodge_result < defense_result:
