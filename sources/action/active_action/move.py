@@ -142,7 +142,6 @@ class Move(ActiveActions):
                                                           self.target_abs, self.target_ord) \
                / self.initiator.movement_handicap_ratio()
 
-        coef = math.sqrt(coef)  # Limit the effect of bonus / malus
         if abs(self.target_abs - self.initiator.abscissa) + abs(self.target_ord - self.initiator.ordinate) == 2:
             return coef * math.sqrt(2)
         else:

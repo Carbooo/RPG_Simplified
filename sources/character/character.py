@@ -260,9 +260,10 @@ class Character:
         self.calculate_dodging()
 
     def movement_handicap_ratio(self):
-        return math.sqrt(
+        return math.pow(
             (math.pow(self.load_ratio, 1.0 / 2) * math.pow(self.use_load_ratio, 1.0 / 3)) * \
-            (math.pow(self.bulk_ratio, 1.0 / 3) * math.pow(self.use_bulk_ratio, 1.0 / 2)))
+            (math.pow(self.bulk_ratio, 1.0 / 3) * math.pow(self.use_bulk_ratio, 1.0 / 2)),
+            1.0 / 3)
 
 ################### VARIOUS KEY FUNCTIONS ######################
     def exceeded_feelings_check(self):
