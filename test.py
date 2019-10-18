@@ -19,26 +19,52 @@ ImportData("ObstaclesField", "data/maps/LongObstacles.csv")
 
 
 ##################### TESTING ###################
-def test_melee1():
+def test_melee1():  # Big def vs Big attack
     func.log_level = 1
     func.automatic = False
     func.log_debug = True
     # func.actions = ["EQP", 236]
     Fight(cfg.field_list[0], cfg.team_list[8], cfg.team_list[9])
 
-def test_melee2():
+
+def test_melee2():  # Big def vs Big def
     func.log_level = 1
     func.automatic = False
     func.log_debug = True
     # func.actions = ["EQP", 236]
     Fight(cfg.field_list[0], cfg.team_list[8], cfg.team_list[10])
 
+
+def test_melee3():  # Medium def vs Medium def
+    func.log_level = 1
+    func.automatic = False
+    func.log_debug = True
+    # func.actions = ["EQP", 236]
+    Fight(cfg.field_list[0], cfg.team_list[11], cfg.team_list[12])
+
+
+def test_melee_vs_ranged1():  # Small shield vs bow
+    func.log_level = 1
+    func.automatic = False
+    func.log_debug = True
+    # func.actions = ["EQP", 236]
+    Fight(cfg.field_list[0], cfg.team_list[11], cfg.team_list[15])
+
+
+def test_melee_vs_ranged2():  # Small shield vs bow
+    func.log_level = 1
+    func.automatic = False
+    func.log_debug = True
+    # func.actions = ["EQP", 236]
+    Fight(cfg.field_list[0], cfg.team_list[13], cfg.team_list[15])
+
+
 def test_ranged():
     func.log_level = 1
     func.automatic = False
     func.log_debug = True
     func.actions = ["EQP", 236]
-    Fight(cfg.field_list[0], cfg.team_list[11], cfg.team_list[12])
+    Fight(cfg.field_list[0], cfg.team_list[14], cfg.team_list[15])
 
 
 def test_magic():
@@ -46,7 +72,7 @@ def test_magic():
     func.automatic = False
     func.log_debug = True
     # func.actions = ["EQP", 236]
-    Fight(cfg.field_list[0], cfg.team_list[13], cfg.team_list[14])
+    Fight(cfg.field_list[0], cfg.team_list[16], cfg.team_list[17])
 
 
-test_melee2()
+test_melee_vs_ranged2()

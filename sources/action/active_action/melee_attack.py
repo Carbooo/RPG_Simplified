@@ -4,7 +4,6 @@ import time as time
 import copy as copy
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
-from sources.character.character import Character
 from sources.action.action import Actions
 from sources.action.active_action.active_action import ActiveActions
 
@@ -244,6 +243,7 @@ class MeleeAttack(ActiveActions):
 
     def delay(self, attack_value):
         attack_value /= cfg.melee_attack_stage[3] / 2
+        attack_value = math.sqrt(attack_value)
         self.target.spend_time(attack_value)
         self.initiator.print_basic()
         func.optional_print("-- has DELAYED --", skip_line=True, level=2)

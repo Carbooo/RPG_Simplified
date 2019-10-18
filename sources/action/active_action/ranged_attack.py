@@ -170,6 +170,9 @@ class RangedAttack(ActiveActions):
         defense_level = self.target.ranged_defense \
                        * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
         attack_result = attack_power - defense_level
+        func.optional_print("attack_power", attack_power, level=3, debug=True)
+        func.optional_print("defense_level", defense_level, level=3, debug=True)
+        func.optional_print("attack_result", attack_result, level=3, debug=True)
 
         # Update availability after computed the result
         self.target.previous_attacks.append((self.initiator.timeline, self))
@@ -226,9 +229,8 @@ class RangedAttack(ActiveActions):
                / self.initiator.equipments.get_range()
 
     def get_range_power(self, hit_chance):
-        return self.initiator.ranged_power \
-                * self.range_power_distance_ratio() \
-                * RangedAttack.range_power_hit_chance_ratio(hit_chance)
+        return self.initiator.ranged_power * self.range_power_distance_ratio() * \
+               RangedAttack.range_power_hit_chance_ratio(hit_chance)
 
     def can_ranged_attack(self):
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:

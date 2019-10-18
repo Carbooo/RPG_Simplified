@@ -227,8 +227,9 @@ class Character:
         
         # Calculate defense coefs
         melee_coef = (self.reflex + self.agility/2 + self.force/2) / (1 + 2.0/2)
+        ranged_coef = (self.reflex + self.agility/2) / (1 + 1.0/2)
         # Skills do not really matter for ranged defense, the bigger you are, the harder it is to defend
-        ranged_coef = math.sqrt((self.reflex + self.agility/2) / (1 + 1.0/2)) / self.constitution_ratio
+        ranged_coef = math.sqrt(ranged_coef/10) * 10 / self.constitution_ratio
         magic_coef = (self.spirit + self.willpower/2 + self.constitution/3) / (1 + 1.0/2 + 1.0/3)
         
         # Set defenses
@@ -329,8 +330,11 @@ class Character:
 
         # Calculate fighting readiness regarding char timeline
         readiness_time = max(0.0, self.timeline - timeline)
-        if self.last_action and self.last_action.type == "MeleeAttack":  # Do not count "counter" attack
-            readiness_time = max(0.0, readiness_time - cfg.actions["melee_attack"]["duration"] / self.speed_ratio)
+        if self.last_action:
+            if self.last_action.type == "MeleeAttack":  # Do not count "counter" attack
+                readiness_time = max(0.0, readiness_time - cfg.actions["melee_attack"]["duration"] / self.speed_ratio)
+            if self.last_action.type == "Waiting" or self.last_action.type == "Move":  # Always ready for this type of action
+                readiness_time = 0.0
 
         total_time += readiness_time
         return 1.0 / (1.0 + total_time / char_defense_time)

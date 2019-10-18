@@ -9,7 +9,7 @@ from sources.miscellaneous import configuration as cfg
 class ActiveActions(Actions):
     """
     Super class for all real actions.
-    For all new action, stop_action and get_ranged_action_ratio must be updated
+    For all new action, stop_action, fighting_availability and get_ranged_action_ratio must be updated
     """
 
     def __init__(self, fight, initiator):

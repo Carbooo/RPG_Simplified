@@ -9,7 +9,10 @@ TestMixed1,m1,r1
 TestMixed2,m2,r2
 TestShortMelee1,t0
 TestShortMelee2,t1
-TestShortMelee2,t2
+TestShortMelee3,t2
+TestShortMelee4,a1
+TestShortMelee5,a4
+TestShortMelee6,a0
 TestShortRanged1,r0
 TestShortRanged2,r1
 TestShortMage1,a6
