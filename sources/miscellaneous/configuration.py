@@ -88,6 +88,7 @@ moving_char_shooting_handicap = 0.5
 melee_fighter_shooting_handicap = 0.5
 decrease_hit_chance_per_case = 0.01  # Every case, the distance hit chance diminishes by this ratio
 min_distance_ratio = 0.05  # The distance hit chance cannot go lower than that
+min_ranged_def_ratio = 0.33  # The minimum ranged def ratio based on the distance between target and shooter
 
 ################### MELEE ATTACK CONFIG ###################
 melee_attack_stage = [0, 25, 50, 75]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]

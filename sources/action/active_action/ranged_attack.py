@@ -165,31 +165,31 @@ class RangedAttack(ActiveActions):
         self.fight.stop_action(self.target, self.initiator.timeline)
 
         # Range defense result
-        attack_power = self.get_range_power(hit_chance) \
+        # The higher the shoot is precised, the more chance it is to hurt the target
+        # The further the target is, the easiest it is to anticipate and defend
+        attack_power = self.initiator.ranged_accuracy * hit_chance \
                        * ActiveActions.get_attack_coef(self.initiator, self.initiator.timeline)
-        defense_level = self.target.ranged_defense \
+        defense_level = self.target.ranged_defense * max(cfg.min_ranged_def_ratio, self.range_distance_ratio()) \
                        * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
         attack_result = attack_power - defense_level
+        range_power = self.get_range_power(hit_chance) * attack_result / defense_level
         func.optional_print("attack_power", attack_power, level=3, debug=True)
         func.optional_print("defense_level", defense_level, level=3, debug=True)
         func.optional_print("attack_result", attack_result, level=3, debug=True)
+        func.optional_print("range_power", range_power, level=3, debug=True)
 
         # Update availability after computed the result
         self.target.previous_attacks.append((self.initiator.timeline, self))
         
         # Attack result --> Either block or be hit
         if attack_result <= cfg.ranged_attack_stage[0]:
-            self.target.equipments.all_shields_absorbed_damage(attack_power, self.ammo_used.resis_dim_rate)
+            self.target.equipments.all_shields_absorbed_damage(range_power, self.ammo_used.resis_dim_rate)
             func.optional_print("The attack has been fully blocked / avoided by the defender", level=2)
             time.sleep(5)
         else:
-            accuracy_ratio = 0.5 + hit_chance  # Between 0,5 and 1,5, similar to melee handiness_ratio
+            accuracy_ratio = RangedAttack.range_hit_chance_ratio(hit_chance)
             armor_coef = self.target.get_armor_coef(accuracy_ratio)
-            "damage_life_rate"
-            "ignoring_armor_rate"
-            "pen_rate"
-            "resis_dim_rate"
-            self.target.damages_received(self.initiator, attack_result, accuracy_ratio, armor_coef,
+            self.target.damages_received(self.initiator, range_power, accuracy_ratio, armor_coef,
                                          self.ammo_used.damage_life_rate, self.ammo_used.ignoring_armor_rate,
                                          self.ammo_used.pen_rate, self.ammo_used.resis_dim_rate)
 
@@ -221,16 +221,16 @@ class RangedAttack(ActiveActions):
         return coef
     
     @staticmethod
-    def range_power_hit_chance_ratio(hit_chance):
-        return math.pow(hit_chance / 0.5, 1.0/3.0)
+    def range_hit_chance_ratio(hit_chance):
+        return 0.5 + hit_chance  # Between 0,5 and 1,5, similar to melee handiness_ratio
     
-    def range_power_distance_ratio(self):
-        return 1 - self.initiator.calculate_point_distance(self.target.abscissa, self.target.ordinate) \
+    def range_distance_ratio(self):
+        return self.initiator.calculate_point_distance(self.target.abscissa, self.target.ordinate) \
                / self.initiator.equipments.get_range()
 
     def get_range_power(self, hit_chance):
-        return self.initiator.ranged_power * self.range_power_distance_ratio() * \
-               RangedAttack.range_power_hit_chance_ratio(hit_chance)
+        return self.initiator.ranged_power * (1 - self.range_distance_ratio()) * \
+               RangedAttack.range_hit_chance_ratio(hit_chance)
 
     def can_ranged_attack(self):
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:
