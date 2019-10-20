@@ -113,12 +113,12 @@ class Armors(Equipments):
         func.optional_print("direct_life_damages", direct_life_damages, level=3, debug=True)
         func.optional_print("ignoring_armor_damages", ignoring_armor_damages, level=3, debug=True)
         func.optional_print("Damages absorbed by", self.name, ":", int(round(absorbed_damages)), level=3)
-        time.sleep(2)
+        func.optional_sleep(2)
         ratio = self.decrease(absorbed_damages * resis_dim_rate)
             
         if total_damages == 0:
             func.optional_print("The", self.name, "has absorbed the damages and no life has been lost", level=3)
-            time.sleep(3)
+            func.optional_sleep(3)
         
         return [ratio, total_damages]
             

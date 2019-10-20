@@ -129,10 +129,10 @@ class Fight:
         #Victory of a team
         if self.team1.is_life_active():
             func.optional_print("Team:", self.team1.name, " (ID:", self.team1.get_id(), ") has won the fight!", level=3)
-            time.sleep(3)
+            func.optional_sleep(3)
         else:
             func.optional_print("Team:", self.team2.name, " (", self.team2.get_id(), ") has won the fight!", level=3)
-            time.sleep(3)
+            func.optional_sleep(3)
             
 
 ################################## TURN FUNCTIONS ####################################
@@ -142,7 +142,7 @@ class Fight:
         func.optional_print("******************** A GAME TURN HAS PASSED *************************", level=2)
         func.optional_print("*********************************************************************")
         self.timeline += 1 
-        time.sleep(2)
+        func.optional_sleep(2)
         
         for char in self.char_order:
             if char.body.is_alive() and char.exceeded_feelings_check():
@@ -193,7 +193,7 @@ class Fight:
         func.optional_print("stamina is too low and can only rest", level=2)
         func.optional_print("*********************************************************************")
         func.optional_print("")
-        time.sleep(3)
+        func.optional_sleep(3)
         
     def order_scheduler(self):
         scheduler_list = [self.scheduler[0]]
@@ -424,7 +424,7 @@ class Fight:
         # Stop action without penalty
         if isinstance(char.last_action, Move) or isinstance(char.last_action, PassTime):
             func.optional_print("Your current action (", char.last_action.name, ") is canceled by the attack!", level=2)
-            time.sleep(2)
+            func.optional_sleep(2)
             char.last_action = None
             char.timeline = timeline
             return False
@@ -440,13 +440,13 @@ class Fight:
             func.optional_print("The attack surprises you during your current action(",
                                 char.last_action.name, ")!", level=2)
             func.optional_print("Your defense is diminished!", level=2)
-            time.sleep(2)
+            func.optional_sleep(2)
             func.optional_print("Your current action is also canceled!", level=2)
-            time.sleep(2)
+            func.optional_sleep(2)
             
             if isinstance(char.last_action, Reload):
                 func.optional_print("You loose the ammo being used for reloading!", level=2)
-                time.sleep(2)
+                func.optional_sleep(2)
                 char.ammo.remove(char.last_action.ammo_to_load)
             
             char.last_action = None  # Has to be done after the unreload

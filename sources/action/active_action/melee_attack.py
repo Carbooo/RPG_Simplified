@@ -35,7 +35,7 @@ class MeleeAttack(ActiveActions):
     def choose_target(self):
         if not self.can_melee_attack():
             func.optional_print("No enemy can be reached by a melee attack")
-            time.sleep(3)
+            func.optional_sleep(3)
             return False
 
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:
@@ -92,7 +92,7 @@ class MeleeAttack(ActiveActions):
             func.optional_print(") has been cancelled !")
             func.optional_print("*********************************************************************")
             func.optional_print("")
-            time.sleep(5)
+            func.optional_sleep(5)
             return False
 
         func.optional_print("")
@@ -109,7 +109,7 @@ class MeleeAttack(ActiveActions):
                             level=2)
         func.optional_print("*********************************************************************")
         func.optional_print("")
-        time.sleep(3)
+        func.optional_sleep(3)
 
         self.initiator.last_action = None  # To avoid looping on this action
         self.fight.stop_action(self.target, self.real_end_timeline)
@@ -125,20 +125,20 @@ class MeleeAttack(ActiveActions):
         if self.actual_defense == "Dodge" and \
            self.fight.field.random_move(self.target, cfg.random_defenser_move_probability * 2):
                 func.optional_print("The fight made the defenser move from their position!")
-                time.sleep(2)
+                func.optional_sleep(2)
                 if random.random() < cfg.random_attacker_move_probability:
                     self.fight.field.move_character(self.initiator, abscissa, ordinate)
                     func.optional_print("And the attacker took the initial position of the defender!")
-                    time.sleep(2)
+                    func.optional_sleep(2)
                 
         elif self.actual_defense == "Defense" and \
              self.fight.field.random_move(self.target, cfg.random_defenser_move_probability):
                 func.optional_print("The fight made the defenser move from their position!")
-                time.sleep(2)
+                func.optional_sleep(2)
                 if random.random() < cfg.random_attacker_move_probability:
                     self.fight.field.move_character(self.initiator, abscissa, ordinate)
                     func.optional_print("And the attacker took the initial position of the defender!")
-                    time.sleep(2)
+                    func.optional_sleep(2)
                 
         return True
 
@@ -193,7 +193,7 @@ class MeleeAttack(ActiveActions):
         if attack_value < cfg.melee_attack_stage[0]:
             # Only block for very weak attack
             self.block()
-            time.sleep(3)
+            func.optional_sleep(3)
         elif attack_value < cfg.melee_attack_stage[1]:
             # Block or delay for weak attack
             r = random.random()
@@ -201,13 +201,13 @@ class MeleeAttack(ActiveActions):
                 self.delay(attack_value)
             else:
                 self.block()
-            time.sleep(3)
+            func.optional_sleep(3)
         elif attack_value < cfg.melee_attack_stage[2]:
             # Hit or delay for medium attack
             r = random.random()
             if r < 0.5:
                 self.delay(attack_value)
-                time.sleep(3)
+                func.optional_sleep(3)
             else:
                 func.optional_print("The attack is a normal hit", level=2)
                 self.melee_attack_received(attack_value)
@@ -216,7 +216,7 @@ class MeleeAttack(ActiveActions):
             r = random.random()
             if r < 0.5:
                 func.optional_print("The attack will hit and slightly delay the player!", level=2)
-                time.sleep(2)
+                func.optional_sleep(2)
                 self.delay(attack_value / 2)
                 self.melee_attack_received(attack_value * 3 / 4)
             else:
@@ -227,12 +227,12 @@ class MeleeAttack(ActiveActions):
             r = random.random()
             if r < 0.5:
                 func.optional_print("The attack will hit AND delay the player!", level=2)
-                time.sleep(2)
+                func.optional_sleep(2)
                 self.delay(attack_value * 2 / 3)
                 self.melee_attack_received(attack_value)
             else:
                 func.optional_print("The attack is a HUGE HIT!", level=2)
-                time.sleep(2)
+                func.optional_sleep(2)
                 self.melee_attack_received(attack_value * 3 / 2)
 
     def block(self):

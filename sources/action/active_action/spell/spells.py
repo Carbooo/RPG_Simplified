@@ -251,7 +251,7 @@ class Spells(ActiveActions):
             func.optional_print("-- has BLOCKED the attack of --", skip_line=True, level=3)
             self.initiator.print_basic()
             func.optional_print("")
-            time.sleep(4)
+            func.optional_sleep(4)
         else:
             if is_localized:
                 accuracy_ratio = self.fight.field.get_magical_accuracy(self.initiator, self.target)
@@ -317,4 +317,4 @@ class Spells(ActiveActions):
         func.optional_print("")
         func.optional_print("*********************************************************************")
         func.optional_print("")
-        time.sleep(2)
+        func.optional_sleep(2)

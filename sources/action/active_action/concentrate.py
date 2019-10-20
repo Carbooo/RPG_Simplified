@@ -56,7 +56,7 @@ class Concentrate(ActiveActions):
 
         func.optional_print("")
         func.optional_print("You have decided to increase your", self.feeling, "for", self.nb_of_turns, "turns")
-        time.sleep(3)
+        func.optional_sleep(3)
         
         self.concentration_ratio = math.pow(self.nb_of_turns, cfg.concentration_rate)
         self.initiator.nb_of_concentrate += 1

@@ -18,7 +18,7 @@ class Actions:
             read = int(read)
             if read == 0 or read == '0':
                 func.optional_print("Action cancelled!")
-                time.sleep(1)
+                func.optional_sleep(1)
                 return True
             return False
         except:

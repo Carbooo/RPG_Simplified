@@ -253,7 +253,7 @@ class CharEquipments:
                 has_lost = True
                 weapon.unload()
                 func.optional_print("Your bow has lost its loaded arrow!", level=2)
-                time.sleep(2)
+                func.optional_sleep(2)
         return has_lost
 
     ############################# TEST ON EQUIP ###########################

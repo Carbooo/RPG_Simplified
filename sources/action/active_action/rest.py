@@ -38,7 +38,7 @@ class Rest(ActiveActions):
                 func.optional_print("The input is not an integer")
 
         func.optional_print("You have decided to rest for ", self.nb_of_turns, " turn(s)")
-        time.sleep(3)
+        func.optional_sleep(3)
         
         self.resting_ratio = math.pow(self.nb_of_turns, cfg.resting_ratio)
         self.end_update(0, 1, True)

@@ -57,7 +57,7 @@ class LoveSpells(Spells):
             
         func.optional_print("You have decided to set up a shield, protecting your target against damages.")
         func.optional_print("The shield will be set up soon!")
-        time.sleep(3)
+        func.optional_sleep(3)
         
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
@@ -104,7 +104,7 @@ class LoveSpells(Spells):
         
         func.optional_print("You have decided to heal an ally")
         func.optional_print("The heal is charging...")
-        time.sleep(3)
+        func.optional_sleep(3)
         
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())

@@ -353,15 +353,15 @@ class Character:
         
         if cover_ratio == 0:
             func.optional_print("The player has no armor!", level=2)
-            time.sleep(2)
+            func.optional_sleep(2)
             return 0
         elif random.random() < avoid_armor_chances:
             func.optional_print("The hit will avoid the armor!", level=2)
-            time.sleep(2)
+            func.optional_sleep(2)
             return 0
         else:
             func.optional_print("The hit will meet a full armor part", level=2)
-            time.sleep(2)
+            func.optional_sleep(2)
             return 1
             
     def damages_received(self, enemy, attack_value, accuracy_ratio, armor_coef, damage_life_rate,
@@ -370,11 +370,11 @@ class Character:
         func.optional_print("-- has HIT --", skip_line=True, level=3)
         self.print_basic()
         func.optional_print("-- with a power of", int(round(attack_value)), level=3)
-        time.sleep(2)
+        func.optional_sleep(2)
 
         if accuracy_ratio != 0 and random.random() / accuracy_ratio < cfg.critical_hit_chance:
             func.optional_print("The damages are amplified, because they hit a critical area!", level=3)
-            time.sleep(2)
+            func.optional_sleep(2)
             attack_value *= cfg.critical_hit_boost
 
         damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, damage_life_rate,
@@ -387,7 +387,7 @@ class Character:
                 life_ratio = math.pow(2 - life_ratio, 2) - 1
                 func.optional_print("The shock of the attack delays the player of", round(life_ratio, 2),
                                     "turn(s) and consume stamina", level=3)
-                time.sleep(3)
+                func.optional_sleep(3)
                 self.spend_time(life_ratio)
                 self.spend_stamina(life_ratio * 10, ignore=True)
         

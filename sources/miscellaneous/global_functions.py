@@ -1,3 +1,5 @@
+import time as time
+
 automatic = False
 log_level = 1
 log_debug = False
@@ -22,3 +24,9 @@ def optional_print(*argv, skip_line=False, level=1, debug=False):
                 print(*argv, end=' ')
             else:
                 print(*argv)
+
+
+def optional_sleep(duration):
+    global automatic
+    if not automatic:
+        func.optional_sleep(duration)

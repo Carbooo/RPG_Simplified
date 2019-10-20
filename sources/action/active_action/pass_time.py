@@ -32,5 +32,5 @@ class PassTime(ActiveActions):
             
         self.initiator.spend_absolute_time(read * 0.1)
         func.optional_print("You have decided to wait", round(read * 0.1, 1), "turn(s)")
-        time.sleep(3)
+        func.optional_sleep(3)
         return True

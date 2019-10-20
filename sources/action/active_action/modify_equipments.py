@@ -57,7 +57,7 @@ class ModifyEquipments(ActiveActions):
         func.optional_print("You are going to unequip the following items:")
         for weapon in weapons_list:
             weapon.print_obj()
-        time.sleep(3)
+        func.optional_sleep(3)
         
         self.next_unequipment = weapons_list
         self.calculate_timelines(weapons_list)
@@ -111,7 +111,7 @@ class ModifyEquipments(ActiveActions):
         func.optional_print("You are going to equip the following weapons:")
         for weapon in weapons_list:
             weapon.print_obj()
-        time.sleep(3)
+        func.optional_sleep(3)
         
         self.next_equipment = weapons_list
         self.calculate_timelines(weapons_list)

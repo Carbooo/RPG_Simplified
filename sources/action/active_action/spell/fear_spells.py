@@ -55,7 +55,7 @@ class FearSpells(Spells):
         
         func.optional_print("You have decided to generate strong winds around you, making you harder to reach.")
         func.optional_print("The effect will start soon!")
-        time.sleep(3)
+        func.optional_sleep(3)
             
         self.target = self.initiator
         self.set_magical_coef()
@@ -94,7 +94,7 @@ class FearSpells(Spells):
         
         func.optional_print("You have decided to throw a gigantic magic fist")
         func.optional_print("The fist is forming...")
-        time.sleep(3)
+        func.optional_sleep(3)
         
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
@@ -119,7 +119,7 @@ class FearSpells(Spells):
         
         if self.spell_power["min_damage_for_moving"]:
             func.optional_print("The powerful impact with the magic fist moves you few cases back!")
-            time.sleep(2)
+            func.optional_sleep(2)
             # to be done
             
         return True

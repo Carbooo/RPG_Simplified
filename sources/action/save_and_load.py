@@ -36,7 +36,7 @@ class Save(Actions):
                     file = open(Save.save_path + self.filename + Save.save_extension, 'wb')
                     pickle.dump(self, file)
                     func.optional_print("***** GAME HAS BEEN SAVED *****")
-                    time.sleep(3)
+                    func.optional_sleep(3)
                     return True
                 except:
                     func.optional_print("Cannot open file:", self.filename)
@@ -86,6 +86,6 @@ class Load(Actions):
             if open_file:
                 self = pickle.load(file)
                 func.optional_print("***** GAME HAS BEEN LOADED *****")
-                time.sleep(3)
+                func.optional_sleep(3)
                 self.fight.start()
                 exit(0)

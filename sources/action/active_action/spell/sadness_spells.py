@@ -61,7 +61,7 @@ class SadnessSpells(Spells):
         
         func.optional_print("You have decided to send a ice pick")
         func.optional_print("The ice is forming...")
-        time.sleep(3)
+        func.optional_sleep(3)
         
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
@@ -92,7 +92,7 @@ class SadnessSpells(Spells):
         
         func.optional_print("You have decided to cast a despair ice storm")
         func.optional_print("The storm is forming...")
-        time.sleep(3)
+        func.optional_sleep(3)
         
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())

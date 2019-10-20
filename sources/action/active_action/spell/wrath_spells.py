@@ -54,7 +54,7 @@ class WrathSpells(Spells):
         
         func.optional_print("You have decided to improve your strength.")
         func.optional_print("The effect will start soon!")
-        time.sleep(3)
+        func.optional_sleep(3)
             
         self.target = self.initiator
         self.set_magical_coef()
@@ -112,7 +112,7 @@ class WrathSpells(Spells):
         
         func.optional_print("You have decided to throw a fireball")
         func.optional_print("The fireball is charging...")
-        time.sleep(3)
+        func.optional_sleep(3)
         
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())

@@ -64,9 +64,9 @@ class CharBody:
             func.optional_print("The attack has made tremendous damages", level=2)
         else:
             func.optional_print("The attack has made deadly damages!", level=2)
-        time.sleep(2)
+        func.optional_sleep(2)
         func.optional_print("The attack has made", int(round(damage)), "life damages", level=3)
-        time.sleep(2)
+        func.optional_sleep(2)
 
         self.update_life(- damage)
         return self.life / previous_life  # Used for spend_time & stamina resulting of the hit
@@ -152,7 +152,7 @@ class CharBody:
         if self.state != old:
             func.optional_print("ID:", self.character.get_id(), ", Name:", self.character.name,
                                 "state is now:", self.state, level=2)
-            time.sleep(3)
+            func.optional_sleep(3)
 
         # Stamina shape
         old = self.shape
@@ -172,7 +172,7 @@ class CharBody:
         if self.shape != old:
             func.optional_print("ID:", self.character.get_id(), ", Name:", self.character.name,
                                 "shape is now:", self.shape, level=2)
-            time.sleep(3)
+            func.optional_sleep(3)
 
         self.character.calculate_characteristic()
 

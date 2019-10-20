@@ -76,7 +76,7 @@ class Reload(ActiveActions):
 
         func.optional_print("You have decided to reload your ranged weapon")
         func.optional_print("Reload in progress...")
-        time.sleep(3)
+        func.optional_sleep(3)
         
         if isinstance(self.weapon_to_reload, Crossbows):
             stamina = self.weapon_to_reload.reload_time * cfg.actions["reload"]["stamina"] * 10

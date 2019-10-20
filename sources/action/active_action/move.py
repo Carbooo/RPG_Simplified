@@ -157,7 +157,7 @@ class Move(ActiveActions):
         func.optional_print("*********************************************************************")
         func.optional_print("")
         self.path = []
-        time.sleep(3)
+        func.optional_sleep(3)
         return False
 
     ######################## BROWSE PATH ##########################

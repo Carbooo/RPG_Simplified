@@ -54,7 +54,7 @@ class JoySpells(Spells):
         
         func.optional_print("You have decided to energize yourselves, improving your overall stats and restoring stamina.")
         func.optional_print("The effect will start soon!")
-        time.sleep(3)
+        func.optional_sleep(3)
             
         self.target = self.initiator
         self.set_magical_coef()
@@ -99,7 +99,7 @@ class JoySpells(Spells):
         
         func.optional_print("You have decided to send a burning light")
         func.optional_print("The light is charging...")
-        time.sleep(3)
+        func.optional_sleep(3)
         
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
@@ -124,7 +124,7 @@ class JoySpells(Spells):
         
         if self.target.body.is_alive() and result >= self.spell_power["min_damage_for_delay"]:
             func.optional_print("This light attack blinds you and delay your next step!")
-            time.sleep(2)
+            func.optional_sleep(2)
             self.target.spend_time(self.spell_power["delay"])
 
         return True
