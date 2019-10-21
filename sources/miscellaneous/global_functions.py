@@ -29,4 +29,4 @@ def optional_print(*argv, skip_line=False, level=1, debug=False):
 def optional_sleep(duration):
     global automatic
     if not automatic:
-        func.optional_sleep(duration)
+        time.sleep(duration)

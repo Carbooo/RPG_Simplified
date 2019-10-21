@@ -1,9 +1,9 @@
 Name,Load,Bulk,Resistance,Hand,Defense,Melee power,Melee Handiness,Damage Life Rate,Ignoring Armor Rate,Penetration Rate,Resistance Diminution Rate
-Dagger,5,1,7,1,7.5,5,15,1.75,1,10,5
-Light sword,10,2,8,1,12.5,7.5,12.5,1.5,2.5,12.5,10
-Heavy sword,15,3,9,2,15,12.5,10,1.5,5,15,15
-Light spear,10,2.5,9,1,10,7.5,7.5,1.0,2.5,20,7.5
-Light axe,10,1.5,9,1,7.5,12.5,12.5,1.5,5,20,20
-Double axe,15,3,12,2,10,17.5,7.5,1.75,7.5,30,30
+Dagger,5,1,7,1,7.5,5,15,1.75,2.5,10,5
+Light sword,10,2,8,1,12.5,7.5,12.5,1.5,5.0,12.5,10
+Heavy sword,15,3,9,2,15,12.5,10,1.5,7.5,15,15
+Light spear,10,2.5,9,1,10,7.5,7.5,1.0,7.5,20,7.5
+Light axe,10,1.5,9,1,7.5,12.5,12.5,1.5,7.5,20,20
+Double axe,15,3,12,2,10,17.5,7.5,1.75,10.0,30,30
 Light mace,12.5,1.5,10,1,5,15,7.5,0.5,65,7.5,35
 Heavy mace,17.5,2.5,14,2,2.5,20,5,0.5,75,7.5,45
