@@ -233,7 +233,7 @@ class Spells(ActiveActions):
 
         return char_list
 
-    def magical_attack_received(self, attack_value, is_localized, can_use_shield, damage_life_rate,
+    def magical_attack_received(self, attack_value, is_localized, can_use_shield, life_rate,
                                 ignoring_armor_rate, pen_rate, resis_dim_rate):
         if self.target != self.initiator:
             self.fight.stop_action(self.target, self.initiator.timeline)
@@ -256,14 +256,14 @@ class Spells(ActiveActions):
             if is_localized:
                 accuracy_ratio = self.fight.field.get_magical_accuracy(self.initiator, self.target)
                 armor_coef = self.target.get_armor_coef(accuracy_ratio)
-                attack_value = self.target.damages_received(self.initiator, attack_value, accuracy_ratio, armor_coef,
-                                                            damage_life_rate, ignoring_armor_rate, pen_rate,
+                attack_value = self.target.damages_received(self.initiator, attack_value, armor_coef, 1.0,
+                                                            life_rate, ignoring_armor_rate, pen_rate,
                                                             resis_dim_rate)
             else:
                 # Non localized attack cannot avoid armor (use cover ratio instead) or do critical hit
-                attack_value = self.target.damages_received(self.initiator, attack_value, 0,
-                                                           self.target.equipments.get_armor_cover_ratio(),
-                                                            damage_life_rate, ignoring_armor_rate, pen_rate,
+                attack_value = self.target.damages_received(self.initiator, attack_value,
+                                                            self.target.equipments.get_armor_cover_ratio(), 1.0,
+                                                            life_rate, ignoring_armor_rate, pen_rate,
                                                             resis_dim_rate)
 
         self.target.previous_attacks.append((self.initiator.timeline, self))

@@ -174,12 +174,12 @@ class RangedAttack(ActiveActions):
                        * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
         attack_result = attack_power - defense_level
         range_power = self.get_range_power() * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
-        life_rate_ratio = attack_result / defense_level
+        damages_ratio = attack_result / defense_level
         func.optional_print("attack_power", attack_power, level=3, debug=True)
         func.optional_print("defense_level", defense_level, level=3, debug=True)
         func.optional_print("attack_result", attack_result, level=3, debug=True)
         func.optional_print("range_power", range_power, level=3, debug=True)
-        func.optional_print("life_rate_ratio", life_rate_ratio, level=3, debug=True)
+        func.optional_print("damages_ratio", damages_ratio, level=3, debug=True)
 
         # Update availability after computed the result
         self.target.previous_attacks.append((self.initiator.timeline, self))
@@ -191,9 +191,8 @@ class RangedAttack(ActiveActions):
             func.optional_sleep(5)
         else:
             armor_coef = self.target.get_armor_coef(accuracy_ratio)
-            self.target.damages_received(self.initiator, range_power, accuracy_ratio, armor_coef,
-                                         self.ammo_used.damage_life_rate * life_rate_ratio,
-                                         self.ammo_used.ignoring_armor_rate,
+            self.target.damages_received(self.initiator, range_power, armor_coef, damages_ratio,
+                                         self.ammo_used.life_rate, self.ammo_used.ignoring_armor_rate,
                                          self.ammo_used.pen_rate, self.ammo_used.resis_dim_rate)
 
     def shoot_hit_chance(self):

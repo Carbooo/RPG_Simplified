@@ -350,13 +350,14 @@ class Character:
     def get_armor_coef(self, accuracy_ratio):
         cover_ratio = self.equipments.get_armor_cover_ratio()
         avoid_armor_chances = (1 - random.gauss(1, cfg.high_variance) * cover_ratio) * accuracy_ratio
+        func.optional_print("avoid_armor_chances", avoid_armor_chances, level=3, debug=True)
         
         if cover_ratio == 0:
             func.optional_print("The player has no armor!", level=2)
             func.optional_sleep(2)
             return 0
         elif random.random() < avoid_armor_chances:
-            func.optional_print("The hit will avoid the armor!", level=2)
+            func.optional_print("The hit will avoid the armor!", level=3)
             func.optional_sleep(2)
             return 0
         else:
@@ -364,7 +365,7 @@ class Character:
             func.optional_sleep(2)
             return 1
             
-    def damages_received(self, enemy, attack_value, accuracy_ratio, armor_coef, damage_life_rate,
+    def damages_received(self, enemy, attack_value, armor_coef, damages_coef, life_rate,
                          ignoring_armor_rate, pen_rate, resis_dim_rate):
         enemy.print_basic()
         func.optional_print("-- has HIT --", skip_line=True, level=3)
@@ -372,12 +373,7 @@ class Character:
         func.optional_print("-- with a power of", int(round(attack_value)), level=3)
         func.optional_sleep(2)
 
-        if accuracy_ratio != 0 and random.random() / accuracy_ratio < cfg.critical_hit_chance:
-            func.optional_print("The damages are amplified, because they hit a critical area!", level=3)
-            func.optional_sleep(2)
-            attack_value *= cfg.critical_hit_boost
-
-        damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, damage_life_rate,
+        damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, damages_coef, life_rate,
                                                               ignoring_armor_rate, pen_rate, resis_dim_rate)
         
         if damage_result > 0:

@@ -136,7 +136,7 @@ class WrathSpells(Spells):
                 attack_value * distance_ratio,
                 False,  # is_localized
                 True,  # can_use_shield
-                self.spell_power["damage_life_rate"],
+                self.spell_power["life_rate"],
                 self.spell_power["ignoring_armor_rate"],
                 self.spell_power["pen_rate"],
                 self.spell_power["resis_dim_rate"]
