@@ -3,7 +3,10 @@ import time as time
 automatic = False
 log_level = 1
 log_debug = False
-actions = []
+current_char = None
+actions = {}
+action0 = []
+action1 = []
 
 
 def optional_input(txt):
@@ -11,8 +14,10 @@ def optional_input(txt):
     if not automatic:
         return input(txt)
     else:
+        global current_char
         global actions
-        return actions.pop(0)
+        action = actions[current_char.name].pop(0)
+        return action
 
 
 def optional_print(*argv, skip_line=False, level=1, debug=False):

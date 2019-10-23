@@ -1,6 +1,5 @@
 import copy as copy
 import random as random
-import time as time
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
 from sources.character.character import Character
@@ -92,6 +91,8 @@ class Fight:
                 next_event.execute()
                 
             elif isinstance(next_event, Character):
+                func.current_char = next_event  # Used for automatic tests
+
                 if isinstance(next_event.last_action, Move) \
                 or isinstance(next_event.last_action, RangedAttack) \
                 or (isinstance(next_event.last_action, Rest) and next_event.last_action.nb_of_turns > 0) \

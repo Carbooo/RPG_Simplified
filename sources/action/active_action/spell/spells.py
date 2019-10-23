@@ -36,7 +36,7 @@ class Spells(ActiveActions):
     def execute(self):
         self.initiator.last_action = None  # To avoid looping on the spell
 
-    def end(self, is_canceled):
+    def end(self, is_canceled=False):
         pass  # Only for inheritance
 
     def set_magical_coef(self):
