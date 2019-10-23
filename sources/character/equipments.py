@@ -80,7 +80,7 @@ class Armors(Equipments):
     def __init__(self, name, load, bulk, resistance, def_cover):
         super().__init__(name, load, bulk, resistance)
         self.type = "Armor"
-        self.original_def_cover = float(def_cover)
+        self.original_def_cover = float(def_cover) / 10.0
         self.def_cover = self.original_def_cover
         self.original_defense = self.resistance * cfg.armor_resis_def_ratio
         self.defense = self.original_defense
@@ -98,14 +98,14 @@ class Armors(Equipments):
     def cover_ratio(self):
         return self.def_cover / 10.0
 
-    def damage_absorbed(self, damages, armor_coef, damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
+    def damage_absorbed(self, damages, armor_coef, damages_coef, life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
         pen_damages = damages * pen_rate
         defense_value = self.defense * armor_coef
         remaining_damages_ratio = max(0, (1 - defense_value / pen_damages))
-        direct_life_damages = damages * remaining_damages_ratio * damage_life_rate
+        direct_life_damages = damages * remaining_damages_ratio * life_rate
         ignoring_armor_damages = damages * (1 - remaining_damages_ratio) * ignoring_armor_rate * (1 - pen_rate)
         absorbed_damages = damages * (1 - remaining_damages_ratio) - ignoring_armor_damages
-        total_damages = direct_life_damages + ignoring_armor_damages
+        total_damages = (direct_life_damages + ignoring_armor_damages) * damages_coef
 
         func.optional_print("pen_damages", pen_damages, level=3, debug=True)
         func.optional_print("defense_value", defense_value, level=3, debug=True)
@@ -133,10 +133,10 @@ class MagicalArmors(Armors):
         super().__init__(name, 0.0, 0.0, resistance, 10.0)
         self.type = "MagicalArmor"
         
-    def damage_absorbed(self, damage, armor_coef, damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
+    def damage_absorbed(self, damages, armor_coef, damages_coef, life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
         # Same parameters as parent for consistency
-        ratio, damage_result = super().damage_absorbed(damage, 1, 0, 0, 1, 0)
-        ratio = self.decrease(damage)
+        ratio, damage_result = super().damage_absorbed(damages, 1, 1, 0, 0, 1, 0)
+        ratio = self.decrease(damages)
         return ratio, damage_result
     
     def decrease(self, damage):
@@ -155,11 +155,11 @@ class Ammo(Equipments):
     """Common sub class of equipments for all ammo"""
     
     def __init__(self, name, load, bulk, resistance, ranged_weapon_type,
-                 damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
+                 life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
         super().__init__(name, load, bulk, resistance)
         self.type = "Arrow"
-        self.original_damage_life_rate = float(damage_life_rate)
-        self.damage_life_rate = self.original_damage_life_rate
+        self.original_life_rate = float(life_rate)
+        self.life_rate = self.original_life_rate
         self.original_ignoring_armor_rate = float(ignoring_armor_rate) / 100.0
         self.ignoring_armor_rate = self.original_ignoring_armor_rate
         self.original_pen_rate = float(pen_rate) / 100.0
@@ -174,14 +174,14 @@ class Ammo(Equipments):
 
     def print_obj(self):
         super().print_obj()
-        func.optional_print(", Damage life rate:", round(self.damage_life_rate, 2),
+        func.optional_print(", Damage life rate:", round(self.life_rate, 2),
                             ", Ignoring armor rate:", round(self.ignoring_armor_rate, 2),
                             ", Penetration rate:", round(self.pen_rate, 2),
                             ", Resistance dim rate:", round(self.resis_dim_rate, 2))
 
     def decrease(self, damage):
         ratio = super().decrease(self, damage)
-        self.damage_life_rate = self.original_damage_life_rate * math.pow(ratio, 1.0/2)
+        self.life_rate = self.original_life_rate * math.pow(ratio, 1.0/2)
         self.ignoring_armor_rate = self.original_ignoring_armor_rate * math.pow(ratio, 1.0 / 2)
         self.pen_rate = self.original_pen_rate * math.pow(ratio, 1.0/2)
         self.resis_dim_rate = self.original_resis_dim_rate * math.pow(ratio, 1.0/2)
@@ -195,7 +195,7 @@ class Weapons(Equipments):
     """Common sub class of equipments for all weapons"""
 
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                 damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
+                 life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
         super().__init__(name, load, bulk, resistance)
         self.hand = hand
         self.original_defense = float(defense)
@@ -204,8 +204,8 @@ class Weapons(Equipments):
         self.melee_power = self.original_melee_power
         self.original_melee_handiness = float(melee_handiness)
         self.melee_handiness = self.original_melee_handiness
-        self.original_damage_life_rate = float(damage_life_rate)
-        self.damage_life_rate = self.original_damage_life_rate
+        self.original_life_rate = float(life_rate)
+        self.life_rate = self.original_life_rate
         self.original_ignoring_armor_rate = float(ignoring_armor_rate) / 100.0
         self.ignoring_armor_rate = self.original_ignoring_armor_rate
         self.original_pen_rate = float(pen_rate) / 100.0
@@ -223,7 +223,7 @@ class Weapons(Equipments):
                             ", Defense:", round(self.defense, 1),
                             ", Melee power:", round(self.melee_power, 1),
                             ", Melee handiness:", round(self.melee_handiness, 1),
-                            ", Damage life rate:", round(self.damage_life_rate, 2),
+                            ", Damage life rate:", round(self.life_rate, 2),
                             ", Ignoring armor rate:", round(self.ignoring_armor_rate, 2),
                             ", Penetration rate:", round(self.pen_rate, 2),
                             ", Resistance dim. rate:", round(self.resis_dim_rate, 2), skip_line=True)
@@ -233,7 +233,7 @@ class Weapons(Equipments):
         self.defense = self.original_defense * math.pow(ratio, 1.0/3)
         self.melee_power = self.original_melee_power * math.pow(ratio, 1.0/3)
         self.melee_handiness = self.original_melee_handiness * math.pow(ratio, 1.0/4)
-        self.damage_life_rate = self.original_damage_life_rate * math.pow(ratio, 1.0/4)
+        self.life_rate = self.original_life_rate * math.pow(ratio, 1.0/4)
         self.ignoring_armor_rate = self.original_ignoring_armor_rate * math.pow(ratio, 1.0/4)
         self.pen_rate = self.original_pen_rate * math.pow(ratio, 1.0/4)
         self.resis_dim_rate = self.original_resis_dim_rate * math.pow(ratio, 1.0/4)
@@ -247,9 +247,9 @@ class Shields(Weapons):
     """Common sub class of weapons for all shields"""
     
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                 damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
+                 life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
         super().__init__(name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                 damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate)
+                 life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate)
         self.type = "Shield"
         
     def print_obj(self):
@@ -290,9 +290,9 @@ class AttackWeapons(Weapons):
     """Common sub class of weapons for all attack weapons"""
     
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                 damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
+                 life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
         super().__init__(name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                         damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate)
+                         life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate)
         self.ranged_defend_ratio = 0.0
         self.magic_defend_ratio = 0.0
         
@@ -311,9 +311,9 @@ class MeleeWeapons(AttackWeapons):
     """Common sub class of attack weapons for all melee weapons"""
 
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                 damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
+                 life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
         super().__init__(name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                         damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate)
+                         life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate)
         self.type = "MeleeWeapon"
 
     def print_obj(self):
@@ -333,10 +333,10 @@ class RangedWeapons(AttackWeapons):
     """Common sub class of attack weapons for all ranged weapons"""
     
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                 damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate,
+                 life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate,
                  range_power, accuracy, reload_time):
         super().__init__(name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                         damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate)
+                         life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate)
         self.type = "RangedWeapon"
         self.original_range_power = float(range_power)
         self.range_power = self.original_range_power
@@ -352,7 +352,7 @@ class RangedWeapons(AttackWeapons):
                             ", Ammo:", skip_line=True)
         if self.current_ammo:
             func.optional_print(self.current_ammo.name,
-                                ", DamageLifeRate:", round(self.damage_life_rate, 2),
+                                ", DamageLifeRate:", round(self.life_rate, 2),
                                 ", IgnoringArmorRate:", round(self.ignoring_armor_rate, 2),
                                 ", PenetrationRate:", round(self.pen_rate, 2),
                                 ", ResistanceDimRate:", round(self.resis_dim_rate, 2))
@@ -399,10 +399,10 @@ class Bows(RangedWeapons):
     """Common sub class for bows"""
 
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                 damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate,
+                 life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate,
                  range_power, accuracy, reload_time):
         super().__init__(name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                         damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate,
+                         life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate,
                          range_power, accuracy, reload_time)
         self.type = "Bow"
 
@@ -414,9 +414,9 @@ class Crossbows(RangedWeapons):
     """Common sub class of attack weapons for all ranged weapons"""
 
     def __init__(self, name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                 damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate,
+                 life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate,
                  range_power, accuracy, reload_time):
         super().__init__(name, load, bulk, resistance, hand, defense, melee_power, melee_handiness,
-                         damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate,
+                         life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate,
                          range_power, accuracy, reload_time)
         self.type = "Crossbow"

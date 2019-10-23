@@ -78,7 +78,7 @@ class SadnessSpells(Spells):
             attack_value,
             True,  # is_localized
             True,  # can_use_shield
-            self.spell_power["damage_life_rate"],
+            self.spell_power["life_rate"],
             self.spell_power["ignoring_armor_rate"],
             self.spell_power["pen_rate"],
             self.spell_power["resis_dim_rate"]

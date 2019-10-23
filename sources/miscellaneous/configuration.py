@@ -24,13 +24,11 @@ use_bulk_mean = 3.5  # Weapons use bulk reference for characters
 max_bonus = 1.5  # Max load and bulk bonus
 min_speed = 1.0 / 6.0  # Minimum speed for char (necessary for hurt char)
 accuracy_mean = 100.0  # Accuracy reference for characters
-critical_hit_chance = 0.083  # Chances to hit the head or other key areas (1 / 12)
-critical_hit_boost = 6.0  # Coef boost when doing a critical hit
 max_magic_distance = 100.0  # Around 200 meters
 free_hand_melee_defense = 0.75  # Melee defense for each free hand
 free_hand_melee_handiness = 7.5  # Melee handiness for each free hand
 free_hand_melee_power = 0.75  # Melee power for each free hand
-free_hand_damage_life_rate = 1.0  # extra life damages of hits with free hands
+free_hand_life_rate = 1.0  # extra life damages of hits with free hands
 free_hand_ignoring_armor_rate = 0.1  # ignoring armor rate of hits with free hands
 free_hand_pen_rate = 0.05  # Penetration of hits with free hands
 free_hand_resis_dim_rate = 0.01  # Armor diminution of hits with free hands
@@ -224,7 +222,7 @@ wrath_spells_power = {
     "FBL": {
         "attack_value": 50.0,
         "spread_distance": 1,
-        "damage_life_rate": 1.5,
+        "life_rate": 1.5,
         "ignoring_armor_rate": 0.15,
         "pen_rate": 0.1,
         "resis_dim_rate": 0.5
@@ -277,7 +275,7 @@ joy_spells_power = {
     },
     "LGT": {
         "attack_value": 20.0,
-        "damage_life_rate": 1.25,
+        "life_rate": 1.25,
         "ignoring_armor_rate": 0.0,
         "pen_rate": 0.2,
         "resis_dim_rate": 0.33,
@@ -375,7 +373,7 @@ sadness_spells_knowledge = {
 sadness_spells_power = {
     "IPK": {
         "attack_value": 50.0,
-        "damage_life_rate": 1.5,
+        "life_rate": 1.5,
         "ignoring_armor_rate": 0.1,
         "pen_rate": 0.3,
         "resis_dim_rate": 0.2
@@ -435,7 +433,7 @@ fear_spells_power = {
     },
     "MFI": {
         "attack_value": 27.5,
-        "damage_life_rate": 1.0,
+        "life_rate": 1.0,
         "ignoring_armor_rate": 0.85,
         "pen_rate": 0.05,
         "resis_dim_rate": 0.25,

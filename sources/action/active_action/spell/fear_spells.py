@@ -111,7 +111,7 @@ class FearSpells(Spells):
             attack_value,
             False,  # is_localized
             False,  # can_use_shield
-            self.spell_power["damage_life_rate"],
+            self.spell_power["life_rate"],
             self.spell_power["ignoring_armor_rate"],
             self.spell_power["pen_rate"],
             self.spell_power["resis_dim_rate"]

@@ -133,12 +133,13 @@ class CharEquipments:
         else:
             return self.armors[0].def_cover
 
-    def armor_damage_absorbed(self, damage, armor_coef, damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
-        damage_result = damage
+    def armor_damage_absorbed(self, damages, armor_coef, damages_coef, life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate):
+        damage_result = damages
         armors = self.armors.copy()
         for armor in armors:
             if damage_result > 0:
-                result = armor.damage_absorbed(damage_result, armor_coef, damage_life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate)
+                result = armor.damage_absorbed(damage_result, armor_coef, damages_coef, life_rate,
+                                               ignoring_armor_rate, pen_rate, resis_dim_rate)
                 damage_result = result[1]
                 if result[0] == 0:
                     func.optional_print("Your armor \\ID:", armor.get_id(), "\\Name:", armor.name, "has been broken!", level=3)
@@ -410,7 +411,7 @@ class CharEquipments:
                 func.optional_print(", Reloaded: No")
             else:
                 func.optional_print(", Reloaded: Yes",
-                                    ", DamageLifeRate:", round(weapon.current_ammo.damage_life_rate, 2),
+                                    ", DamageLifeRate:", round(weapon.current_ammo.life_rate, 2),
                                     ", IgnoringArmorRate:", round(weapon.current_ammo.ignoring_armor_rate, 2),
                                     ", PenetrationRate:", round(weapon.current_ammo.pen_rate, 2))
 
@@ -419,7 +420,7 @@ class CharEquipments:
                                 ", Defense:", round(weapon.defense, 1),
                                 ", MeleePower:", round(weapon.melee_power, 1),
                                 ", MeleeHandiness:", round(weapon.melee_handiness, 1),
-                                ", DamageLifeRate:", round(weapon.damage_life_rate, 2),
+                                ", DamageLifeRate:", round(weapon.life_rate, 2),
                                 ", IgnoringArmorRate:", round(weapon.ignoring_armor_rate, 2),
                                 ", PenetrationRate:", round(weapon.pen_rate, 2))
 
