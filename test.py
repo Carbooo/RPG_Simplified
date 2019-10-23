@@ -53,14 +53,21 @@ def test_melee_vs_ranged1():  # Small shield vs bow
     func.log_level = 3
     func.automatic = True
     func.log_debug = True
-    func.actions = ["EQP", 244, "EQP", 27, 28,
-                    "MOV", 0, 0, "MOV", 11, 5,
-                    "REL", "PAS", 100, "REL", "RAT", 2,
-                    "REL", "PAS", 100, "REL", "RAT", 2,
-                    "REL", "PAS", 100, "REL", "RAT", 2,
-                    "REL", "PAS", 100, "REL", "RAT", 2,
-                    "REL", "PAS", 100, "REL", "RAT", 2
+    func.action0 = ["EQP", 244, "MOV", 0, 0,
+                    "REL", "RAT", 2,
+                    "REL", "RAT", 2,
+                    "REL", "RAT", 2,
+                    "REL", "RAT", 2,
+                    "REL", "RAT", 2
                     ]
+    func.action1 = ["EQP", 27, 28, "MOV", 11, 5,
+                    "PAS", 100, "PAS", 100,
+                    "PAS", 100, "PAS", 100,
+                    "PAS", 100, "PAS", 100,
+                    "PAS", 100, "PAS", 100,
+                    "PAS", 100, "PAS", 100
+                    ]
+    func.actions = {"r1": func.action0, "a1": func.action1}
     Fight(cfg.field_list[0], cfg.team_list[11], cfg.team_list[15])
 
 
@@ -102,4 +109,4 @@ def test_magic():
     Fight(cfg.field_list[0], cfg.team_list[16], cfg.team_list[17])
 
 
-test_melee1()
+test_melee_vs_ranged1()

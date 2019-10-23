@@ -367,11 +367,28 @@ class Character:
             
     def damages_received(self, enemy, attack_value, armor_coef, damages_coef, life_rate,
                          ignoring_armor_rate, pen_rate, resis_dim_rate):
+        if damages_coef < 0.25:
+            area_type = "non threatening"
+        elif damages_coef <= 0.5:
+            area_type = "barely threatening"
+        elif damages_coef <= 0.75:
+            area_type = "little threatening"
+        elif damages_coef <= 1.25:
+            area_type = "moderately threatening"
+        elif damages_coef <= 2.0:
+            area_type = "quite threatening"
+        elif damages_coef <= 3.0:
+            area_type = "very threatening"
+        else:
+            area_type = "highly threatening"
         enemy.print_basic()
         func.optional_print("-- has HIT --", skip_line=True, level=3)
         self.print_basic()
-        func.optional_print("-- with a power of", int(round(attack_value)), level=3)
+        func.optional_print("-- with a power of", int(round(attack_value)), skip_line=True, level=3)
+        func.optional_print("-- on a", area_type, "area", level=3)
         func.optional_sleep(2)
+
+
 
         damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, damages_coef, life_rate,
                                                               ignoring_armor_rate, pen_rate, resis_dim_rate)
