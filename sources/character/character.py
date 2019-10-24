@@ -388,10 +388,7 @@ class Character:
         func.optional_print("-- on a", area_type, "area", level=3)
         func.optional_sleep(2)
 
-
-
-        damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, damages_coef, life_rate,
-                                                              ignoring_armor_rate, pen_rate, resis_dim_rate)
+        damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef,             damages_coef, life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate)
         
         if damage_result > 0:
             life_ratio = self.body.loose_life(damage_result)
@@ -453,7 +450,17 @@ class Character:
             angle = 2 * math.pi - angle
 
         return angle
+        
+    def get_next_pos_from_add_distance(self, enemy, distance):  # Used to move back a char
+        # Calculate angle between enemy and abscissa axis
+        c = copy.copy(self)  # Is used for abscissa axis
+        c.abscissa += 1
+        angle = self.calculate_point_to_enemy_path_angle(c, enemy.abscissa, enemy.ordinate)
 
+        new_abscissa = enemy.abscissa + int(round(distance * math.cos(angle)))
+        new_ordinate = enemy.ordinate + int(round(distance * math.sin(angle)))
+        return {"new_abscissa": new_abscissa, "new_ordinate": new_ordinate}
+        
     def set_target_pos_variation(self, enemy, variation):
         # Calculate angle between enemy and abscissa axis
         c = copy.copy(self)  # Is used for abscissa axis

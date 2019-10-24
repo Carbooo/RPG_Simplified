@@ -117,9 +117,15 @@ class FearSpells(Spells):
             self.spell_power["resis_dim_rate"]
         )
         
-        if self.spell_power["min_damage_for_moving"]:
-            func.optional_print("The powerful impact with the magic fist moves you few cases back!")
-            func.optional_sleep(2)
-            # to be done
+        func.optional_print("The powerful impact of the magic fist moves you back!")
+        func.optional_sleep(2)
+        knockback = self.fight.field.get_next_possible_pos_from_max_distance(
+                    self.initiator, self.target, round(result))
+        self.fight.field.move_character(self.target, knockback["new_abscissa"], knockback["new_ordinate"])
+        
+        if knockback["obstacle_reached"]:
+            pass # to update
+        elif knockback["other_char_reached"]:
+            pass # to be done
             
         return True

@@ -217,6 +217,32 @@ class Field:
                     return self.characters_array[c_abs, c_ord]
         return False
 
+    def get_next_possible_pos_from_max_distance(self, attacker, target, distance):  # Used to knock back a char
+        obstacle_reached = False
+        other_char_reached = False
+        new_abscissa = target.abscissa
+        new_ordinate = target.ordinate
+        
+        for i in range(1, max_distance + 1):
+            coord = attacker.get_next_pos_from_add_distance(target, i)
+            if not self.is_case_obstacle_free(coord["new_abscissa"], coord["new_ordinate"]):
+                obstacle_reached = True
+                break
+            elif not self.is_case_character_free(coord["new_abscissa"], coord["new_ordinate"]) and
+            target != self.get_character_from_pos(coord["new_abscissa"], coord["new_ordinate"]):
+                other_char_reached = True
+                break
+            else:
+                new_abscissa = coord["new_abscissa"]
+                new_ordinate = coord["new_ordinate"]
+        
+        return {
+            "new_abscissa": new_abscissa, 
+            "new_ordinate": new_ordinate,
+            "obstacle_reached": obstacle_reached,
+            "other_char_reached": other_char_reached
+        }
+
     ###################### SET AND MOVE FUNCTIONS #####################
     def remove_dead_char(self, character):
         if character.body.state == "Dead" and \
