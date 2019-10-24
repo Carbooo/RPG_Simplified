@@ -103,10 +103,10 @@ class MeleeAttack(ActiveActions):
         func.optional_print(")")
         func.optional_print("Initiator fighting availability:", round(
                             self.initiator.get_fighting_availability(self.real_end_timeline), 2),
-                            level=2)
+                            level=3)
         func.optional_print("Target fighting availability:", round(
                             self.target.get_fighting_availability(self.real_end_timeline), 2),
-                            level=2)
+                            level=3)
         func.optional_print("*********************************************************************")
         func.optional_print("")
         func.optional_sleep(3)
@@ -154,13 +154,13 @@ class MeleeAttack(ActiveActions):
         defense_result = attack_power - self.target.melee_defense
         if not self.target.check_stamina(cfg.actions["melee_attack"]["stamina"]):
             func.optional_print("The defender does not have enough stamina (", round(self.target.body.stamina, 2),
-                                ") to defend")
+                                ") to defend", level=3)
             self.actual_defense = "No defense"
         elif dodge_result < defense_result:
-            func.optional_print("The defender is trying to dodge the attack.", level=2)
+            func.optional_print("The defender is trying to dodge the attack.", level=3)
             self.actual_defense = "Dodge"
         else:
-            func.optional_print("The defender is trying to block the attack.", level=2)
+            func.optional_print("The defender is trying to block the attack.", level=3)
             self.actual_defense = "Defense"
 
         # Calculate real defense
@@ -201,7 +201,7 @@ class MeleeAttack(ActiveActions):
                 self.delay(attack_value)
             else:
                 func.optional_print("The attack is a small hit", level=3)
-                self.melee_attack_received(attack_value, 0.5)
+                self.melee_attack_received(attack_value, 0.49)
             func.optional_sleep(3)
         elif attack_value < cfg.melee_attack_stage[2]:
             # Big delay or normal hit for medium attack
@@ -218,37 +218,37 @@ class MeleeAttack(ActiveActions):
             if r < 0.33:
                 func.optional_print("The attack will hit and slightly delay the player!", level=3)
                 func.optional_sleep(2)
-                self.delay(attack_value / 2)
-                self.melee_attack_received(attack_value, 1.0)
+                self.delay(attack_value / 3)
+                self.melee_attack_received(attack_value, 1.24)
             elif r < 0.66:
                 func.optional_print("The attack is a strong hit!", level=3)
-                self.melee_attack_received(attack_value, 2.0)
+                self.melee_attack_received(attack_value, 1.99)
         else:
             # Gigantic hit or big hit + delay for massive attack
             r = random.random()
             if r < 0.5:
                 func.optional_print("The attack will hit AND delay the player!", level=3)
                 func.optional_sleep(2)
-                self.delay(attack_value * 2 / 3)
-                self.melee_attack_received(attack_value, 2.0)
+                self.delay(attack_value / 2)
+                self.melee_attack_received(attack_value, 2.99)
             else:
                 func.optional_print("The attack is a HUGE HIT!", level=3)
                 func.optional_sleep(2)
-                self.melee_attack_received(attack_value, 4.0)
+                self.melee_attack_received(attack_value, 5.0)
 
     def block(self):
-        self.target.print_basic()
+        self.target.print_basic(level=3)
         func.optional_print("-- has SUCCESSFULLY DEFENDED against the attack of --", skip_line=True, level=3)
-        self.initiator.print_basic()
-        func.optional_print("")
+        self.initiator.print_basic(level=3)
+        func.optional_print("", level=3)
 
     def delay(self, attack_value):
         attack_value /= cfg.melee_attack_stage[3] / 2
         attack_value = math.sqrt(attack_value)
         self.target.spend_time(attack_value)
-        self.initiator.print_basic()
+        self.initiator.print_basic(level=3)
         func.optional_print("-- has DELAYED --", skip_line=True, level=3)
-        self.target.print_basic()
+        self.target.print_basic(level=3)
         func.optional_print("-- of", round(attack_value, 2), "TURN(S) --", level=3)
     
     def melee_attack_received(self, attack_value, damages_coef):
@@ -280,8 +280,8 @@ class MeleeAttack(ActiveActions):
             weapon_name = "his/her free hand"
         else:
             weapon_name = hitting_weapon.name
-        self.initiator.print_basic()
-        func.optional_print("-- is hitting with --", weapon_name.upper(), level=2)
+        self.initiator.print_basic(level=3)
+        func.optional_print("-- is hitting with --", weapon_name.upper(), level=3)
 
         ### Calculate weapon stats ###
         if hitting_weapon == "free_hand":

@@ -23,13 +23,21 @@ def test_melee1():  # Big def vs Big attack
     func.log_level = 3
     func.automatic = True
     func.log_debug = True
-    func.actions = ["EQP", 317, "EQP", 314, 315, "PAS", 5,
-                    "MAT", 23, "MAT", 24,
-                    "MAT", 23, "MAT", 24,
-                    "MAT", 23, "MAT", 24,
-                    "MAT", 23, "MAT", 24,
-                    "MAT", 23, "MAT", 24
+    func.action0 = ["EQP", 314, 315, "PAS", 1,
+                    "MAT", 24, "MAT", 24,
+                    "MAT", 24, "MAT", 24,
+                    "MAT", 24, "MAT", 24,
+                    "MAT", 24, "MAT", 24,
+                    "MAT", 24, "MAT", 24
                     ]
+    func.action1 = ["EQP", 317, "PAS", 4,
+                    "MAT", 23, "MAT", 23,
+                    "MAT", 23, "MAT", 23,
+                    "MAT", 23, "MAT", 23,
+                    "MAT", 23, "MAT", 23,
+                    "MAT", 23, "MAT", 23
+                    ]
+    func.actions = {"t0": func.action0, "t1": func.action1}
     Fight(cfg.field_list[0], cfg.team_list[8], cfg.team_list[9])
 
 
@@ -109,4 +117,4 @@ def test_magic():
     Fight(cfg.field_list[0], cfg.team_list[16], cfg.team_list[17])
 
 
-test_melee_vs_ranged1()
+test_melee1()

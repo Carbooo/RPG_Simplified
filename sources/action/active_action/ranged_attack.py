@@ -1,6 +1,6 @@
 import copy as copy
 import math as math
-import time as time
+import random as random
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
 from sources.action.action import Actions
@@ -173,7 +173,7 @@ class RangedAttack(ActiveActions):
         defense_level = self.target.ranged_defense * self.range_defense_ratio() \
                        * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
         attack_result = attack_power - defense_level
-        range_power = self.get_range_power() * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
+        range_power = self.get_range_power() * random.gauss(1, cfg.variance)
         damages_ratio = attack_result / defense_level
         func.optional_print("attack_power", attack_power, level=3, debug=True)
         func.optional_print("defense_level", defense_level, level=3, debug=True)
@@ -190,8 +190,7 @@ class RangedAttack(ActiveActions):
             func.optional_print("The attack has been fully blocked / avoided by the defender", level=3)
             func.optional_sleep(5)
         else:
-            armor_coef = self.target.get_armor_coef(accuracy_ratio)
-            self.target.damages_received(self.initiator, range_power, armor_coef, damages_ratio,
+            self.target.damages_received(self.initiator, range_power, 1.0, damages_ratio,
                                          self.ammo_used.life_rate, self.ammo_used.ignoring_armor_rate,
                                          self.ammo_used.pen_rate, self.ammo_used.resis_dim_rate)
 

@@ -381,14 +381,15 @@ class Character:
             area_type = "very threatening"
         else:
             area_type = "highly threatening"
-        enemy.print_basic()
+        enemy.print_basic(level=3)
         func.optional_print("-- has HIT --", skip_line=True, level=3)
-        self.print_basic()
+        self.print_basic(level=3)
         func.optional_print("-- with a power of", int(round(attack_value)), skip_line=True, level=3)
         func.optional_print("-- on a", area_type, "area", level=3)
         func.optional_sleep(2)
 
-        damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef,             damages_coef, life_rate, ignoring_armor_rate, pen_rate, resis_dim_rate)
+        damage_result = self.equipments.armor_damage_absorbed(attack_value, armor_coef, damages_coef, life_rate,
+                                                              ignoring_armor_rate, pen_rate, resis_dim_rate)
         
         if damage_result > 0:
             life_ratio = self.body.loose_life(damage_result)
@@ -473,8 +474,8 @@ class Character:
         enemy.ordinate += int(round(self.equipments.get_range() * math.sin(angle)))
 
 ##################### PRINTING FUNCTIONS ########################
-    def print_basic(self):
-        func.optional_print("ID:", self.get_id(), ", Name:", self.name, skip_line=True)
+    def print_basic(self, level=1):
+        func.optional_print("ID:", self.get_id(), ", Name:", self.name, skip_line=True, level=level)
 
     def print_characteristics(self):
         func.optional_print("-- CHARACTERISTICS --", skip_line=True)
