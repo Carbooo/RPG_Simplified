@@ -120,12 +120,22 @@ class FearSpells(Spells):
         func.optional_print("The powerful impact of the magic fist moves you back!")
         func.optional_sleep(2)
         knockback = self.fight.field.get_next_possible_pos_from_max_distance(
-                    self.initiator, self.target, round(result))
+                    self.initiator, self.target, 
+                    round(result / self.spell_power["moving_back_ratio"]))
         self.fight.field.move_character(self.target, knockback["new_abscissa"], knockback["new_ordinate"])
         
         if knockback["obstacle_reached"]:
-            pass # to update
-        elif knockback["other_char_reached"]:
-            pass # to be done
+            func.optional_print("During your fall back, you hit an obstacle and get extra damages!")
+            func.optional_sleep(2)
+            self.target.body.loose_life(result / self.spell_power["obstacle_hit_ratio"])
+            
+        elif knockback["other_char"] is not None:
+            func.optional_print("During your fall back, you hit", skip_line=True)
+            knockback["other_char"].print_basic()
+            func.optional_print("", "Both of you are delayed by the impact!")
+            func.optional_sleep(2)
+            self.fight.stop_action(knockback["other_char"], self.initiator.timeline)
+            knockback["other_char"].spend_time(result / self.spell_power["char_hit_ratio"])
+            self.target.spend_time(result)
             
         return True

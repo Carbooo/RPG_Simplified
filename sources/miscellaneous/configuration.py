@@ -436,7 +436,9 @@ fear_spells_power = {
         "life_rate": 1.0,
         "ignoring_armor_rate": 0.85,
         "pen_rate": 0.05,
-        "resis_dim_rate": 0.25,
-        "min_damage_for_moving": 15.0
+        "dresis_dim_rate": 0.25,
+        "moving_back_ratio": 40.0,
+        "obstacle_hit_ratio": 10.0,
+        "char_hit_ratio": 75.0
     }
 }
