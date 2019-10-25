@@ -42,18 +42,46 @@ def test_melee1():  # Big def vs Big attack
 
 
 def test_melee2():  # Big def vs Big def
-    func.log_level = 1
-    func.automatic = False
+    func.log_level = 3
+    func.automatic = True
     func.log_debug = True
-    # func.actions = ["EQP", 236]
+    func.action0 = ["EQP", 314, 315, "PAS", 1,
+                    "MAT", 25, "MAT", 25,
+                    "MAT", 25, "MAT", 25,
+                    "MAT", 25, "MAT", 25,
+                    "MAT", 25, "MAT", 25,
+                    "MAT", 25, "MAT", 25
+                    ]
+    func.action1 = ["EQP", 319, 320,
+                    "MAT", 23, "MAT", 23,
+                    "MAT", 23, "MAT", 23,
+                    "MAT", 23, "MAT", 23,
+                    "MAT", 23, "MAT", 23,
+                    "MAT", 23, "MAT", 23
+                    ]
+    func.actions = {"t0": func.action0, "t2": func.action1}
     Fight(cfg.field_list[0], cfg.team_list[8], cfg.team_list[10])
 
 
 def test_melee3():  # Medium def vs Medium def
-    func.log_level = 1
-    func.automatic = False
+    func.log_level = 3
+    func.automatic = True
     func.log_debug = True
-    # func.actions = ["EQP", 236]
+    func.action0 = ["MOV", 5, 3, "PAS", 5, "EQP", 34, 35, "PAS", 5,
+                    "MAT", 2, "MAT", 2,
+                    "MAT", 2, "MAT", 2,
+                    "MAT", 2, "MAT", 2,
+                    "MAT", 2, "MAT", 2,
+                    "MAT", 2, "MAT", 2
+                    ]
+    func.action1 = ["EQP", 27, 28, "PAS", 5, "MOV", 6, 2, "PAS", 5,
+                    "MAT", 5, "MAT", 5,
+                    "MAT", 5, "MAT", 5,
+                    "MAT", 5, "MAT", 5,
+                    "MAT", 5, "MAT", 5,
+                    "MAT", 5, "MAT", 5
+                    ]
+    func.actions = {"a4": func.action0, "a1": func.action1}
     Fight(cfg.field_list[0], cfg.team_list[11], cfg.team_list[12])
 
 
@@ -117,4 +145,4 @@ def test_magic():
     Fight(cfg.field_list[0], cfg.team_list[16], cfg.team_list[17])
 
 
-test_melee1()
+test_melee3()

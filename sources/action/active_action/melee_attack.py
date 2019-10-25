@@ -189,7 +189,10 @@ class MeleeAttack(ActiveActions):
         return attack_result
 
     def melee_attack_type(self, attack_value):
+        ratio = min(cfg.max_attack_power_ratio, max(cfg.min_attack_power_ratio, random.random()))
+        area_bonus = 1 - ratio
         func.optional_print("attack_value", attack_value, level=3, debug=True)
+        func.optional_print("ratio", ratio, level=3, debug=True)
         if attack_value < cfg.melee_attack_stage[0]:
             # Block for very weak attack
             self.block()
@@ -201,7 +204,7 @@ class MeleeAttack(ActiveActions):
                 self.delay(attack_value)
             else:
                 func.optional_print("The attack is a small hit", level=3)
-                self.melee_attack_received(attack_value, 0.49)
+                self.melee_attack_received(self.initiator.melee_power * ratio, 1.0 * area_bonus)
             func.optional_sleep(3)
         elif attack_value < cfg.melee_attack_stage[2]:
             # Big delay or normal hit for medium attack
@@ -211,7 +214,7 @@ class MeleeAttack(ActiveActions):
                 func.optional_sleep(3)
             else:
                 func.optional_print("The attack is a normal hit", level=3)
-                self.melee_attack_received(attack_value, 1.0)
+                self.melee_attack_received(self.initiator.melee_power * (ratio + 0.25), 2.0 * area_bonus)
         elif attack_value < cfg.melee_attack_stage[3]:
             # Big hit or hit + small delay for strong attack
             r = random.random()
@@ -219,22 +222,22 @@ class MeleeAttack(ActiveActions):
                 func.optional_print("The attack will hit and slightly delay the player!", level=3)
                 func.optional_sleep(2)
                 self.delay(attack_value / 3)
-                self.melee_attack_received(attack_value, 1.24)
+                self.melee_attack_received(self.initiator.melee_power * (ratio + 0.5), 2.5 * area_bonus)
             elif r < 0.66:
                 func.optional_print("The attack is a strong hit!", level=3)
-                self.melee_attack_received(attack_value, 1.99)
+                self.melee_attack_received(self.initiator.melee_power * (ratio + 0.75), 4.0 * area_bonus)
         else:
             # Gigantic hit or big hit + delay for massive attack
             r = random.random()
             if r < 0.5:
-                func.optional_print("The attack will hit AND delay the player!", level=3)
+                func.optional_print("The attack will strongly hit AND delay the player!", level=3)
                 func.optional_sleep(2)
                 self.delay(attack_value / 2)
-                self.melee_attack_received(attack_value, 2.99)
+                self.melee_attack_received(self.initiator.melee_power * (ratio + 1.0), 5.0 * area_bonus)
             else:
                 func.optional_print("The attack is a HUGE HIT!", level=3)
                 func.optional_sleep(2)
-                self.melee_attack_received(attack_value, 5.0)
+                self.melee_attack_received(self.initiator.melee_power * (ratio + 1.5), 8.0 * area_bonus)
 
     def block(self):
         self.target.print_basic(level=3)

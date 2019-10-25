@@ -91,6 +91,8 @@ min_distance_ratio = 0.05  # The distance hit chance cannot go lower than that
 melee_attack_stage = [0, 25, 50, 75]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]
 random_defenser_move_probability = 0.25
 random_attacker_move_probability = 0.35
+min_attack_power_ratio = 0.25
+max_attack_power_ratio = 0.75
 
 ###################### ACTIONS CONFIG #####################
 # A turn is around 6 seconds
