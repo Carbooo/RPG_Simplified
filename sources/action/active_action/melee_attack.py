@@ -1,6 +1,5 @@
 import math as math
 import random as random
-import time as time
 import copy as copy
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
@@ -322,9 +321,9 @@ class MeleeAttack(ActiveActions):
             resis_dim_rate = hitting_weapon.resis_dim_rate
 
         ### Hitting result ###
-        armor_coef = self.target.get_armor_coef(handiness_ratio * damages_coef)
+        armor_coef = self.target.get_armor_coef(handiness_ratio * math.sqrt(damages_coef))
         if armor_coef == 0:
-            attack_value /= 3.0
+            attack_value /= cfg.no_armor_power_ratio
         self.target.damages_received(
             self.initiator, 
             attack_value,
