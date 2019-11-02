@@ -74,7 +74,7 @@ def test_melee3():  # Medium def vs Medium def
                     "MAT", 2, "MAT", 2,
                     "MAT", 2, "MAT", 2
                     ]
-    func.action1 = ["EQP", 27, 28, "PAS", 5, "MOV", 6, 2, "PAS", 5,
+    func.action1 = ["EQP", 27, 28, "PAS", 5, "MOV", 6, 3, "PAS", 5,
                     "MAT", 5, "MAT", 5,
                     "MAT", 5, "MAT", 5,
                     "MAT", 5, "MAT", 5,

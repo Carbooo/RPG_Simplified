@@ -349,7 +349,10 @@ class Character:
 ###################### DAMAGE FUNCTIONS ########################
     def get_armor_coef(self, accuracy_ratio):
         cover_ratio = self.equipments.get_armor_cover_ratio()
-        avoid_armor_chances = (1 - random.gauss(1, cfg.high_variance) * cover_ratio) * accuracy_ratio
+        avoid_armor_chances = math.pow(
+            math.pow(1 - cover_ratio, 2) * random.gauss(1, cfg.high_variance),
+            1.0 / accuracy_ratio)
+        func.optional_print("accuracy_ratio", accuracy_ratio, level=3, debug=True)
         func.optional_print("avoid_armor_chances", avoid_armor_chances, level=3, debug=True)
         
         if cover_ratio == 0:
@@ -394,13 +397,15 @@ class Character:
         if damage_result > 0:
             life_ratio = self.body.loose_life(damage_result)
             # Damages received diminish the defender
-            if self.body.is_alive():
+            if self.body.is_alive() and life_ratio < 0.95:
                 life_ratio = math.pow(2 - life_ratio, 2) - 1
                 func.optional_print("The shock of the attack delays the player of", round(life_ratio, 2),
                                     "turn(s) and consume stamina", level=3)
                 func.optional_sleep(3)
                 self.spend_time(life_ratio)
                 self.spend_stamina(life_ratio * 10, ignore=True)
+            else:
+                func.optional_sleep(1)
         
         return max(0.0, damage_result)
             

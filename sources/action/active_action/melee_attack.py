@@ -176,23 +176,20 @@ class MeleeAttack(ActiveActions):
         defense_result = (attack_power - defense_level) / coef
 
         if self.actual_defense == "Dodge":
-            attack_result = dodge_result + defense_result/3
+            attack_result = dodge_result + defense_result / cfg.def_type_ratio
             self.target.spend_stamina(cfg.actions["melee_attack"]["stamina"])
-            self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level) / 3, self.initiator.resis_dim_rate)
+            self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level) / cfg.def_type_ratio, self.initiator.resis_dim_rate)
         elif self.actual_defense == "Defense":
-            attack_result = defense_result + dodge_result/3
+            attack_result = defense_result + dodge_result / cfg.def_type_ratio
             self.target.spend_stamina(cfg.actions["melee_attack"]["stamina"])
             self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level), self.initiator.resis_dim_rate)
         else:
-            attack_result = attack_power + attack_accuracy/3
+            attack_result = attack_power + attack_accuracy/ cfg.def_type_ratio
             
         return attack_result
 
     def melee_attack_type(self, attack_value):
-        ratio = min(cfg.max_attack_power_ratio, max(cfg.min_attack_power_ratio, random.random()))
-        area_bonus = 1 - ratio
-        func.optional_print("attack_value", attack_value, level=3, debug=True)
-        func.optional_print("ratio", ratio, level=3, debug=True)
+        func.optional_print("attack_result", attack_value, level=3, debug=True)
         if attack_value < cfg.melee_attack_stage[0]:
             # Block for very weak attack
             self.block()
@@ -204,7 +201,11 @@ class MeleeAttack(ActiveActions):
                 self.delay(attack_value)
             else:
                 func.optional_print("The attack is a small hit", level=3)
-                self.melee_attack_received(self.initiator.melee_power * ratio, 1.0 * area_bonus)
+                power_ratio = random.uniform(0.2, 0.66)
+                area_ratio = math.pow(1 - power_ratio, 2.0)
+                func.optional_print("power_ratio", power_ratio, level=3, debug=True)
+                func.optional_print("area_ratio", area_ratio, level=3, debug=True)
+                self.melee_attack_received(self.initiator.melee_power * power_ratio, area_ratio)
             func.optional_sleep(3)
         elif attack_value < cfg.melee_attack_stage[2]:
             # Big delay or normal hit for medium attack
@@ -214,30 +215,50 @@ class MeleeAttack(ActiveActions):
                 func.optional_sleep(3)
             else:
                 func.optional_print("The attack is a normal hit", level=3)
-                self.melee_attack_received(self.initiator.melee_power * (ratio + 0.25), 2.0 * area_bonus)
+                power_ratio = random.uniform(0.66, 1.0)
+                area_ratio = math.pow(1.85 - power_ratio, 2.5)
+                func.optional_print("power_ratio", power_ratio, level=3, debug=True)
+                func.optional_print("area_ratio", area_ratio, level=3, debug=True)
+                self.melee_attack_received(self.initiator.melee_power * power_ratio, area_ratio)
         elif attack_value < cfg.melee_attack_stage[3]:
             # Big hit or hit + small delay for strong attack
             r = random.random()
             if r < 0.33:
                 func.optional_print("The attack will hit and slightly delay the player!", level=3)
                 func.optional_sleep(2)
+                power_ratio = random.uniform(0.66, 1.0)
+                area_ratio = math.pow(1.85 - power_ratio, 2.5)
+                func.optional_print("power_ratio", power_ratio, level=3, debug=True)
+                func.optional_print("area_ratio", area_ratio, level=3, debug=True)
                 self.delay(attack_value / 3)
-                self.melee_attack_received(self.initiator.melee_power * (ratio + 0.5), 2.5 * area_bonus)
+                self.melee_attack_received(self.initiator.melee_power * power_ratio, area_ratio)
             elif r < 0.66:
                 func.optional_print("The attack is a strong hit!", level=3)
-                self.melee_attack_received(self.initiator.melee_power * (ratio + 0.75), 4.0 * area_bonus)
+                power_ratio = random.uniform(0.85, 1.25)
+                area_ratio = math.pow(2.35 - power_ratio, 2.0)
+                func.optional_print("power_ratio", power_ratio, level=3, debug=True)
+                func.optional_print("area_ratio", area_ratio, level=3, debug=True)
+                self.melee_attack_received(self.initiator.melee_power * power_ratio, area_ratio)
         else:
             # Gigantic hit or big hit + delay for massive attack
             r = random.random()
             if r < 0.5:
                 func.optional_print("The attack will strongly hit AND delay the player!", level=3)
                 func.optional_sleep(2)
+                power_ratio = random.uniform(0.85, 1.25)
+                area_ratio = math.pow(2.35 - power_ratio, 2.0)
+                func.optional_print("power_ratio", power_ratio, level=3, debug=True)
+                func.optional_print("area_ratio", area_ratio, level=3, debug=True)
                 self.delay(attack_value / 2)
-                self.melee_attack_received(self.initiator.melee_power * (ratio + 1.0), 5.0 * area_bonus)
+                self.melee_attack_received(self.initiator.melee_power * power_ratio, area_ratio)
             else:
                 func.optional_print("The attack is a HUGE HIT!", level=3)
                 func.optional_sleep(2)
-                self.melee_attack_received(self.initiator.melee_power * (ratio + 1.5), 8.0 * area_bonus)
+                power_ratio = random.uniform(1.0, 1.66)
+                area_ratio = math.pow(3.0 - power_ratio, 2.0)
+                func.optional_print("power_ratio", power_ratio, level=3, debug=True)
+                func.optional_print("area_ratio", area_ratio, level=3, debug=True)
+                self.melee_attack_received(self.initiator.melee_power * power_ratio, area_ratio)
 
     def block(self):
         self.target.print_basic(level=3)
@@ -301,7 +322,9 @@ class MeleeAttack(ActiveActions):
             resis_dim_rate = hitting_weapon.resis_dim_rate
 
         ### Hitting result ###
-        armor_coef = self.target.get_armor_coef(handiness_ratio)
+        armor_coef = self.target.get_armor_coef(handiness_ratio * damages_coef)
+        if armor_coef == 0:
+            attack_value /= 3.0
         self.target.damages_received(
             self.initiator, 
             attack_value,

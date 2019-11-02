@@ -23,7 +23,7 @@ use_load_mean = 15.0  # Weapons use load reference for characters
 use_bulk_mean = 3.5  # Weapons use bulk reference for characters
 max_bonus = 1.5  # Max load and bulk bonus
 min_speed = 1.0 / 6.0  # Minimum speed for char (necessary for hurt char)
-accuracy_mean = 100.0  # Accuracy reference for characters
+accuracy_mean = 10.0  # Accuracy reference for characters
 max_magic_distance = 150.0  # Around 300 meters
 free_hand_melee_defense = 0.75  # Melee defense for each free hand
 free_hand_melee_handiness = 7.5  # Melee handiness for each free hand
@@ -89,10 +89,11 @@ min_distance_ratio = 0.05  # The distance hit chance cannot go lower than that
 
 ################### MELEE ATTACK CONFIG ###################
 melee_attack_stage = [0, 25, 50, 75]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]
+def_type_ratio = 4.0  # Divided importance of the other type of def
 random_defenser_move_probability = 0.25
 random_attacker_move_probability = 0.35
-min_attack_power_ratio = 0.25
-max_attack_power_ratio = 0.75
+no_armor_power_ratio = 6.0  # Divide the power of an attack if it is a no-armor attack
+
 
 ###################### ACTIONS CONFIG #####################
 # A turn is around 6 seconds
