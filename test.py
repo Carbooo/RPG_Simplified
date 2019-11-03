@@ -145,4 +145,4 @@ def test_magic():
     Fight(cfg.field_list[0], cfg.team_list[16], cfg.team_list[17])
 
 
-test_melee1()
+test_melee3()

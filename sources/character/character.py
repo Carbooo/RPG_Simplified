@@ -350,7 +350,7 @@ class Character:
     def get_armor_coef(self, accuracy_ratio):
         cover_ratio = self.equipments.get_armor_cover_ratio()
         avoid_armor_chances = math.pow(
-            math.pow(1 - cover_ratio, 2) * random.gauss(1, cfg.high_variance),
+            math.pow(1 - cover_ratio, 2) * random.gauss(cfg.mean, cfg.high_variance),
             1.0 / accuracy_ratio)
         func.optional_print("accuracy_ratio", accuracy_ratio, level=3, debug=True)
         func.optional_print("avoid_armor_chances", avoid_armor_chances, level=3, debug=True)

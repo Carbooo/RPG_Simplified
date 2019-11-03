@@ -173,7 +173,7 @@ class RangedAttack(ActiveActions):
         defense_level = self.target.ranged_defense * self.range_defense_ratio() \
                        * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
         attack_result = attack_power - defense_level
-        range_power = self.get_range_power() * random.gauss(1, cfg.variance)
+        range_power = self.get_range_power() * random.gauss(cfg.mean, cfg.variance)
         damages_ratio = attack_result / defense_level
         func.optional_print("attack_power", attack_power, level=3, debug=True)
         func.optional_print("defense_level", defense_level, level=3, debug=True)

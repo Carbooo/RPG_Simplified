@@ -40,7 +40,7 @@ class Spells(ActiveActions):
         pass  # Only for inheritance
 
     def set_magical_coef(self):
-        self.magical_coef = random.gauss(1, cfg.high_variance) \
+        self.magical_coef = random.gauss(cfg.mean, cfg.high_variance) \
                             * self.initiator.feelings[self.feeling_type].use_energy(self.spell_energy)
 
     def get_stamina_with_coef(self):

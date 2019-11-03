@@ -204,7 +204,7 @@ class MeleeAttack(ActiveActions):
                 area_ratio = math.pow(1 - power_ratio, 2.0)
                 func.optional_print("power_ratio", power_ratio, level=3, debug=True)
                 func.optional_print("area_ratio", area_ratio, level=3, debug=True)
-                self.melee_attack_received(self.initiator.melee_power * power_ratio, area_ratio)
+                self.melee_attack_received(power_ratio, area_ratio)
             func.optional_sleep(3)
         elif attack_value < cfg.melee_attack_stage[2]:
             # Big delay or normal hit for medium attack
@@ -218,7 +218,7 @@ class MeleeAttack(ActiveActions):
                 area_ratio = math.pow(1.85 - power_ratio, 2.5)
                 func.optional_print("power_ratio", power_ratio, level=3, debug=True)
                 func.optional_print("area_ratio", area_ratio, level=3, debug=True)
-                self.melee_attack_received(self.initiator.melee_power * power_ratio, area_ratio)
+                self.melee_attack_received(power_ratio, area_ratio)
         elif attack_value < cfg.melee_attack_stage[3]:
             # Big hit or hit + small delay for strong attack
             r = random.random()
@@ -230,14 +230,14 @@ class MeleeAttack(ActiveActions):
                 func.optional_print("power_ratio", power_ratio, level=3, debug=True)
                 func.optional_print("area_ratio", area_ratio, level=3, debug=True)
                 self.delay(attack_value / 3)
-                self.melee_attack_received(self.initiator.melee_power * power_ratio, area_ratio)
+                self.melee_attack_received(power_ratio, area_ratio)
             elif r < 0.66:
                 func.optional_print("The attack is a strong hit!", level=3)
                 power_ratio = random.uniform(0.85, 1.25)
                 area_ratio = math.pow(2.35 - power_ratio, 2.0)
                 func.optional_print("power_ratio", power_ratio, level=3, debug=True)
                 func.optional_print("area_ratio", area_ratio, level=3, debug=True)
-                self.melee_attack_received(self.initiator.melee_power * power_ratio, area_ratio)
+                self.melee_attack_received(power_ratio, area_ratio)
         else:
             # Gigantic hit or big hit + delay for massive attack
             r = random.random()
@@ -249,7 +249,7 @@ class MeleeAttack(ActiveActions):
                 func.optional_print("power_ratio", power_ratio, level=3, debug=True)
                 func.optional_print("area_ratio", area_ratio, level=3, debug=True)
                 self.delay(attack_value / 2)
-                self.melee_attack_received(self.initiator.melee_power * power_ratio, area_ratio)
+                self.melee_attack_received(power_ratio, area_ratio)
             else:
                 func.optional_print("The attack is a HUGE HIT!", level=3)
                 func.optional_sleep(2)
@@ -257,7 +257,7 @@ class MeleeAttack(ActiveActions):
                 area_ratio = math.pow(3.0 - power_ratio, 2.0)
                 func.optional_print("power_ratio", power_ratio, level=3, debug=True)
                 func.optional_print("area_ratio", area_ratio, level=3, debug=True)
-                self.melee_attack_received(self.initiator.melee_power * power_ratio, area_ratio)
+                self.melee_attack_received(power_ratio, area_ratio)
 
     def block(self):
         self.target.print_basic(level=3)
@@ -274,7 +274,7 @@ class MeleeAttack(ActiveActions):
         self.target.print_basic(level=3)
         func.optional_print("-- of", round(attack_value, 2), "TURN(S) --", level=3)
     
-    def melee_attack_received(self, attack_value, damages_coef):
+    def melee_attack_received(self, power_ratio, area_ratio):
         ### Choose which weapon has hit the target ###
         # List all weapons
         weapons = copy.copy(self.initiator.equipments.weapons_in_use)
@@ -290,7 +290,7 @@ class MeleeAttack(ActiveActions):
                 melee_power = weapon.melee_power
 
         # Select the weapon (higher attack value = higher chance of better weapon)
-        ratio = attack_value / cfg.melee_attack_stage[3]
+        ratio = (power_ratio + area_ratio) / 2.0
         hitting_weapon = best_weapon
         if random.random() > ratio:  # Choose the worst weapon
             for weapon in weapons:
@@ -308,27 +308,29 @@ class MeleeAttack(ActiveActions):
 
         ### Calculate weapon stats ###
         if hitting_weapon == "free_hand":
-            handiness_ratio = cfg.free_hand_melee_handiness / cfg.accuracy_mean
+            handiness_ratio = cfg.free_hand_melee_handiness / cfg.accuracy_mean * math.sqrt(area_ratio)
             life_rate = cfg.free_hand_life_rate
-            ignoring_armor_rate = cfg.free_hand_ignoring_armor_rate
-            pen_rate = cfg.free_hand_pen_rate
-            resis_dim_rate = cfg.free_hand_resis_dim_rate
+            ignoring_armor_rate = cfg.free_hand_ignoring_armor_rate * random.gauss(cfg.mean, cfg.high_variance)
+            pen_rate = cfg.free_hand_pen_rate * random.gauss(cfg.mean, cfg.high_variance)
+            resis_dim_rate = cfg.free_hand_resis_dim_rate * random.gauss(cfg.mean, cfg.high_variance)
+            attack_power = cfg.free_hand_melee_power * (self.initiator.melee_power / 10.0) * power_ratio
         else:
-            handiness_ratio = hitting_weapon.melee_handiness / cfg.accuracy_mean
+            handiness_ratio = hitting_weapon.melee_handiness / cfg.accuracy_mean * math.sqrt(area_ratio)
             life_rate = hitting_weapon.life_rate
-            ignoring_armor_rate = hitting_weapon.ignoring_armor_rate
-            pen_rate = hitting_weapon.pen_rate
-            resis_dim_rate = hitting_weapon.resis_dim_rate
+            ignoring_armor_rate = hitting_weapon.ignoring_armor_rate * random.gauss(cfg.mean, cfg.high_variance)
+            pen_rate = hitting_weapon.pen_rate * random.gauss(cfg.mean, cfg.high_variance)
+            resis_dim_rate = hitting_weapon.resis_dim_rate * random.gauss(cfg.mean, cfg.high_variance)
+            attack_power = hitting_weapon.melee_power * (self.initiator.melee_power / 10.0) * power_ratio
 
         ### Hitting result ###
-        armor_coef = self.target.get_armor_coef(handiness_ratio * math.sqrt(damages_coef))
+        armor_coef = self.target.get_armor_coef(handiness_ratio)
         if armor_coef == 0:
-            attack_value /= cfg.no_armor_power_ratio
+            attack_power /= cfg.no_armor_power_ratio
         self.target.damages_received(
             self.initiator, 
-            attack_value,
+            attack_power,
             armor_coef, 
-            damages_coef,
+            area_ratio,
             life_rate,
             ignoring_armor_rate,
             pen_rate,

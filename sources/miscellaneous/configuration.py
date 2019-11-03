@@ -5,6 +5,7 @@ team_list = []
 field_list = []
 
 ######################## GENERIC VARIABLES ######################
+mean = 1.0  # Gauss mean
 variance = 0.1  # Gauss variance
 high_variance = 0.25  # Gauss variance
 

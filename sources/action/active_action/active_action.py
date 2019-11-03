@@ -28,4 +28,4 @@ class ActiveActions(Actions):
 
     @staticmethod
     def get_attack_coef(char, timeline):
-        return random.gauss(1, cfg.high_variance) * char.get_fighting_availability(timeline)
+        return random.gauss(cfg.mean, cfg.high_variance) * char.get_fighting_availability(timeline)

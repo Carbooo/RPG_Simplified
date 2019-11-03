@@ -42,7 +42,7 @@ class Equipments:
         return equip
     
     def decrease(self, damage, def_malus_rate):
-        decrease = min(self.life, max(0, random.gauss(1, cfg.high_variance)) \
+        decrease = min(self.life, max(0, random.gauss(cfg.mean, cfg.high_variance)) \
             * damage  * def_malus_rate / self.resistance_ratio())
         self.life -= decrease
         

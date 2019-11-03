@@ -190,7 +190,7 @@ class Field:
         # Calculate shoot length
         length = attacker.calculate_point_distance(target.abscissa, target.ordinate)
         length += (attacker.equipments.get_range() - length) / 3  # shoot length depend of target distance
-        length *= max(0, random.gauss(1, cfg.variance))
+        length *= max(0, random.gauss(cfg.mean, cfg.variance))
 
         # Browse shoot path
         for i in pos_p_abs_range:
