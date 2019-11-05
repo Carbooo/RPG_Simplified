@@ -186,8 +186,10 @@ class Character:
     def calculate_agility(self):
         previous_agility = self.original_agility
         self.original_agility = self.true_original_agility \
-                                * math.pow(self.load_ratio, 1.0 / 3.0) \
-                                * math.pow(self.use_load_ratio, 1.0 / 2.0)
+                                * math.pow(self.load_ratio, 1.0 / 6.0) \
+                                * math.pow(self.use_load_ratio, 1.0 / 4.0) \
+                                * math.pow(self.bulk_ratio, 1.0 / 6.0) \
+                                * math.pow(self.use_bulk_ratio, 1.0 / 4.0)
         new_agility = self.original_agility
         self.agility *= new_agility / previous_agility
 
@@ -244,8 +246,8 @@ class Character:
     def calculate_dodging(self):
         # The bigger you are, the harder is to dodge
         dodging_coef = (self.reflex + self.agility) / (1.0 + 1.0) / self.constitution_ratio * 10.0
-        # More bulky equipment, lower dodge ratio (load ratio already included in agility stat)
-        dodging_coef *= math.sqrt(math.pow(self.bulk_ratio, 1.0 / 3) * math.pow(self.use_bulk_ratio, 1.0 / 2))
+        # More bulky/load equipment, lower dodge ratio (in addition to agility penalty)
+        dodging_coef *= math.pow(self.bulk_ratio * self.use_bulk_ratio * self.use_bulk_ratio, 1.0 / 4.0)
         self.dodging = self.get_global_ratio() * dodging_coef
     
     def calculate_characteristic(self):

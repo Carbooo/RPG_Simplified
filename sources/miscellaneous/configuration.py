@@ -43,6 +43,9 @@ life_resting_coef = 14400.0  # Rest coefficient
 stamina_resting_coef = 200.0  # Rest coefficient
 turn_stamina = 0.5  # Stamina reference used
 
+####################### CHAR EQUIP CONFIG #######################
+equip_bulk_mean = 2.5  # Bulk reference for equipped weapons
+
 ######################## FEELING CONFIG ######################
 concentrate_update_coef = 3  # Energy coef to update feeling with concentration
 max_alive_energy = 1000.0
@@ -89,7 +92,7 @@ decrease_hit_chance_per_case = 0.01  # Every case, the distance hit chance dimin
 min_distance_ratio = 0.05  # The distance hit chance cannot go lower than that
 
 ################### MELEE ATTACK CONFIG ###################
-melee_attack_stage = [0, 25, 50, 75]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]
+melee_attack_stage = [0, 30, 60, 90]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]
 def_type_ratio = 4.0  # Divided importance of the other type of def
 random_defenser_move_probability = 0.25
 random_attacker_move_probability = 0.35

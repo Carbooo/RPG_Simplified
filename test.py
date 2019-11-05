@@ -20,8 +20,8 @@ ImportData("ObstaclesField", "data/maps/LongObstacles.csv")
 
 ##################### TESTING ###################
 def test_melee1():  # Big def vs Big attack
-    func.log_level = 3
-    func.automatic = True
+    func.log_level = 1
+    func.automatic = False
     func.log_debug = True
     func.action0 = ["EQP", 314, 315, "PAS", 1,
                     "MAT", 24, "MAT", 24,
@@ -145,4 +145,4 @@ def test_magic():
     Fight(cfg.field_list[0], cfg.team_list[16], cfg.team_list[17])
 
 
-test_melee3()
+test_melee1()

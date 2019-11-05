@@ -183,7 +183,7 @@ class MeleeAttack(ActiveActions):
             self.target.spend_stamina(cfg.actions["melee_attack"]["stamina"])
             self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level), self.initiator.resis_dim_rate)
         else:
-            attack_result = attack_power + attack_accuracy/ cfg.def_type_ratio
+            attack_result = attack_power + attack_accuracy / cfg.def_type_ratio
             
         return attack_result
 

@@ -1,4 +1,4 @@
-import time as time
+import math as math
 from sources.character.equipments import Armors, MagicalArmors, Weapons, MeleeWeapons, \
     Shields, MagicalShields, RangedWeapons, Bows, Crossbows, Ammo
 import sources.miscellaneous.configuration as cfg
@@ -347,17 +347,25 @@ class CharEquipments:
             "range_power": 0.0,
             "range_accuracy": 0.0,
         }
+        bulk = 0
 
         for weapon in self.weapons_in_use:
+            bulk += weapon.bulk
             attack_powers["melee_power"] += weapon.melee_power * weapon.attack_ratio
             attack_powers["melee_handiness"] += weapon.melee_handiness * weapon.attack_ratio
             if isinstance(weapon, RangedWeapons) and self.ranged_weapon_has_ammo(weapon):
                 attack_powers["range_power"] += weapon.range_power * weapon.attack_ratio
                 attack_powers["range_accuracy"] += weapon.accuracy * weapon.attack_ratio
 
-        # Free hands melee attack power
+        # Free hands melee attack
         attack_powers["melee_power"] += self.free_hands * cfg.free_hand_melee_power
         attack_powers["melee_handiness"] += self.free_hands * cfg.free_hand_melee_handiness
+        bulk += self.free_hands * 0.25
+
+        # Apply bulk ratio bonus / penalty
+        bulk_ratio = math.sqrt(cfg.equip_bulk_mean / bulk)
+        attack_powers["melee_power"] *= bulk_ratio
+        attack_powers["melee_handiness"] *= bulk_ratio
 
         return attack_powers
 
@@ -367,14 +375,23 @@ class CharEquipments:
             "ranged_defense": 0.0,
             "magic_defense": 0.0  # Where shield can be used against magic attacks
         }
+        bulk = 0
 
         for weapon in self.weapons_in_use:
+            bulk += weapon.bulk
             defenses["melee_defense"] += weapon.defense * weapon.melee_defend_ratio
             defenses["ranged_defense"] += weapon.defense * weapon.ranged_defend_ratio
             defenses["magic_defense"] += weapon.defense * weapon.magic_defend_ratio
 
         # Free hands melee defense
         defenses["melee_defense"] += self.free_hands * cfg.free_hand_melee_defense
+        bulk += self.free_hands * 0.25
+
+        # Apply bulk ratio bonus / penalty
+        bulk_ratio = math.sqrt(cfg.equip_bulk_mean / bulk)
+        defenses["melee_defense"] *= bulk_ratio
+        defenses["ranged_defense"] *= bulk_ratio
+        defenses["magic_defense"] *= bulk_ratio
 
         return defenses
 
