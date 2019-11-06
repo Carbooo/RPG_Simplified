@@ -223,7 +223,7 @@ class RangedAttack(ActiveActions):
     
     @staticmethod
     def range_hit_chance_ratio(hit_chance):
-        return 0.5 + hit_chance  # Between 0,5 and 1,5, similar to melee handiness_ratio
+        return math.sqrt(0.5 + hit_chance)  # Between 0,7 and 1,2
 
     def range_defense_ratio(self):
         return 1.0 + math.pow(self.range_distance_ratio(), 4) * 10  # Great bonus if you are really far away

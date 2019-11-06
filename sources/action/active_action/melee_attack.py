@@ -174,14 +174,21 @@ class MeleeAttack(ActiveActions):
         dodge_result = (attack_accuracy - dodge_level) / coef
         defense_result = (attack_power - defense_level) / coef
 
+        # Apply resis dim rate on weapons
+        resis_dim_rate = 0
+        for weapon in self.initiator.equipments.weapons_in_use:
+            resis_dim_rate += weapon.resis_dim_rate
+        resis_dim_rate += self.initiator.equipments.free_hands * cfg.free_hand_resis_dim_rate
+        resis_dim_rate *= random.gauss(cfg.mean, cfg.high_variance)
+
         if self.actual_defense == "Dodge":
             attack_result = dodge_result + defense_result / cfg.def_type_ratio
             self.target.spend_stamina(cfg.actions["melee_attack"]["stamina"])
-            self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level) / cfg.def_type_ratio, self.initiator.resis_dim_rate)
+            self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level) / cfg.def_type_ratio, resis_dim_rate)
         elif self.actual_defense == "Defense":
             attack_result = defense_result + dodge_result / cfg.def_type_ratio
             self.target.spend_stamina(cfg.actions["melee_attack"]["stamina"])
-            self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level), self.initiator.resis_dim_rate)
+            self.target.equipments.all_weapons_absorbed_damage(min(attack_power, defense_level), resis_dim_rate)
         else:
             attack_result = attack_power + attack_accuracy / cfg.def_type_ratio
             
@@ -313,14 +320,14 @@ class MeleeAttack(ActiveActions):
             ignoring_armor_rate = cfg.free_hand_ignoring_armor_rate * random.gauss(cfg.mean, cfg.high_variance)
             pen_rate = cfg.free_hand_pen_rate * random.gauss(cfg.mean, cfg.high_variance)
             resis_dim_rate = cfg.free_hand_resis_dim_rate * random.gauss(cfg.mean, cfg.high_variance)
-            attack_power = cfg.free_hand_melee_power * (self.initiator.melee_power / 10.0) * power_ratio
+            attack_power = cfg.free_hand_melee_power * 10.0 * power_ratio
         else:
             handiness_ratio = hitting_weapon.melee_handiness / cfg.accuracy_mean * math.sqrt(area_ratio)
             life_rate = hitting_weapon.life_rate
             ignoring_armor_rate = hitting_weapon.ignoring_armor_rate * random.gauss(cfg.mean, cfg.high_variance)
             pen_rate = hitting_weapon.pen_rate * random.gauss(cfg.mean, cfg.high_variance)
             resis_dim_rate = hitting_weapon.resis_dim_rate * random.gauss(cfg.mean, cfg.high_variance)
-            attack_power = hitting_weapon.melee_power * (self.initiator.melee_power / 10.0) * power_ratio
+            attack_power = hitting_weapon.melee_power * 10.0 * power_ratio
 
         ### Hitting result ###
         armor_coef = self.target.get_armor_coef(handiness_ratio)

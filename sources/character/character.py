@@ -101,8 +101,6 @@ class Character:
         self.melee_handiness = 0.0
         self.ranged_accuracy = 0.0
         self.ranged_accuracy_ratio = 0.0
-        self.pen_rate = 0.0
-        self.resis_dim_rate = 0.0
         self.melee_power = 0.0
         self.ranged_power = 0.0
         self.magic_power = 0.0
@@ -508,15 +506,13 @@ class Character:
         func.optional_print("--   DEFENSE  --", skip_line=True)
         func.optional_print("Dodging:", int(round(self.dodging)),
             ", MeleeDefense:", int(round(self.melee_defense)),
-            ", RangedDefense:", int(round(self.ranged_defense)),
-            ", MagicDefense:", int(round(self.magic_defense)))
+            ", MagicDefense:", int(round(self.magic_defense)),
+            ", RangedDefense:", int(round(self.ranged_defense)))
 
     def print_attack(self):
         func.optional_print("--   ATTACK   --", skip_line=True)
         func.optional_print("MeleeHandiness:", int(round(self.melee_handiness)),
             ", MeleePower:", int(round(self.melee_power)),
-            ", PenetrationRate:", int(round(self.pen_rate, 2)),
-            ", Resis_dim_rate:", int(round(self.resis_dim_rate, 2)),
             ", MagicPower:", int(round(self.magic_power)), skip_line=True)
         if self.ranged_power > 1:
             func.optional_print(", RangedAccuracy:", int(round(self.ranged_accuracy)),

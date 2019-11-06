@@ -1,5 +1,5 @@
 Name,Load,Bulk,Resistance,Hand,Defense,Melee Power,Melee Handiness,Damage Life Rate,Ignoring Armor Rate,Penetration Rate,Resistance Diminution Rate
-Small wooden shield,8,1.25,3,1,10.0,2.5,7.5,1.0,2.5,2.5,2.5
-Large wooden shield,12,2.0,3,1,15.0,5.0,5.0,1.0,2.5,2.5,2.5
-Small steel shield,12,1.25,15,1,10.0,5.0,5.0,1.0,5.0,5.0,5.0
-Large steel shield,18,2.0,15,1,15.0,7.5,2.5,1.0,5.0,5.0,5.0
+Small wooden shield,8,1.25,3,1,10.0,2.5,5.0,1.0,2.5,2.5,2.5
+Large wooden shield,12,2.0,3,1,15.0,3.5,2.5,1.0,2.5,2.5,2.5
+Small steel shield,12,1.25,15,1,10.0,3.5,5.0,1.0,5.0,5.0,5.0
+Large steel shield,18,2.0,15,1,15.0,4.5,2.5,1.0,5.0,5.0,5.0
