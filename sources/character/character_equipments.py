@@ -247,7 +247,7 @@ class CharEquipments:
                 break
         return True
 
-    def loose_reloaded_ammo(self):
+    def loose_reloaded_bow_ammo(self):
         has_lost = False
         for weapon in self.weapons_in_use:
             if isinstance(weapon, Bows) and weapon.is_reloaded():

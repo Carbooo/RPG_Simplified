@@ -50,7 +50,7 @@ class Reload(ActiveActions):
                             ammo_available.append(ammo)
 
                 if len(ammo_available) == 1:
-                    self.ammo_to_load  = ammo_available[0]
+                    self.ammo_to_load = ammo_available[0]
                     
                 elif len(ammo_available) > 1:
                     func.optional_print("Choose the ammo to reload:")
@@ -69,7 +69,7 @@ class Reload(ActiveActions):
                             continue
                         for ammo in ammo_available:
                             if ammo.get_id() == read:
-                                self.ammo_to_load  = ammo
+                                self.ammo_to_load = ammo
                                 ammo_chosen = True
                                 break
                         func.optional_print("ID:", read, "is not available")
@@ -86,6 +86,6 @@ class Reload(ActiveActions):
         return True
     
     def execute(self):
-        self.initiator.equipments.reload(self.weapon_to_reload, self.ammo_to_load )
+        self.initiator.equipments.reload(self.weapon_to_reload, self.ammo_to_load)
         self.initiator.last_action = None  # To remove it from the scheduler
         return True

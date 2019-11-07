@@ -1,5 +1,5 @@
 Name,Load,Bulk,Resistance,RangedWeaponType,Damage Life Rate,Ignoring Armor Rate,Penetration Rate,Resistance Diminution Rate
-Bodkin arrow,0.2,0.1,0.1,Bow,1.0,10.0,25,2.5
-Broadhead arrow,0.2,0.1,0.1,Bow,1.25,7.5,17.5,1.0
-Bodkin bolt,0.2,0.1,0.1,Crossbow,1.0,10.0,25,2.5
-Broadhead bolt,0.2,0.1,0.1,Crossbow,1.25,7.5,17.5,1.0
+Bodkin arrow,0.2,0.1,0.1,Bow,1.0,10.0,20.0,2.5
+Broadhead arrow,0.2,0.1,0.1,Bow,1.25,7.5,15.0,1.0
+Bodkin bolt,0.2,0.1,0.1,Crossbow,1.0,10.0,20.0,2.5
+Broadhead bolt,0.2,0.1,0.1,Crossbow,1.25,7.5,15.0,1.0

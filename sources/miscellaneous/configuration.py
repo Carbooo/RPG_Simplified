@@ -87,7 +87,7 @@ max_move_per_action = 15  # To prevent eternal stupid moving
 ################### RANGED ATTACK CONFIG ##################
 ranged_attack_stage = [25, 50]  # [Blocked", "Hit", "Hit & stopped"]
 moving_char_shooting_handicap = 0.5
-melee_fighter_shooting_handicap = 0.5
+melee_fighter_shooting_handicap = 0.33
 decrease_hit_chance_per_case = 0.01  # Every case, the distance hit chance diminishes by this ratio
 min_distance_ratio = 0.05  # The distance hit chance cannot go lower than that
 

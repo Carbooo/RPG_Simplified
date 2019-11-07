@@ -420,7 +420,7 @@ class Fight:
 
     def stop_action(self, char, timeline):
         # Loose reloaded bow ammo no matter last action
-        char.equipments.loose_reloaded_ammo()
+        char.equipments.loose_reloaded_bow_ammo()
             
         # Stop action without penalty
         if isinstance(char.last_action, Move) or isinstance(char.last_action, PassTime):
@@ -448,7 +448,7 @@ class Fight:
             if isinstance(char.last_action, Reload):
                 func.optional_print("You loose the ammo being used for reloading!", level=2)
                 func.optional_sleep(2)
-                char.ammo.remove(char.last_action.ammo_to_load)
+                char.equipments.ammo.remove(char.last_action.ammo_to_load)
             
             char.last_action = None  # Has to be done after the unreload
             char.timeline = timeline

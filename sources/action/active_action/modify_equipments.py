@@ -191,7 +191,7 @@ class ModifyEquipments(ActiveActions):
             for weapon in self.next_unequipment:
                 if not self.initiator.equipments.remove_weapon(weapon):
                     return False
-                self.initiator.equipments.loose_reloaded_ammo()
+                self.initiator.equipments.loose_reloaded_bow_ammo()
                     
         self.initiator.last_action = None  # To remove it from the scheduler
         return True

@@ -52,7 +52,7 @@ class CharBody:
         previous_life = self.life
         damage_ratio = damage / self.life
 
-        if damage <= 1.0:
+        if damage < 0.5:
             func.optional_print("The attack didn't do any real damages", level=2)
         elif damage_ratio < 0.1:
             func.optional_print("The attack has only made a flesh wound", level=2)
