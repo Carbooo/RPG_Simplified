@@ -16,7 +16,6 @@ shield_def_malus_rate = 0.1  # Armor def lost when defending
 attack_weapon_def_malus_rate = 0.01  # Attack weapon def lost when defending
 
 ######################## CHARACTER CONFIG ######################
-defense_time = 0.5  # Turn time before having a fully operational defense
 max_position_area = 6  # Max range for characters positions
 load_mean = 50.0  # Load reference for characters characteristics
 bulk_mean = 6.0  # Bulk reference for characters characteristics
@@ -69,6 +68,9 @@ full_obstacle = "X"
 obstacle_types_list = [no_obstacle, melee_handicap, melee_obstacle, ranged_handicap, ranged_obstacle, full_handicap,
                        full_obstacle]
 
+######################## ACTION CONFIG ######################
+surprise_delay = 0.25
+
 ######################## REST CONFIG ######################
 min_rest_turn = 1
 max_rest_turn = 10
@@ -87,7 +89,7 @@ max_move_per_action = 15  # To prevent eternal stupid moving
 ################### RANGED ATTACK CONFIG ##################
 ranged_attack_stage = [25, 50]  # [Blocked", "Hit", "Hit & stopped"]
 moving_char_shooting_handicap = 0.5
-melee_fighter_shooting_handicap = 0.33
+melee_fighter_shooting_handicap = 0.5
 decrease_hit_chance_per_case = 0.01  # Every case, the distance hit chance diminishes by this ratio
 min_distance_ratio = 0.05  # The distance hit chance cannot go lower than that
 

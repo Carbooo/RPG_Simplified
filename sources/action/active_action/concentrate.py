@@ -72,5 +72,6 @@ class Concentrate(ActiveActions):
                                                                         )
         self.nb_of_turns -= 1
         if self.nb_of_turns > 0:
+            self.start_timeline = self.initiator.timeline
             self.end_update(cfg.actions["concentrate"]["stamina"], 1.0, True)
         return True

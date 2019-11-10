@@ -236,15 +236,15 @@ class Spells(ActiveActions):
     def magical_attack_received(self, attack_value, is_localized, can_use_shield, life_rate,
                                 ignoring_armor_rate, pen_rate, resis_dim_rate):
         if self.target != self.initiator:
-            self.fight.stop_action(self.target, self.initiator.timeline)
+            self.stop_action(self.target, self.initiator.timeline)
 
         if can_use_shield:
             attack_value -= self.target.magic_defense_with_shields \
-                            * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
+                            * self.get_attack_coef(self.target, self.initiator.timeline)
             self.target.equipments.all_shields_absorbed_damage(attack_value, resis_dim_rate)
         else:
             attack_value -= self.target.magic_defense \
-                            * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
+                            * self.get_attack_coef(self.target, self.initiator.timeline)
 
         if attack_value <= 0:
             self.target.print_basic()
@@ -266,7 +266,6 @@ class Spells(ActiveActions):
                                                             life_rate, ignoring_armor_rate, pen_rate,
                                                             resis_dim_rate)
 
-        self.target.previous_attacks.append((self.initiator.timeline, self))
         return max(0.0, attack_value)
 
 ######################### ACTIVE SPELLS FUNCTIONS #######################

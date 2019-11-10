@@ -100,6 +100,8 @@ class RangedAttack(ActiveActions):
                     else:
                         stamina = cfg.actions["ranged_attack"]["stamina"] * self.shooting_time
                     self.end_update(stamina, cfg.actions["ranged_attack"]["duration"] * self.shooting_time)
+
+                    self.target.add_previous_attack(self.start_timeline, self.initiator.timeline, self)
                     return True
 
             func.optional_print("ID:", read, "is not available")
@@ -133,7 +135,8 @@ class RangedAttack(ActiveActions):
         hit_chance = self.shoot_hit_chance()
         func.optional_print("Current hit chance:", round(hit_chance, 2), level=2)
         func.optional_print("Range power:", int(round(self.get_range_power())), level=2)
-        func.optional_print("Fighting availability:", round(self.target.get_fighting_availability(self.initiator.timeline), 2),
+        func.optional_print("Fighting availability:", round(
+            self.target.get_fighting_availability(self.start_timeline, self.initiator.timeline, self), 2),
                             level=2)
         func.optional_print("*********************************************************************")
         func.optional_print("")
@@ -162,16 +165,16 @@ class RangedAttack(ActiveActions):
         return True
 
     def range_defend(self, hit_chance):
-        self.fight.stop_action(self.target, self.initiator.timeline)
+        self.stop_action(self.target, self.initiator.timeline)
 
         # Range defense result
         # The higher the shoot is precised, the more chance it is to hurt the target
         # The further the target is, the easiest it is to anticipate and defend
         accuracy_ratio = RangedAttack.range_hit_chance_ratio(hit_chance)
         attack_power = self.initiator.ranged_accuracy * accuracy_ratio \
-                       * ActiveActions.get_attack_coef(self.initiator, self.initiator.timeline)
+                       * self.get_attack_coef(self.initiator, self.initiator.timeline)
         defense_level = self.target.ranged_defense * self.range_defense_ratio() \
-                       * ActiveActions.get_attack_coef(self.target, self.initiator.timeline)
+                       * self.get_attack_coef(self.target, self.initiator.timeline)
         attack_result = attack_power - defense_level
         range_power = self.get_range_power() * random.gauss(cfg.mean, cfg.variance)
         damages_ratio = attack_result / defense_level
@@ -180,9 +183,6 @@ class RangedAttack(ActiveActions):
         func.optional_print("attack_result", attack_result, level=3, debug=True)
         func.optional_print("range_power", range_power, level=3, debug=True)
         func.optional_print("damages_ratio", damages_ratio, level=3, debug=True)
-
-        # Update availability after computed the result
-        self.target.previous_attacks.append((self.initiator.timeline, self))
         
         # Attack result --> Either block or be hit
         if attack_result <= cfg.ranged_attack_stage[0]:
@@ -206,13 +206,16 @@ class RangedAttack(ActiveActions):
         return h_dist * h_obs
 
     def get_ranged_action_ratio(self):
-        nb_of_attacks = 0
-        for attack_timeline, attack in self.target.previous_attacks:
-            if self.timeline < attack_timeline + cfg.defense_time / self.target.speed_ratio:
-                nb_of_attacks += 1
+        total_time = 0
+        for attack in self.target.previous_attacks:
+            if attack["action"].type == "MeleeAttack":
+                real_start_time = max(attack["start_time"], self.start_timeline)
+                real_end_time = min(attack["end_time"], self.initiator.timeline)
+                time = (real_end_time - real_start_time) / (attack["end_time"] - attack["start_time"])
+                total_time += time
 
-        if nb_of_attacks > 0:
-            coef = math.pow(cfg.melee_fighter_shooting_handicap, nb_of_attacks)
+        if total_time > 0:
+            coef = math.pow(cfg.melee_fighter_shooting_handicap, total_time)
         else:
             coef = 1
 

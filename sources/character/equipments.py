@@ -118,7 +118,7 @@ class Armors(Equipments):
             
         if total_damages == 0:
             func.optional_print("The", self.name, "has absorbed the damages and no life has been lost", level=3)
-            func.optional_sleep(3)
+            func.optional_sleep(2)
         
         return [ratio, total_damages]
             

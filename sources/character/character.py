@@ -311,33 +311,45 @@ class Character:
             return False
 
 ###################### MELEE FUNCTIONS ########################
-    def get_fighting_availability(self, timeline):
-        char_defense_time = cfg.defense_time / self.speed_ratio
+    def add_previous_attack(self, start_time, end_time, action):
+        previous_attack = {
+            "start_time": start_time,
+            "end_time": end_time,
+            "action": action
+        }
+        self.previous_attacks.append(previous_attack)
+
+    def get_fighting_availability(self, start_time, end_time, excluded_attack):
         total_time = 0
         
         # Calculate fighting recovery from previous attack
-        for attack_timeline, attack in self.previous_attacks:
-            time = attack_timeline + char_defense_time - timeline
-            if time > 0:
-                if attack.type == "MeleeAttack":
-                    total_time += time * cfg.melee_attack_fighting_availability
-                elif attack.type == "RangedAttack":
-                    total_time += time * cfg.ranged_attack_fighting_availability
-                elif attack.type == "Spell":
-                    total_time += time * cfg.magic_attack_fighting_availability
-                else:
-                    print("Error: Fighting availability type (", attack.type, ") not expected!")
+        for attack in self.previous_attacks:
+            if attack["action"] != excluded_attack:
+                real_end_time = min(attack["end_time"], end_time)
+                time = max(0, (real_end_time - start_time) / (attack["end_time"] - attack["start_time"]))
+                print("end_time", end_time)
+                print("start_time", start_time)
+                print("att_end_time", attack["end_time"])
+                print("att_start_time", attack["start_time"])
+                if time > 0:
+                    if attack["action"].type == "MeleeAttack":
+                        total_time += time * cfg.melee_attack_fighting_availability
+                    elif attack["action"].type == "RangedAttack":
+                        total_time += time * cfg.ranged_attack_fighting_availability
+                    elif attack["action"].type == "Spell":
+                        total_time += time * cfg.magic_attack_fighting_availability
+                    else:
+                        print("Error: Fighting availability type (", attack.type, ") not expected!")
 
         # Calculate fighting readiness regarding char timeline
-        readiness_time = max(0.0, self.timeline - timeline)
+        readiness_time = max(0.0, self.timeline - start_time)
         if self.last_action:
-            if self.last_action.type == "MeleeAttack":  # Do not count "counter" attack
-                readiness_time = max(0.0, readiness_time - cfg.actions["melee_attack"]["duration"] / self.speed_ratio)
-            if self.last_action.type == "Waiting" or self.last_action.type == "Move":  # Always ready for this type of action
+            if self.last_action.type == "MeleeAttack" or self.last_action.type == "Waiting" or \
+                    self.last_action.type == "Move":  # Always ready for this type of action
                 readiness_time = 0.0
 
         total_time += readiness_time
-        return 1.0 / (1.0 + total_time / char_defense_time)
+        return 1.0 / (1.0 + total_time / self.speed_ratio)
         
     def can_melee_attack(self, enemy):
         if self.body.is_active() and enemy.body.is_alive() and \
@@ -401,7 +413,7 @@ class Character:
                 life_ratio = math.pow(2 - life_ratio, 2) - 1
                 func.optional_print("The shock of the attack delays the player of", round(life_ratio, 2),
                                     "turn(s) and consume stamina", level=3)
-                func.optional_sleep(3)
+                func.optional_sleep(2)
                 self.spend_time(life_ratio)
                 self.spend_stamina(life_ratio * 10, ignore=True)
             else:

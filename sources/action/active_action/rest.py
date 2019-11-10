@@ -48,5 +48,6 @@ class Rest(ActiveActions):
         self.initiator.body.global_rest(self.resting_ratio)
         self.nb_of_turns -= 1
         if self.nb_of_turns > 0:
+            self.start_timeline = self.initiator.timeline
             self.end_update(0, 1, True)
         return True

@@ -230,9 +230,9 @@ class Fight:
                     char.feelings[type].natural_energy_update(time_diff)
 
                 previous_attacks = copy.copy(char.previous_attacks)
-                for attack_timeline, attack in previous_attacks:
-                    if self.current_timeline >= attack_timeline + cfg.defense_time / char.speed_ratio:
-                        char.previous_attacks.remove((attack_timeline, attack))
+                for attack in previous_attacks:
+                    if self.current_timeline > attack["end_time"]:
+                        char.previous_attacks.remove(attack)
 
             self.field.remove_dead_char(char)
 
@@ -417,40 +417,3 @@ class Fight:
             return False
         character.last_action = action
         return True
-
-    def stop_action(self, char, timeline):
-        # Loose reloaded bow ammo no matter last action
-        char.equipments.loose_reloaded_bow_ammo()
-            
-        # Stop action without penalty
-        if isinstance(char.last_action, Move) or isinstance(char.last_action, PassTime):
-            func.optional_print("Your current action (", char.last_action.name, ") is canceled by the attack!", level=2)
-            func.optional_sleep(2)
-            char.last_action = None
-            char.timeline = timeline
-            return False
-        
-        # Stop action with penalty
-        elif isinstance(char.last_action, ModifyEquipments) \
-                or isinstance(char.last_action, Reload) \
-                or isinstance(char.last_action, RangedAttack) \
-                or isinstance(char.last_action, Rest) \
-                or isinstance(char.last_action, Concentrate) \
-                or isinstance(char.last_action, Spells):
-            
-            func.optional_print("The attack surprises you during your current action(",
-                                char.last_action.name, ")!", level=2)
-            func.optional_print("Your defense is diminished!", level=2)
-            func.optional_sleep(2)
-            func.optional_print("Your current action is also canceled!", level=2)
-            func.optional_sleep(2)
-            
-            if isinstance(char.last_action, Reload):
-                func.optional_print("You loose the ammo being used for reloading!", level=2)
-                func.optional_sleep(2)
-                char.equipments.ammo.remove(char.last_action.ammo_to_load)
-            
-            char.last_action = None  # Has to be done after the unreload
-            char.timeline = timeline
-            char.spend_time(cfg.defense_time)
-            return True

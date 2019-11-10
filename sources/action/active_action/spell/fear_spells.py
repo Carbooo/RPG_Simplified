@@ -134,7 +134,7 @@ class FearSpells(Spells):
             knockback["other_char"].print_basic()
             func.optional_print("", "Both of you are delayed by the impact!")
             func.optional_sleep(2)
-            self.fight.stop_action(knockback["other_char"], self.initiator.timeline)
+            self.stop_action(knockback["other_char"], self.initiator.timeline)
             knockback["other_char"].spend_time(result / self.spell_power["char_hit_ratio"])
             self.target.spend_time(result)
             

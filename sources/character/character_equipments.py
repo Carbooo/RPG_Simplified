@@ -144,6 +144,7 @@ class CharEquipments:
                 if result[0] == 0:
                     func.optional_print("Your armor \\ID:", armor.get_id(), "\\Name:", armor.name, "has been broken!", level=3)
                     self.remove_armor(armor)
+                    func.optional_sleep(2)
             else:
                 break
             
