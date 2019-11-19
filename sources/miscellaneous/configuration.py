@@ -181,7 +181,9 @@ actions = {
 
 ######################## SPELLS CONFIG ######################
 spells = []
+min_visibility = 0.25  # Min visibililty to magically reach a target
 recurrent_spell_frequency = 1.0  # Frequency (in turn) when effects occur
+throwing_time = 0.25  # Time to throw a spell when the spell is ready
 
 ##################### WRATH SPELLS CONFIG ###################
 wrath_spells = {
@@ -206,8 +208,8 @@ wrath_spells_energy = {
     "FBL": 30.0
 }
 wrath_spells_time = {
-    "STR": 1.0,
-    "FBL": 2.5
+    "STR": 0.75,
+    "FBL": 1.75
 }
 wrath_spells_stamina = {
     "STR": 1.0,
@@ -261,8 +263,8 @@ joy_spells_energy = {
         "LGT": 20.0
     }
 joy_spells_time = {
-    "EGY": 1.0,
-    "LGT": 1.75
+    "EGY": 0.75,
+    "LGT": 1.25
 }
 joy_spells_stamina = {
     "EGY": 2.0,
@@ -316,8 +318,8 @@ love_spells_energy = {
         "HEA": 30.0
     }
 love_spells_time = {
-    "SHD": 1.75,
-    "HEA": 3.0
+    "SHD": 1.0,
+    "HEA": 1.75
 }
 love_spells_stamina = {
     "SHD": 2.5,
@@ -364,8 +366,8 @@ sadness_spells_energy = {
     "DST": 35.0
 }
 sadness_spells_time = {
-    "IPK": 1.75,
-    "DST": 3.0
+    "IPK": 1.25,
+    "DST": 2.25
 }
 sadness_spells_stamina = {
     "IPK": 2.5,
@@ -416,23 +418,23 @@ fear_spells["list"].append(fear_gigantic_fist)
 
 fear_spells_energy = {
     "OWI": 15.0,
-    "MFI": 22.5
+    "GFI": 22.5
 }
 fear_spells_time = {
-    "OWI": 1.25,
-    "MFI": 1.75
+    "OWI": 1.0,
+    "GFI": 1.25
 }
 fear_spells_stamina = {
     "OWI": 1.5,
-    "MFI": 3.0
+    "GFI": 3.0
 }
 fear_spells_hands = {
     "OWI": 2,
-    "MFI": 1
+    "GFI": 1
 }
 fear_spells_knowledge = {
     "OWI": 2,
-    "MFI": 3
+    "GFI": 3
 }
 fear_spells_power = {
     "OWI": {
@@ -440,12 +442,12 @@ fear_spells_power = {
         "defense": 15.0,
         "duration": 10.0
     },
-    "MFI": {
+    "GFI": {
         "attack_value": 27.5,
         "life_rate": 1.0,
         "ignoring_armor_rate": 0.85,
         "pen_rate": 0.05,
-        "dresis_dim_rate": 0.25,
+        "resis_dim_rate": 0.25,
         "moving_back_ratio": 40.0,
         "obstacle_hit_ratio": 10.0,
         "char_hit_ratio": 75.0

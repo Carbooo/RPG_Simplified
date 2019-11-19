@@ -116,13 +116,13 @@ class Field:
         
     def is_target_magically_reachable(self, attacker, target):
         if target.body.is_alive() and attacker.is_enemy_magically_reachable(target) and \
-                self.calculate_ranged_obstacle_ratio(attacker, target.abscissa, target.ordinate) > 0:
+                self.calculate_ranged_obstacle_ratio(attacker, target.abscissa, target.ordinate) >= cfg.min_visibility:
             return True
         return False
     
     def is_pos_magically_reachable(self, attacker, abscissa, ordinate):
         if attacker.is_distance_magically_reachable(abscissa, ordinate) and \
-                self.calculate_ranged_obstacle_ratio(attacker, abscissa, ordinate) > 0:
+                self.calculate_ranged_obstacle_ratio(attacker, abscissa, ordinate) >= cfg.min_visibility:
             return True
         return False
         

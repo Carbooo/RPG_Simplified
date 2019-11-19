@@ -1,5 +1,4 @@
 import math as math
-import time as time
 import random as random
 from sources.action.action import Actions
 from sources.action.active_action.active_action import ActiveActions
@@ -18,6 +17,7 @@ class Spells(ActiveActions):
         self.name = "Generic spell action"
         self.surname = "Generic spell name"
         self.type = "Spell"
+        self.stage = "Initialization"
         self.target = None
         self.feeling_type = None
         self.spell_code = spell_code
@@ -31,13 +31,26 @@ class Spells(ActiveActions):
 
 ######################### BASE FUNCTIONS #######################
     def start(self):
-        pass  # Only for inheritance
+        self.stage = "Gathering"
+
+    def throw(self):
+        self.stage = "Throwing"
+        self.end_update(0, cfg.throwing_time)
+
+    def occur(self):
+        self.stage = "Occurring"
 
     def execute(self):
-        self.initiator.last_action = None  # To avoid looping on the spell
+        if self.stage == "Gathering":
+            return self.throw()
+        elif self.stage == "Throwing":
+            self.initiator.last_action = None  # To avoid looping on the spell
+            return self.occur()
+        else:
+            return False
 
     def end(self, is_canceled=False):
-        pass  # Only for inheritance
+        self.stage = "Ending"
 
     def set_magical_coef(self):
         self.magical_coef = random.gauss(cfg.mean, cfg.high_variance) \
@@ -105,11 +118,6 @@ class Spells(ActiveActions):
             func.optional_print("Spell type:", read, "is not recognized")
 
     def choose_pos_target(self, is_obstacle_free=False):
-        if self.fight.belong_to_team(self.initiator) == self.fight.team1:
-            team = self.fight.team2
-        else:
-            team = self.fight.team1
-
         while 1:
             try:
                 func.optional_print("Where do you want to throw your spell?")
@@ -139,36 +147,11 @@ class Spells(ActiveActions):
                     func.optional_print("Target is not magically reachable")
                     continue
 
-            target = {
+            self.target = {
                 "abscissa": abscissa,
                 "ordinate": ordinate
             }
-            return target
-
-    def choose_target_from_list(self, char_list):
-        func.optional_print("---------- CASTER -----------")
-        self.initiator.print_attack_state()
-        func.optional_print("")
-        func.optional_print("--------- TARGETS -----------")
-        func.optional_print("Choose one of the available targets:")
-        for char in char_list:
-            char.print_defense_state()
-
-        while 1:
-            try:
-                func.optional_print("")
-                read = int(func.optional_input('--> ID (0 = Cancel): '))
-                if Actions.cancel_action(read):
-                    return False
-
-                for char in char_list:
-                    if char.get_id() == read:
-                        return char
-
-                func.optional_print("ID:", read, "is not available")
-
-            except:
-                func.optional_print("The input is not an ID")
+            return True
 
     def choose_target(self, include_enemies, include_allied, include_deads):
         team_list = []
@@ -189,21 +172,50 @@ class Spells(ActiveActions):
                     (include_deads or char.body.is_alive()):
                 char_list.append(char)
 
-        self.target = self.choose_target_from_list(char_list)
-        if not self.target:
-            return False
-        else:
-            return True
+        func.optional_print("---------- CASTER -----------")
+        self.initiator.print_attack_state()
+        func.optional_print("")
+        func.optional_print("--------- TARGETS -----------")
+        func.optional_print("Choose one of the available targets:")
+        for char in char_list:
+            char.print_defense_state()
 
-    def rechoose_target_if_necessary(self, include_enemies, include_allied, include_deads):
-        if not self.fight.field.is_target_magically_reachable(self.initiator, self.target):
-            if include_deads or not self.target.body.is_alive():
-                func.optional_print("Your initial target is no longer reachable!")
-                func.optional_print("Please choose a new one or cancel the attack.")
-                self.target = self.choose_target(include_enemies, include_allied, include_deads)
-                if not self.target:
-                    func.optional_print("Spell cancelled, the magic and stamina spent is lost")
+        while 1:
+            try:
+                func.optional_print("")
+                read = int(func.optional_input('--> ID (0 = Cancel): '))
+                if Actions.cancel_action(read):
                     return False
+
+                for char in char_list:
+                    if char.get_id() == read:
+                        self.target = char
+                        return True
+
+                func.optional_print("ID:", read, "is not available")
+
+            except:
+                func.optional_print("The input is not an ID")
+
+    def is_target_still_reachable(self, include_deads, is_obstacle_free):
+        reachable = True
+        if isinstance(self.target, dict):  # Target is a position, not a character
+            if is_obstacle_free:
+                if not self.initiator.is_distance_magically_reachable(self.target["abscissa"], self.target["ordinate"]):
+                    reachable = False
+            else:
+                if not self.fight.field.is_pos_magically_reachable(self.initiator, self.target["abscissa"], self.target["ordinate"]):
+                    reachable = False
+        else:
+            if not self.fight.field.is_target_magically_reachable(self.initiator, self.target):
+                reachable = False
+            elif not include_deads and not self.target.body.is_alive():
+                reachable = False
+
+        if not reachable:
+            func.optional_print("Your initial target is no longer reachable!")
+            func.optional_print("Spell cancelled, the magic and stamina spent is lost")
+            return False
         return True
 
 ######################### EXECUTING FUNCTIONS #######################

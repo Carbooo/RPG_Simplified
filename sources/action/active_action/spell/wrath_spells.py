@@ -1,5 +1,4 @@
 import math as math
-import time as time
 from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
@@ -31,13 +30,22 @@ class WrathSpells(Spells):
             return self.start_fireball()
         else:
             return False
-    
-    def execute(self):
-        super().execute()
+
+    def throw(self):
+        super().throw()
+        if self.spell_code == "STR":
+            pass
+        elif self.spell_code == "FBL":
+            return self.choose_fireball_target()
+        else:
+            return False
+
+    def occur(self):
+        super().occur()
         if self.spell_code == "STR":
             return self.improve_strength()
         elif self.spell_code == "FBL":
-            return self.throw_fireball()
+            return self.fireball()
         else:
             return False
     
@@ -116,15 +124,20 @@ class WrathSpells(Spells):
         
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
-        return True   
-    
-    def throw_fireball(self):
+        return True
+
+    def choose_fireball_target(self):
         self.print_spell("has a fireball ready and needs to choose a target", "choosing", True)
-        target = self.choose_pos_target()
-        if not target:
+        if not self.choose_pos_target():
             func.optional_print("Spell cancelled, the magic and stamina spent is lost")
             return False
+        return True
 
+    def fireball(self):
+        if not self.is_target_still_reachable(False, False):
+            return False
+
+        target = self.target
         attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
         for char, distance_ratio in self.get_all_spread_targets(
                 self.spell_power["spread_distance"] * self.magical_coef,

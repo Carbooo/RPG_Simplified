@@ -1,4 +1,3 @@
-import time as time
 from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
@@ -31,13 +30,22 @@ class LoveSpells(Spells):
             return self.start_heal()
         else:
             return False
-    
-    def execute(self):
-        super().execute()
+
+    def throw(self):
+        super().throw()
+        if self.spell_code == "SHD":
+            return self.choose_shield_target()
+        elif self.spell_code == "HEA":
+            return self.choose_heal_target()
+        else:
+            return False
+
+    def occur(self):
+        super().occur()
         if self.spell_code == "SHD":
             return self.shield()
         elif self.spell_code == "HEA":
-            return self.throw_heal()
+            return self.heal()
         else:
             return False
     
@@ -51,29 +59,30 @@ class LoveSpells(Spells):
     def start_shield(self):
         if not self.is_able_to_cast():
             return False
-
-        if not self.choose_target(False, True, False):
-            return False
             
         func.optional_print("You have decided to set up a shield, protecting your target against damages.")
         func.optional_print("The shield will be set up soon!")
         func.optional_sleep(3)
-        
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
         return True
-        
+
+    def choose_shield_target(self):
+        self.print_spell("has a magical shield ready and needs to choose a target", "choosing", True)
+        if not self.choose_target(False, True, False):
+            func.optional_print("Spell cancelled, the magic and stamina spent is lost")
+            return False
+        return True
+
     def shield(self):
-        if not self.rechoose_target_if_necessary(False, True, False):
+        if not self.is_target_still_reachable(False, False):
             return False
 
-        self.print_spell("has set up a magic shield on", "executing", False)
-                
+        self.print_spell("has set up a magical shield on", "executing", False)
         self.remove_identical_active_spell()
         self.magical_coef *= self.initiator.magic_power_ratio
         self.armor = self.target.equipments.set_magical_armor("Love shield", self.spell_power["resistance"] * self.magical_coef)
-        
-        self.add_lasting_spell("Magic love shield", cfg.recurrent_spell_frequency)
+        self.add_lasting_spell("Magical love shield", cfg.recurrent_spell_frequency)
         return True
     
     def end_shield(self, is_canceled):
@@ -89,7 +98,7 @@ class LoveSpells(Spells):
             
         is_depleted = self.target.equipments.decay_magical_armor(self.armor, self.spell_power["turn_decay"])
         if is_depleted:
-            self.print_spell("has no longer a magic love shield", "ending", False)
+            self.print_spell("has no longer a magical love shield", "ending", False)
             self.end_lasting_spell()
         else:
             self.timeline += 1
@@ -98,24 +107,26 @@ class LoveSpells(Spells):
     def start_heal(self):
         if not self.is_able_to_cast():
             return False
-
-        if not self.choose_target(False, True, False):
-            return False
         
         func.optional_print("You have decided to heal an ally")
         func.optional_print("The heal is charging...")
         func.optional_sleep(3)
-        
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
-        return True   
-    
-    def throw_heal(self):
-        if not self.rechoose_target_if_necessary(False, True, False):
+        return True
+
+    def choose_heal_target(self):
+        self.print_spell("has a heal ready and needs to choose a target", "choosing", True)
+        if not self.choose_target(False, True, False):
+            func.optional_print("Spell cancelled, the magic and stamina spent is lost")
+            return False
+        return True
+
+    def heal(self):
+        if not self.is_target_still_reachable(False, False):
             return False
 
         self.print_spell("is going to heal", "executing", False)
-
         self.magical_coef *= self.initiator.magic_power_ratio
         self.target.body.update_life(self.spell_power["heal"] * self.magical_coef)
         return True

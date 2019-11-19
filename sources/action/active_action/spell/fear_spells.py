@@ -1,5 +1,4 @@
 import math as math
-import time as time
 from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
@@ -28,16 +27,25 @@ class FearSpells(Spells):
         super().start()
         if self.spell_code == "OWI":
             return self.start_opposing_winds()
-        elif self.spell_code == "MFI":
+        elif self.spell_code == "GFI":
             return self.start_gigantic_fist()
         else:
             return False
-    
-    def execute(self):
-        super().execute()
+
+    def throw(self):
+        super().throw()
+        if self.spell_code == "OWI":
+            pass
+        elif self.spell_code == "GFI":
+            return self.choose_gigantic_fist_target()
+        else:
+            return False
+
+    def occur(self):
+        super().occur()
         if self.spell_code == "OWI":
             return self.opposing_winds()
-        elif self.spell_code == "MFI":
+        elif self.spell_code == "GFI":
             return self.gigantic_fist()
         else:
             return False
@@ -89,23 +97,25 @@ class FearSpells(Spells):
         if not self.is_able_to_cast():
             return False
 
-        if not self.choose_target(True, False, False):
-            return False
-        
         func.optional_print("You have decided to throw a gigantic magic fist")
         func.optional_print("The fist is forming...")
         func.optional_sleep(3)
-        
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
-        return True   
-    
+        return True
+
+    def choose_gigantic_fist_target(self):
+        self.print_spell("has a gigantic fist ready and needs to choose a target", "choosing", True)
+        if not self.choose_target(True, False, False):
+            func.optional_print("Spell cancelled, the magic and stamina spent is lost")
+            return False
+        return True
+
     def gigantic_fist(self):
-        if not self.rechoose_target_if_necessary(True, False, False):
+        if not self.is_target_still_reachable(False, False):
             return False
 
         self.print_spell("is sending a gigantic magic fist to", "executing", False)
-
         attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
         result = self.magical_attack_received(
             attack_value,

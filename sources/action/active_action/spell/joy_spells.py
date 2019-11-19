@@ -1,5 +1,4 @@
 import math as math
-import time as time
 from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
@@ -31,13 +30,22 @@ class JoySpells(Spells):
             return self.start_light()
         else:
             return False
-    
-    def execute(self):
-        super().execute()
+
+    def throw(self):
+        super().throw()
+        if self.spell_code == "EGY":
+            pass
+        elif self.spell_code == "LGT":
+            return self.choose_light_target()
+        else:
+            return False
+
+    def occur(self):
+        super().occur()
         if self.spell_code == "EGY":
             return self.energize()
         elif self.spell_code == "LGT":
-            return self.throw_light()
+            return self.light()
         else:
             return False
     
@@ -94,23 +102,25 @@ class JoySpells(Spells):
         if not self.is_able_to_cast():
             return False
 
-        if not self.choose_target(True, False, False):
-            return False
-        
         func.optional_print("You have decided to send a burning light")
         func.optional_print("The light is charging...")
         func.optional_sleep(3)
-        
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
-        return True   
-    
-    def throw_light(self):
-        if not self.rechoose_target_if_necessary(True, False, False):
+        return True
+
+    def choose_light_target(self):
+        self.print_spell("has a burning light ready and needs to choose a target", "choosing", True)
+        if not self.choose_target(True, False, False):
+            func.optional_print("Spell cancelled, the magic and stamina spent is lost")
+            return False
+        return True
+
+    def light(self):
+        if not self.is_target_still_reachable(False, False):
             return False
 
         self.print_spell("is sending a burning light to", "executing", False)
-
         attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
         result = self.magical_attack_received(
             attack_value,

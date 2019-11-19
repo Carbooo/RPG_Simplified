@@ -1,5 +1,4 @@
 import math as math
-import time as time
 from sources.action.active_action.spell.spells import Spells
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
@@ -35,13 +34,22 @@ class SadnessSpells(Spells):
             return self.start_despair_storm()
         else:
             return False
-    
-    def execute(self):
-        super().execute()
+
+    def throw(self):
+        super().throw()
         if self.spell_code == "IPK":
-            return self.throw_ice_pick()
+            return self.choose_ice_pick_target()
         elif self.spell_code == "DST":
-            return self.throw_despair_storm()
+            return self.choose_despair_storm_target()
+        else:
+            return False
+
+    def occur(self):
+        super().occur()
+        if self.spell_code == "IPK":
+            return self.ice_pick()
+        elif self.spell_code == "DST":
+            return self.despair_storm()
         else:
             return False
     
@@ -55,26 +63,27 @@ class SadnessSpells(Spells):
     def start_ice_pick(self):
         if not self.is_able_to_cast():
             return False
-
-        if not self.choose_target(True, False, False):
-            return False
         
         func.optional_print("You have decided to send a ice pick")
         func.optional_print("The ice is forming...")
         func.optional_sleep(3)
-        
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
         return True   
-    
-    def throw_ice_pick(self):
-        if not self.rechoose_target_if_necessary(True, False, False):
+
+    def choose_ice_pick_target(self):
+        self.print_spell("has an ice pick ready and needs to choose a target", "choosing", True)
+        if not self.choose_target(True, False, False):
+            return False
+        return True
+
+    def ice_pick(self):
+        if not self.is_target_still_reachable(False, False):
             return False
 
         self.print_spell("is sending an ice pick to", "executing", False)
-
         attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
-        result = self.magical_attack_received(
+        self.magical_attack_received(
             attack_value,
             True,  # is_localized
             True,  # can_use_shield
@@ -83,7 +92,6 @@ class SadnessSpells(Spells):
             self.spell_power["pen_rate"],
             self.spell_power["resis_dim_rate"]
         )
-        
         return True
     
     def start_despair_storm(self):
@@ -93,20 +101,23 @@ class SadnessSpells(Spells):
         func.optional_print("You have decided to cast a despair ice storm")
         func.optional_print("The storm is forming...")
         func.optional_sleep(3)
-        
         self.set_magical_coef()
         self.end_update(self.get_stamina_with_coef(), self.get_time_with_coef())
         return True   
-    
-    def throw_despair_storm(self):
+
+    def choose_despair_storm_target(self):
         self.print_spell("has a despair storm ready and needs to choose a target", "choosing", True)
-        target = self.choose_pos_target(is_obstacle_free=True)
-        if not target:
+        if not self.choose_pos_target(is_obstacle_free=True):
             func.optional_print("Spell cancelled, the magic and stamina spent is lost")
             return False
+        return True
 
-        self.target_abs = target["abscissa"]
-        self.target_ord = target["ordinate"]
+    def despair_storm(self):
+        if not self.is_target_still_reachable(False, True):
+            return False
+
+        self.target_abs = self.target["abscissa"]
+        self.target_ord = self.target["ordinate"]
         self.magical_coef *= self.initiator.magic_power_ratio
         self.nb_of_turns = int(round(self.spell_power["duration"] * self.magical_coef))
         self.apply_despair_storm()
