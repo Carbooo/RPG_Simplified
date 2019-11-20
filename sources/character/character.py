@@ -1,6 +1,5 @@
 import math as math
 import random as random
-import time as time
 import copy as copy
 import sources.miscellaneous.configuration as cfg
 import sources.miscellaneous.global_functions as func
@@ -341,14 +340,21 @@ class Character:
                     else:
                         print("Error: Fighting availability type (", attack.type, ") not expected!")
 
+        print("total_time1", total_time)
         # Calculate fighting readiness regarding char timeline
-        readiness_time = max(0.0, self.timeline - start_time)
+        real_end_time = min(self.timeline, end_time)
+        readiness_time = max(0.0, (real_end_time - start_time) / (end_time - start_time))
+        print("readiness_time1", readiness_time)
+        print("self.last_action", self.last_action)
         if self.last_action:
             if self.last_action.type == "MeleeAttack" or self.last_action.type == "Waiting" or \
                     self.last_action.type == "Move":  # Always ready for this type of action
                 readiness_time = 0.0
+        print("readiness_time2", readiness_time)
 
         total_time += readiness_time
+        print("total_time2", total_time)
+        print("self.speed_ratio", self.speed_ratio)
         return 1.0 / (1.0 + total_time / self.speed_ratio)
         
     def can_melee_attack(self, enemy):

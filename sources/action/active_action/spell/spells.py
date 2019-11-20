@@ -35,6 +35,7 @@ class Spells(ActiveActions):
 
     def throw(self):
         self.stage = "Throwing"
+        self.start_timeline = self.initiator.timeline
         self.end_update(0, cfg.throwing_time)
 
     def occur(self):
@@ -157,11 +158,13 @@ class Spells(ActiveActions):
         team_list = []
         if self.fight.belong_to_team(self.initiator) == self.fight.team1:
             if include_enemies:
+                enemy_team = self.fight.team2.characters_list
                 team_list.extend(self.fight.team2.characters_list)
             if include_allied:
                 team_list.extend(self.fight.team1.characters_list)
         else:
             if include_enemies:
+                enemy_team = self.fight.team1.characters_list
                 team_list.extend(self.fight.team1.characters_list)
             if include_allied:
                 team_list.extend(self.fight.team2.characters_list)
@@ -190,6 +193,8 @@ class Spells(ActiveActions):
                 for char in char_list:
                     if char.get_id() == read:
                         self.target = char
+                        if include_enemies and char in enemy_team:
+                            char.add_previous_attack(self.start_timeline, self.initiator.timeline, self)
                         return True
 
                 func.optional_print("ID:", read, "is not available")
@@ -247,9 +252,8 @@ class Spells(ActiveActions):
 
     def magical_attack_received(self, attack_value, is_localized, can_use_shield, life_rate,
                                 ignoring_armor_rate, pen_rate, resis_dim_rate):
-        if self.target != self.initiator:
-            self.stop_action(self.target, self.initiator.timeline)
-
+        func.optional_print("Target fighting availability:", round(
+            self.target.get_fighting_availability(self.start_timeline, self.initiator.timeline, self), 2), level=3)
         if can_use_shield:
             attack_value -= self.target.magic_defense_with_shields \
                             * self.get_attack_coef(self.target, self.initiator.timeline)
@@ -257,6 +261,9 @@ class Spells(ActiveActions):
         else:
             attack_value -= self.target.magic_defense \
                             * self.get_attack_coef(self.target, self.initiator.timeline)
+
+        if self.target != self.initiator:
+            self.stop_action(self.target, self.initiator.timeline)
 
         if attack_value <= 0:
             self.target.print_basic()

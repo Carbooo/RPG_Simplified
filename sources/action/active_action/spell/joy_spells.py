@@ -34,7 +34,7 @@ class JoySpells(Spells):
     def throw(self):
         super().throw()
         if self.spell_code == "EGY":
-            pass
+            return True
         elif self.spell_code == "LGT":
             return self.choose_light_target()
         else:

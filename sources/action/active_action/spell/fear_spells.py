@@ -35,7 +35,7 @@ class FearSpells(Spells):
     def throw(self):
         super().throw()
         if self.spell_code == "OWI":
-            pass
+            return True
         elif self.spell_code == "GFI":
             return self.choose_gigantic_fist_target()
         else:

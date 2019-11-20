@@ -34,7 +34,7 @@ class WrathSpells(Spells):
     def throw(self):
         super().throw()
         if self.spell_code == "STR":
-            pass
+            return True
         elif self.spell_code == "FBL":
             return self.choose_fireball_target()
         else:

@@ -110,9 +110,8 @@ class MeleeAttack(ActiveActions):
         func.optional_print("")
         func.optional_sleep(3)
 
-        self.initiator.last_action = None  # To avoid looping on this action
-        self.stop_action(self.target, self.real_end_timeline)
         attack_result = self.melee_defense_result()
+        self.stop_action(self.target, self.real_end_timeline)
         self.melee_attack_type(attack_result)
         
         abscissa = self.target.abscissa

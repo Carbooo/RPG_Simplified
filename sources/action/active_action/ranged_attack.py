@@ -124,8 +124,7 @@ class RangedAttack(ActiveActions):
             func.optional_print("")
             func.optional_sleep(5)
             return False
-        
-        self.initiator.last_action = None  # To avoid looping on this action
+
         func.optional_print("")
         func.optional_print("*********************************************************************")
         self.initiator.print_basic()
@@ -161,12 +160,11 @@ class RangedAttack(ActiveActions):
             func.optional_sleep(3)
             self.range_defend(math.sqrt(1 - hit_chance))
 
+        self.initiator.last_action = None  # To avoid looping on this action
         self.initiator.equipments.use_ammo()
         return True
 
     def range_defend(self, hit_chance):
-        self.stop_action(self.target, self.initiator.timeline)
-
         # Range defense result
         # The higher the shoot is precised, the more chance it is to hurt the target
         # The further the target is, the easiest it is to anticipate and defend
@@ -183,7 +181,8 @@ class RangedAttack(ActiveActions):
         func.optional_print("attack_result", attack_result, level=3, debug=True)
         func.optional_print("range_power", range_power, level=3, debug=True)
         func.optional_print("damages_ratio", damages_ratio, level=3, debug=True)
-        
+
+        self.stop_action(self.target, self.initiator.timeline)
         # Attack result --> Either block or be hit
         if attack_result <= cfg.ranged_attack_stage[0]:
             self.target.equipments.all_shields_absorbed_damage(range_power, self.ammo_used.resis_dim_rate)
