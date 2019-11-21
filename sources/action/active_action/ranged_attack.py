@@ -132,11 +132,14 @@ class RangedAttack(ActiveActions):
         self.target.print_basic()
         func.optional_print(")")
         hit_chance = self.shoot_hit_chance()
-        func.optional_print("Current hit chance:", round(hit_chance, 2), level=2)
+        func.optional_print("Current hit chance:", round(hit_chance, 2), level=3)
         func.optional_print("Range power:", int(round(self.get_range_power())), level=2)
-        func.optional_print("Fighting availability:", round(
+        func.optional_print("Initiator fighting availability:", round(
+            self.initiator.get_fighting_availability(self.start_timeline, self.initiator.timeline, self), 2),
+                            level=3)
+        func.optional_print("Target fighting availability:", round(
             self.target.get_fighting_availability(self.start_timeline, self.initiator.timeline, self), 2),
-                            level=2)
+                            level=3)
         func.optional_print("*********************************************************************")
         func.optional_print("")
         func.optional_sleep(3)

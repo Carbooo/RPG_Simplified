@@ -326,10 +326,6 @@ class Character:
             if attack["action"] != excluded_attack:
                 real_end_time = min(attack["end_time"], end_time)
                 time = max(0, (real_end_time - start_time) / (attack["end_time"] - attack["start_time"]))
-                print("end_time", end_time)
-                print("start_time", start_time)
-                print("att_end_time", attack["end_time"])
-                print("att_start_time", attack["start_time"])
                 if time > 0:
                     if attack["action"].type == "MeleeAttack":
                         total_time += time * cfg.melee_attack_fighting_availability
@@ -340,21 +336,14 @@ class Character:
                     else:
                         print("Error: Fighting availability type (", attack.type, ") not expected!")
 
-        print("total_time1", total_time)
         # Calculate fighting readiness regarding char timeline
         real_end_time = min(self.timeline, end_time)
         readiness_time = max(0.0, (real_end_time - start_time) / (end_time - start_time))
-        print("readiness_time1", readiness_time)
-        print("self.last_action", self.last_action)
-        if self.last_action:
-            if self.last_action.type == "MeleeAttack" or self.last_action.type == "Waiting" or \
-                    self.last_action.type == "Move":  # Always ready for this type of action
-                readiness_time = 0.0
-        print("readiness_time2", readiness_time)
-
+        if excluded_attack.initiator == self or (
+                self.last_action and self.last_action.type in ("MeleeAttack", "Waiting", "Move")):
+            # Always ready for your own action or for some specific action
+            readiness_time = 0.0
         total_time += readiness_time
-        print("total_time2", total_time)
-        print("self.speed_ratio", self.speed_ratio)
         return 1.0 / (1.0 + total_time / self.speed_ratio)
         
     def can_melee_attack(self, enemy):

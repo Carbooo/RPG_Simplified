@@ -39,6 +39,9 @@ class ActiveActions(Actions):
             cancel_probability = cfg.ranged_attack_fighting_availability
         elif self.type == "Spell":
             cancel_probability = cfg.magic_attack_fighting_availability
+        else:
+            func.optional_print("Error: Type not found for stop action function")
+            return False
 
         if not char.last_action or char.last_action.type == "MeleeAttack":
             # Cannot stop these actions
@@ -68,12 +71,12 @@ class ActiveActions(Actions):
                 func.optional_sleep(2)
 
                 if cancelled:
-                    func.optional_print("Your current action (", char.last_action.name, ") is canceled by the attack!",
-                                        level=2)
+                    func.optional_print("Your current action (", char.last_action.name, ") is also canceled by the attack!",
+                                        level=3)
                     func.optional_sleep(2)
 
                     if char.last_action.type == "Reload":
-                        func.optional_print("You also loose the ammo being used for reloading!", level=2)
+                        func.optional_print("Furthermore, you loose the ammo being used for reloading!", level=3)
                         func.optional_sleep(2)
                         char.equipments.ammo.remove(char.last_action.ammo_to_load)
 

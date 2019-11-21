@@ -252,8 +252,13 @@ class Spells(ActiveActions):
 
     def magical_attack_received(self, attack_value, is_localized, can_use_shield, life_rate,
                                 ignoring_armor_rate, pen_rate, resis_dim_rate):
+        func.optional_print("Initiator fighting availability:", round(
+            self.initiator.get_fighting_availability(self.start_timeline, self.initiator.timeline, self), 2), level=3)
         func.optional_print("Target fighting availability:", round(
             self.target.get_fighting_availability(self.start_timeline, self.initiator.timeline, self), 2), level=3)
+
+        attack_value *= self.initiator.get_fighting_availability(self.start_timeline, self.initiator.timeline, self)
+        func.optional_print("attack_value1", attack_value, level=3, debug=True)
         if can_use_shield:
             attack_value -= self.target.magic_defense_with_shields \
                             * self.get_attack_coef(self.target, self.initiator.timeline)
@@ -261,6 +266,7 @@ class Spells(ActiveActions):
         else:
             attack_value -= self.target.magic_defense \
                             * self.get_attack_coef(self.target, self.initiator.timeline)
+        func.optional_print("attack_value2", attack_value, level=3, debug=True)
 
         if self.target != self.initiator:
             self.stop_action(self.target, self.initiator.timeline)

@@ -34,7 +34,7 @@ free_hand_pen_rate = 0.05  # Penetration of hits with free hands
 free_hand_resis_dim_rate = 0.01  # Armor diminution of hits with free hands
 team_state_effect_on_moral = 1.0 / 4.0  # Math.pow(team state, this value) as morale
 melee_attack_fighting_availability = 1.0  # impact coef on fighting availability
-ranged_attack_fighting_availability = 0.25
+ranged_attack_fighting_availability = 0.33
 magic_attack_fighting_availability = 0.5
 
 ########################## BODY CONFIG #######################
@@ -383,10 +383,10 @@ sadness_spells_knowledge = {
 }
 sadness_spells_power = {
     "IPK": {
-        "attack_value": 50.0,
-        "life_rate": 1.5,
-        "ignoring_armor_rate": 0.1,
-        "pen_rate": 0.3,
+        "attack_value": 40.0,
+        "life_rate": 1.25,
+        "ignoring_armor_rate": 0.075,
+        "pen_rate": 0.1,
         "resis_dim_rate": 0.2
     },
     "DST": {

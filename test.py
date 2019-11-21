@@ -112,11 +112,11 @@ def test_melee3():  # Medium def vs Medium def
     Fight(cfg.field_list[0], cfg.team_list[11], cfg.team_list[12])
 
 
-def test_melee_vs_ranged1():  # Small shield vs bow
+def test_melee_vs_ranged1():  # Big shield vs bow
     func.log_level = 3
     func.automatic = True
     func.log_debug = True
-    func.action0 = ["EQP", 244, "MOV", 0, 0,
+    func.action0 = ["EQP", 181, "MOV", 0, 0,
                     "REL", "RAT", 2,
                     "REL", "RAT", 2,
                     "REL", "RAT", 2,
@@ -134,11 +134,11 @@ def test_melee_vs_ranged1():  # Small shield vs bow
     Fight(cfg.field_list[0], cfg.team_list[11], cfg.team_list[15])
 
 
-def test_melee_vs_ranged2():  # Big shield vs bow
+def test_melee_vs_ranged2():  # Small shield vs bow
     func.log_level = 3
     func.automatic = True
     func.log_debug = True
-    func.action0 = ["EQP", 244, "MOV", 0, 0,
+    func.action0 = ["EQP", 181, "MOV", 0, 0,
                     "REL", "RAT", 1,
                     "REL", "RAT", 1,
                     "REL", "RAT", 1,
@@ -152,7 +152,7 @@ def test_melee_vs_ranged2():  # Big shield vs bow
                     "PAS", 100, "PAS", 100,
                     "PAS", 100, "PAS", 100
                     ]
-    func.actions = {"r1": func.action0, "a1": func.action1}
+    func.actions = {"r1": func.action0, "a0": func.action1}
     Fight(cfg.field_list[0], cfg.team_list[13], cfg.team_list[15])
 
 
@@ -164,7 +164,7 @@ def test_ranged():
     Fight(cfg.field_list[0], cfg.team_list[14], cfg.team_list[15])
 
 
-def test_magic():
+def test_magic1():
     func.log_level = 1
     func.automatic = False
     func.log_debug = True
@@ -172,4 +172,24 @@ def test_magic():
     Fight(cfg.field_list[0], cfg.team_list[16], cfg.team_list[17])
 
 
-test_melee1()
+def test_melee_vs_magic1():  # Big shield vs sadness
+    func.log_level = 3
+    func.automatic = True
+    func.log_debug = True
+    func.action0 = ["EQP", 27, 28, "PAS", 100]
+    func.action1 = ["SPL", "SAD", "IPK", 2]
+    func.actions = {"a1": func.action0, "b6": func.action1}
+    Fight(cfg.field_list[0], cfg.team_list[11], cfg.team_list[17])
+
+
+def test_melee_vs_magic2():  # Small shield vs sadness
+    func.log_level = 3
+    func.automatic = True
+    func.log_debug = True
+    func.action0 = ["EQP", 24, 25, "PAS", 100]
+    func.action1 = ["SPL", "SAD", "IPK", 1]
+    func.actions = {"a0": func.action0, "b6": func.action1}
+    Fight(cfg.field_list[0], cfg.team_list[13], cfg.team_list[17])
+
+
+test_melee_vs_magic1()
