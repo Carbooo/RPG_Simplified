@@ -281,6 +281,8 @@ class Spells(ActiveActions):
             if is_localized:
                 accuracy_ratio = self.fight.field.get_magical_accuracy(self.initiator, self.target)
                 armor_coef = self.target.get_armor_coef(accuracy_ratio)
+                if armor_coef == 0:
+                    attack_value /= cfg.no_armor_power_ratio
                 attack_value = self.target.damages_received(self.initiator, attack_value, armor_coef, 1.0,
                                                             life_rate, ignoring_armor_rate, pen_rate,
                                                             resis_dim_rate)

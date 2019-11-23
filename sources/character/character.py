@@ -230,6 +230,8 @@ class Character:
         # Skills do not really matter for ranged defense, the bigger you are, the harder it is to defend
         ranged_coef = math.sqrt(ranged_coef/10) * 10 / self.constitution_ratio
         magic_coef = (self.spirit + self.willpower/2 + self.constitution/3) / (1 + 1.0/2 + 1.0/3)
+        for key in self.feelings:
+            magic_coef += self.feelings[key].energy_ratio * self.feelings[key].mastering_ratio
         
         # Set defenses
         self.melee_defense = self.get_global_ratio() * melee_coef * weapons_defense["melee_defense"]
@@ -343,6 +345,7 @@ class Character:
                 self.last_action and self.last_action.type in ("MeleeAttack", "Waiting", "Move")):
             # Always ready for your own action or for some specific action
             readiness_time = 0.0
+
         total_time += readiness_time
         return 1.0 / (1.0 + total_time / self.speed_ratio)
         

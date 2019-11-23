@@ -192,4 +192,4 @@ def test_melee_vs_magic2():  # Small shield vs sadness
     Fight(cfg.field_list[0], cfg.team_list[13], cfg.team_list[17])
 
 
-test_melee_vs_magic1()
+test_melee_vs_magic2()
