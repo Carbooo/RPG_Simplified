@@ -48,7 +48,15 @@ equip_bulk_mean = 2.5  # Bulk reference for equipped weapons
 concentrate_update_coef = 3  # Energy coef to update feeling with concentration
 max_alive_energy = 1000.0
 max_safe_energy = 300.0
-feelings_list = ["Wrath", "Joy", "Love", "Hate", "Fear", "Sadness"]
+feelings_list = {
+                    "WRA": "Wrath",
+                    "JOY": "Joy",
+                    "LOV": "Love",
+                    "HAT": "Hate",
+                    "FEA": "Fear",
+                    "SAD": "Sadness"
+}
+feelings_code = ["Wrath", "Joy", "Love", "Hate", "Fear", "Sadness"]
 default_energy = 50.0  # Starting energy for sensibility 10
 medium_energy = 100.0  # Energy reference for spells
 natural_increase_reference = 150.0  # Energy reference to increase feeling (with square2)
@@ -394,7 +402,7 @@ sadness_spells_power = {
     },
     "DST": {
         "spread_distance": 2.5,
-        "moral_dim_rate": 0.5,
+        "morale_dim_rate": 0.5,
         "stamina_dim_rate": 3.0,
         "speed_dim_rate": 0.3,
         "duration": 10.0

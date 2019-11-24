@@ -16,6 +16,7 @@ ImportData("ObstaclesField", "data/maps/Short.csv")
 ImportData("ObstaclesField", "data/maps/ShortObstacles.csv")
 ImportData("ObstaclesField", "data/maps/TwoBridges.csv")
 ImportData("ObstaclesField", "data/maps/LongObstacles.csv")
+ImportData("ObstaclesField", "data/maps/VeryLongTwoBridges.csv")
 
 
 ##################### TESTING ###################
@@ -192,4 +193,4 @@ def test_melee_vs_magic2():  # Small shield vs sadness
     Fight(cfg.field_list[0], cfg.team_list[13], cfg.team_list[17])
 
 
-test_melee_vs_magic2()
+test_magic1()

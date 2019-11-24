@@ -24,14 +24,20 @@ class Concentrate(ActiveActions):
 
     def start(self):
         func.optional_print("On which feeling do you want to concentrate?")
-        for feeling in cfg.feelings_list:
-            func.optional_print("- ", feeling)
-        txt = "--> Feeling (0 = Cancel): "
+        for key in cfg.feelings_list:
+            func.optional_print("-", cfg.feelings_list[key], "(" + key + ")")
+
         while 1:
-            self.feeling = func.optional_input(txt)
-            if Actions.cancel_action(self.feeling):
+            read = func.optional_input("--> Feeling (0 = Cancel): ")
+            if Actions.cancel_action(read):
                 return False
-            elif self.feeling in cfg.feelings_list:
+
+            for key in cfg.feelings_list:
+                if read == key:
+                    self.feeling = cfg.feelings_list[key]
+                    break
+
+            if self.feeling:
                 break
             else:
                 func.optional_print("The feeling is not recognized")

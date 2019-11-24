@@ -76,7 +76,7 @@ class Character:
         self.last_action = None
         self.previous_attacks = []
         self.active_spells = []
-        self.team_state = 1.0
+        self.fight_morale_ratio = 1.0
         self.is_a_zombie = False
         self.coef_speed_ratio = 1.0
         
@@ -116,35 +116,35 @@ class Character:
 
 ################### UPDATE STAT FUNCTIONS ######################
     def update_constitution(self, difference):
-        self.constitution += max(0, difference)
+        self.constitution = max(0.0, self.constitution + difference)
         self.constitution_ratio = self.constitution / 10.0
 
     def update_force(self, difference):
-        self.force += max(0, difference)
+        self.force = max(0.0, self.force + difference)
         self.force_ratio = self.force / 10.0
 
     def update_agility(self, difference):
-        self.agility += max(0, difference)
+        self.agility = max(0.0, self.agility + difference)
         self.agility_ratio = self.agility / 10.0
 
     def update_dexterity(self, difference):
-        self.dexterity += max(0, difference)
+        self.dexterity = max(0.0, self.dexterity + difference)
         self.dexterity_ratio = self.dexterity / 10.0
 
     def update_reflex(self, difference):
-        self.reflex += max(0, difference)
+        self.reflex = max(0.0, self.reflex + difference)
         self.reflex_ratio = self.reflex / 10.0
 
     def update_willpower(self, difference):
-        self.willpower += max(0, difference)
+        self.willpower = max(0.0, self.willpower + difference)
         self.willpower_ratio = self.willpower / 10.0
 
     def update_spirit(self, difference):
-        self.spirit += max(0, difference)
+        self.spirit = max(0.0, self.spirit + difference)
         self.spirit_ratio = self.spirit / 10.0
 
     def update_morale(self, difference):
-        self.morale += max(0, difference)
+        self.morale = max(0.0, self.morale + difference)
         self.morale_ratio = self.morale / 10.0
 
 ######################### CHARACTERISTICS FUNCTIONS ########################

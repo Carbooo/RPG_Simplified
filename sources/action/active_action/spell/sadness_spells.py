@@ -134,7 +134,7 @@ class SadnessSpells(Spells):
             self.target = char
             self.print_spell("'s despair storm diminishes", "executing", False)
             coef = math.sqrt(distance_ratio) * self.magical_coef
-            char.update_morale(- self.spell_power["moral_dim_rate"] * coef)
+            char.update_morale(- self.spell_power["morale_dim_rate"] * coef)
             char.spend_stamina(self.spell_power["stamina_dim_rate"] * coef)
             current_targets[char] = coef
             if char not in self.affected_targets:
@@ -146,7 +146,7 @@ class SadnessSpells(Spells):
             if char not in current_targets:
                 char.active_spells.remove(self)
             else:
-                char.coef_speed_ratio -= self.spell_power["speed_dim_rate"] * self.current_targets[char]
+                char.coef_speed_ratio -= self.spell_power["speed_dim_rate"] * current_targets[char]
 
         self.affected_targets = current_targets
 
