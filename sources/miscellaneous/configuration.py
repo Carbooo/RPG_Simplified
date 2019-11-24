@@ -32,7 +32,6 @@ free_hand_life_rate = 1.0  # extra life damages of hits with free hands
 free_hand_ignoring_armor_rate = 0.1  # ignoring armor rate of hits with free hands
 free_hand_pen_rate = 0.05  # Penetration of hits with free hands
 free_hand_resis_dim_rate = 0.01  # Armor diminution of hits with free hands
-team_state_effect_on_moral = 1.0 / 4.0  # Math.pow(team state, this value) as morale
 melee_attack_fighting_availability = 1.0  # impact coef on fighting availability
 ranged_attack_fighting_availability = 0.33
 magic_attack_fighting_availability = 0.5
@@ -52,7 +51,7 @@ max_safe_energy = 300.0
 feelings_list = ["Wrath", "Joy", "Love", "Hate", "Fear", "Sadness"]
 default_energy = 50.0  # Starting energy for sensibility 10
 medium_energy = 100.0  # Energy reference for spells
-natural_increase_threshold = 150.0  # Energy threshold to increase feeling (with square2)
+natural_increase_reference = 150.0  # Energy reference to increase feeling (with square2)
 natural_decrease_reference = 20.0  # Energy reference to decrease feeling (divided by)
 
 ######################## FIELD CONFIG ######################
@@ -67,6 +66,9 @@ full_handicap = "%"
 full_obstacle = "X"
 obstacle_types_list = [no_obstacle, melee_handicap, melee_obstacle, ranged_handicap, ranged_obstacle, full_handicap,
                        full_obstacle]
+
+######################## FIGHT CONFIG ######################
+morale_bonus_over_time = 0.01  # Morale bonus pourcentage for every turn passed
 
 ######################## ACTION CONFIG ######################
 surprise_delay = 0.25
@@ -184,6 +186,7 @@ spells = []
 min_visibility = 0.25  # Min visibililty to magically reach a target
 recurrent_spell_frequency = 1.0  # Frequency (in turn) when effects occur
 throwing_time = 0.25  # Time to throw a spell when the spell is ready
+min_dist_ratio = 0.2  # Min distance ratio to be affected by a spread spell
 
 ##################### WRATH SPELLS CONFIG ###################
 wrath_spells = {
@@ -232,7 +235,7 @@ wrath_spells_power = {
     },
     "FBL": {
         "attack_value": 50.0,
-        "spread_distance": 1,
+        "spread_distance": 1.0,
         "life_rate": 1.5,
         "ignoring_armor_rate": 0.15,
         "pen_rate": 0.1,
@@ -280,7 +283,7 @@ joy_spells_knowledge = {
 }
 joy_spells_power = {
     "EGY": {
-        "moral_increase": 1.15,
+        "moral_increase": 1.45,
         "stamina_restored": 20.0,
         "duration": 10.0
     },
@@ -390,11 +393,11 @@ sadness_spells_power = {
         "resis_dim_rate": 0.2
     },
     "DST": {
-        "spread_distance": 3,
+        "spread_distance": 2.5,
         "moral_dim_rate": 0.5,
         "stamina_dim_rate": 3.0,
         "speed_dim_rate": 0.3,
-        "duration": 15.0
+        "duration": 10.0
     }
 }
 

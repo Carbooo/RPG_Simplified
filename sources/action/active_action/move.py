@@ -82,7 +82,7 @@ class Move(ActiveActions):
 
     def execute(self):
         # Move
-        if not self.fight.field.move_character(self.initiator, self.target_abs, self.target_ord):
+        if not self.fight.field.is_case_adjacent_to_char(self.initiator, self.target_abs, self.target_ord) or not self.fight.field.move_character(self.initiator, self.target_abs, self.target_ord):
             return self.cancel_move()
 
         func.optional_print("", level=0)

@@ -218,8 +218,7 @@ class Fight:
         self.scheduler = scheduler_list
         
     def begin_turn(self):
-        self.update_team_morale(self.team1)
-        self.update_team_morale(self.team2)
+        self.update_teams_morale()
         
         time_diff = self.current_timeline - self.last_timeline
         for char in self.char_order:
@@ -236,17 +235,28 @@ class Fight:
 
             self.field.remove_dead_char(char)
 
-    def update_team_morale(self, team):
-        total_ratio = 0
-        for char in team.characters_list:
+    def update_teams_morale(self):
+        total_ratio1 = 0
+        for char in self.team1.characters_list:
             if not char.is_a_zombie:
-                total_ratio += char.body.get_global_ratio()
-       
-        total_ratio /= len(team.characters_list)
+                total_ratio1 += char.body.get_global_ratio()
+        total_ratio1 /= len(self.team1.characters_list)
         
-        for char in team.characters_list:
-            char.team_state = total_ratio
-                  
+        total_ratio2 = 0
+        for char in self.team2.characters_list:
+            if not char.is_a_zombie:
+                total_ratio2 += char.body.get_global_ratio()
+        total_ratio2 /= len(self.team2.characters_list)
+        
+        # The more time passed, the little higher is your morale
+        # The better is your team, the higher is your morale
+        # Similarly, the worst is the other team, the medium higher is your morale
+        for char in self.team1.characters_list:
+            char.fight_morale_ratio = total_ratio1 + (1 - total_ratio2)/2.0 + self.current_timeline * cfg.morale_bonus_over_time
+        
+        for char in self.team2.characters_list:
+            char.fight_morale_ratio = total_ratio2 + (1 - total_ratio1)/2.0 + self.current_timeline * cfg.morale_bonus_over_time
+               
     def end_turn(self):
         self.order_scheduler()
 

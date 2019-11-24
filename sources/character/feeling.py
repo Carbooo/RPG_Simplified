@@ -17,13 +17,13 @@ class Feeling:
         self.mastering = float(mastering)
         self.mastering_ratio = float(mastering) / 10.0
         self.energy = max(0.0, cfg.default_energy + (float(sensibility) - 10.0) * 10.0)
-        self.energy_ratio = self.energy / cfg.medium_energy
+        self.energy_ratio = math.sqrt(self.energy / cfg.medium_energy)
         self.knowledge = knowledge
         self.warned_of_exceeded_energy = False
     
     def update_energy(self, energy):
         self.energy = max(0, self.energy + energy)
-        self.energy_ratio = self.energy / cfg.medium_energy
+        self.energy_ratio = math.sqrt(self.energy / cfg.medium_energy)
         
     def gain_energy(self, energy):
         self.update_energy(energy * self.sensibility_ratio)
@@ -47,7 +47,7 @@ class Feeling:
             
     def natural_energy_update(self, time):
         if self.energy > cfg.default_energy:
-            energy = math.pow(self.energy / cfg.natural_increase_threshold, 2) * time
+            energy = math.pow(self.energy / cfg.natural_increase_reference, 2) * time
             self.gain_energy(energy)
         elif self.energy < cfg.default_energy and self.energy > 0:
             energy = (cfg.default_energy - self.energy) / cfg.natural_decrease_reference * time

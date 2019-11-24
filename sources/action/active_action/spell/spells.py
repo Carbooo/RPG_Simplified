@@ -58,10 +58,10 @@ class Spells(ActiveActions):
                             * self.initiator.feelings[self.feeling_type].use_energy(self.spell_energy)
 
     def get_stamina_with_coef(self):
-        return self.spell_stamina / math.pow(self.magical_coef, 1.0 / 4.0)
+        return self.spell_stamina / math.sqrt(self.magical_coef)
 
     def get_time_with_coef(self):
-        return self.spell_time / math.pow(self.magical_coef, 1.0 / 4.0)
+        return self.spell_time / self.magical_coef
 
     def is_able_to_cast(self):
         if not self.initiator.feelings[self.feeling_type].check_energy(self.spell_energy):
@@ -225,7 +225,7 @@ class Spells(ActiveActions):
 
 ######################### EXECUTING FUNCTIONS #######################
     def get_all_spread_targets(self, spread_distance, target_abs, target_ord):
-        max_distance = spread_distance + 1
+        max_distance = spread_distance + 1.0
         round_distance = int(math.ceil(spread_distance))
         char_list = []
         for x in range(- round_distance, round_distance + 1):
@@ -236,7 +236,7 @@ class Spells(ActiveActions):
                 if char:
                     distance_ratio = (max_distance - char.calculate_point_distance(target_abs, target_ord)) \
                                      / max_distance
-                    if distance_ratio > 0.1:  # Min distance ratio to be touched by a spell
+                    if distance_ratio >= cfg.min_dist_ratio:
                         char_list.append((char, distance_ratio))
 
         # Put the initiator in last, so the self damages made are not influencing the damages made to others

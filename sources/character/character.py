@@ -116,40 +116,40 @@ class Character:
 
 ################### UPDATE STAT FUNCTIONS ######################
     def update_constitution(self, difference):
-        self.constitution += difference
+        self.constitution += max(0, difference)
         self.constitution_ratio = self.constitution / 10.0
 
     def update_force(self, difference):
-        self.force += difference
+        self.force += max(0, difference)
         self.force_ratio = self.force / 10.0
 
     def update_agility(self, difference):
-        self.agility += difference
+        self.agility += max(0, difference)
         self.agility_ratio = self.agility / 10.0
 
     def update_dexterity(self, difference):
-        self.dexterity += difference
+        self.dexterity += max(0, difference)
         self.dexterity_ratio = self.dexterity / 10.0
 
     def update_reflex(self, difference):
-        self.reflex += difference
+        self.reflex += max(0, difference)
         self.reflex_ratio = self.reflex / 10.0
 
     def update_willpower(self, difference):
-        self.willpower += difference
+        self.willpower += max(0, difference)
         self.willpower_ratio = self.willpower / 10.0
 
     def update_spirit(self, difference):
-        self.spirit += difference
+        self.spirit += max(0, difference)
         self.spirit_ratio = self.spirit / 10.0
 
     def update_morale(self, difference):
-        self.morale += difference
+        self.morale += max(0, difference)
         self.morale_ratio = self.morale / 10.0
 
 ######################### CHARACTERISTICS FUNCTIONS ########################
     def get_global_ratio(self):
-        return self.body.get_global_ratio() * self.morale_ratio
+        return self.body.get_global_ratio() * math.sqrt(self.morale_ratio)
 
     def calculate_load_ratios(self):
         self.load_ratio = min(cfg.max_bonus,
@@ -175,10 +175,8 @@ class Character:
     
     def calculate_morale(self):
         previous_morale = self.original_morale
-        self.original_morale = self.true_original_morale \
-                * math.pow(self.team_state, cfg.team_state_effect_on_moral)
-        new_morale = self.original_morale
-        self.morale *= new_morale / previous_morale
+        self.original_morale = self.true_original_morale * self.fight_morale_ratio
+        self.update_morale((self.original_morale / previous_morale - 1) * self.morale)
     
     def calculate_agility(self):
         previous_agility = self.original_agility
@@ -187,8 +185,7 @@ class Character:
                                 * math.pow(self.use_load_ratio, 1.0 / 4.0) \
                                 * math.pow(self.bulk_ratio, 1.0 / 6.0) \
                                 * math.pow(self.use_bulk_ratio, 1.0 / 4.0)
-        new_agility = self.original_agility
-        self.agility *= new_agility / previous_agility
+        self.update_agility((self.original_agility / previous_agility - 1) * self.agility)
 
     def calculate_speed_ratio(self):
         self.speed_ratio = max(cfg.min_speed, self.get_global_ratio() * self.coef_speed_ratio)

@@ -91,6 +91,18 @@ class Field:
         if not self.characters_array[abscissa, ordinate] is None:
             return False
         return True
+        
+    def is_case_adjacent_to_char(self, character, abscissa, ordinate):
+        if not self.is_a_case(abscissa, ordinate):
+            return False
+            
+        adjacent = False
+        for i in range(character.abscissa - 1, character.abscissa + 2):
+            for j in range(character.ordinate - 1, character.ordinate + 2):
+                if abscissa == i and ordinate == j:
+                    adjacent = True
+                    break
+        return adjacent
     
     def get_character_from_pos(self, abscissa, ordinate):
         if not self.is_a_case(abscissa, ordinate):

@@ -139,14 +139,14 @@ class SadnessSpells(Spells):
             current_targets[char] = coef
             if char not in self.affected_targets:
                 char.coef_speed_ratio -= self.spell_power["speed_dim_rate"] * coef
-                self.affected_targets[char] = coef
                 char.active_spells.append(self)
 
-        # Increase speed back to normal when char left the storm
         for char in self.affected_targets:
+            char.coef_speed_ratio += self.spell_power["speed_dim_rate"] * self.affected_targets[char]
             if char not in current_targets:
-                char.coef_speed_ratio += self.spell_power["speed_dim_rate"] * self.affected_targets[char]
                 char.active_spells.remove(self)
+            else:
+                char.coef_speed_ratio -= self.spell_power["speed_dim_rate"] * self.current_targets[char]
 
         self.affected_targets = current_targets
 
