@@ -163,11 +163,17 @@ actions = {
         "duration": 0.5,
         "stamina": 0.1
     },
-    "spell": {
-        "description": "Cast a spell",
-        "command": "SPL",
+    "charge_spell": {
+        "description": "Charge a spell",
+        "command": "CHG",
         "duration": 0.0,  # Not used, different for each spell
         "stamina": 0.0  # Not used, different for each spell
+    },
+    "cast_spell": {
+        "description": "Cast a spell",
+        "command": "CAS",
+        "duration": 0.25,
+        "stamina": 0.1
     },
     "information": {
         "description": "Information on a character state",
@@ -193,7 +199,6 @@ actions = {
 spells = []
 min_visibility = 0.25  # Min visibililty to magically reach a target
 recurrent_spell_frequency = 1.0  # Frequency (in turn) when effects occur
-throwing_time = 0.25  # Time to throw a spell when the spell is ready
 min_dist_ratio = 0.2  # Min distance ratio to be affected by a spread spell
 
 ##################### WRATH SPELLS CONFIG ###################

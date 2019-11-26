@@ -31,24 +31,16 @@ class Spells(ActiveActions):
 
 ######################### BASE FUNCTIONS #######################
     def start(self):
-        self.stage = "Gathering"
+        self.stage = "Charging"
+        self.initiator.charged_spell = self
 
-    def throw(self):
-        self.stage = "Throwing"
+    def cast(self):
+        self.stage = "Casting"
         self.start_timeline = self.initiator.timeline
-        self.end_update(0, cfg.throwing_time)
-
-    def occur(self):
-        self.stage = "Occurring"
 
     def execute(self):
-        if self.stage == "Gathering":
-            return self.throw()
-        elif self.stage == "Throwing":
-            self.initiator.last_action = None  # To avoid looping on the spell
-            return self.occur()
-        else:
-            return False
+        self.stage = "Executing"
+        self.initiator.last_action = None  # To avoid looping on the spell
 
     def end(self, is_canceled=False):
         self.stage = "Ending"
@@ -84,7 +76,11 @@ class Spells(ActiveActions):
 
 ######################### CHOOSE FUNCTIONS #######################
     @staticmethod
-    def choose_spell():
+    def choose_spell(character):
+        if character.charged_spell:
+            func.optional_print("You already have a charged spell!")
+            return False
+
         func.optional_print("You have decided to cast a spell")
         func.optional_print("")
         func.optional_print("Which type of spell?")
@@ -330,7 +326,9 @@ class Spells(ActiveActions):
         func.optional_print("")
         func.optional_print("*********************************************************************")
         if state == "executing":
-            func.optional_print("************************ SPELL BEING CAST ***************************")
+            func.optional_print("************************* SPELL OCCURRING ****************************")
+        elif state == "affecting":
+            func.optional_print("********************** ACTIVE SPELL AFFECTING ***********************")
         elif state == "ending":
             func.optional_print("*********************** ACTIVE SPELL ENDING *************************")
         elif state == "choosing":
@@ -338,7 +336,9 @@ class Spells(ActiveActions):
         func.optional_print("*********************************************************************")
         self.initiator.print_basic()
         func.optional_print(txt, skip_line=True)
-        if not self_spell:
+        if isinstance(self.target, dict):  # Is not a character, but a field position
+            func.optional_print(self.target)
+        elif not self_spell:
             self.target.print_basic()
         func.optional_print("")
         func.optional_print("*********************************************************************")

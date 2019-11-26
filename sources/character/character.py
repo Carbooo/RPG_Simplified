@@ -76,6 +76,7 @@ class Character:
         self.last_action = None
         self.previous_attacks = []
         self.active_spells = []
+        self.charged_spell = None
         self.fight_morale_ratio = 1.0
         self.is_a_zombie = False
         self.coef_speed_ratio = 1.0
@@ -508,6 +509,13 @@ class Character:
         func.optional_print("--  ACTIVE SPELLS --")
         for spell in self.active_spells:
             func.optional_print("   -", spell.surname)
+        if not self.active_spells:
+            func.optional_print("   - None")
+        func.optional_print("--  CHARGED SPELL --")
+        if self.charged_spell:
+            func.optional_print("   -", self.charged_spell.feeling_type, "(", self.charged_spell.spell_code, ")")
+        else:
+            func.optional_print("   - None")
 
     def print_defense(self):
         func.optional_print("--   DEFENSE  --", skip_line=True)

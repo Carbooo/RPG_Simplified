@@ -31,23 +31,34 @@ class WrathSpells(Spells):
         else:
             return False
 
-    def throw(self):
-        super().throw()
+    def cast(self):
+        super().cast()
+        success = False
         if self.spell_code == "STR":
-            return True
+            success = True
+            func.optional_print("You have decided to improve your strength now.")
         elif self.spell_code == "FBL":
-            return self.choose_fireball_target()
-        else:
-            return False
+            success = self.choose_fireball_target()
+            if success:
+                func.optional_print("You have decided to throw a fireball now.")
 
-    def occur(self):
-        super().occur()
+        if success:
+            self.end_update(cfg.actions["cast_spell"]["stamina"], cfg.actions["cast_spell"]["duration"])
+            func.optional_print("The spell is being cast!")
+            func.optional_sleep(3)
+        return success
+
+    def execute(self):
+        super().execute()
+        success = False
         if self.spell_code == "STR":
-            return self.improve_strength()
+            success = self.improve_strength()
         elif self.spell_code == "FBL":
-            return self.fireball()
-        else:
-            return False
+            success = self.fireball()
+
+        if success:
+            self.initiator.charged_spell = None
+        return success
     
     def end(self, is_canceled=False):
         super().end(is_canceled)
@@ -61,7 +72,7 @@ class WrathSpells(Spells):
             return False
         
         func.optional_print("You have decided to improve your strength.")
-        func.optional_print("The effect will start soon!")
+        func.optional_print("The spell is charging!")
         func.optional_sleep(3)
             
         self.target = self.initiator
@@ -129,7 +140,7 @@ class WrathSpells(Spells):
     def choose_fireball_target(self):
         self.print_spell("has a fireball ready and needs to choose a target", "choosing", True)
         if not self.choose_pos_target():
-            func.optional_print("Spell cancelled, the magic and stamina spent is lost")
+            func.optional_print("Casting cancelled, the spell remains charged")
             return False
         return True
 

@@ -31,23 +31,34 @@ class JoySpells(Spells):
         else:
             return False
 
-    def throw(self):
-        super().throw()
+    def cast(self):
+        super().cast()
+        success = False
         if self.spell_code == "EGY":
-            return True
+            success = True
+            func.optional_print("You have decided to energize yourself now.")
         elif self.spell_code == "LGT":
-            return self.choose_light_target()
-        else:
-            return False
+            success = self.choose_light_target()
+            if success:
+                func.optional_print("You have decided to throw a burning light now.")
 
-    def occur(self):
-        super().occur()
+        if success:
+            self.end_update(cfg.actions["cast_spell"]["stamina"], cfg.actions["cast_spell"]["duration"])
+            func.optional_print("The spell is being cast!")
+            func.optional_sleep(3)
+        return success
+
+    def execute(self):
+        super().execute()
+        success = False
         if self.spell_code == "EGY":
-            return self.energize()
+            success = self.energize()
         elif self.spell_code == "LGT":
-            return self.light()
-        else:
-            return False
+            success = self.light()
+
+        if success:
+            self.initiator.charged_spell = None
+        return success
     
     def end(self, is_canceled=False):
         super().end(is_canceled)
@@ -112,7 +123,7 @@ class JoySpells(Spells):
     def choose_light_target(self):
         self.print_spell("has a burning light ready and needs to choose a target", "choosing", True)
         if not self.choose_target(True, False, False):
-            func.optional_print("Spell cancelled, the magic and stamina spent is lost")
+            func.optional_print("Casting cancelled, the spell remains charged")
             return False
         return True
 

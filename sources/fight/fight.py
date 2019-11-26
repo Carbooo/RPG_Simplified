@@ -99,7 +99,7 @@ class Fight:
                 or (isinstance(next_event.last_action, Concentrate) and next_event.last_action.nb_of_turns > 0) \
                 or isinstance(next_event.last_action, Reload) \
                 or isinstance(next_event.last_action, ModifyEquipments) \
-                or isinstance(next_event.last_action, Spells):
+                or (isinstance(next_event.last_action, Spells) and next_event.last_action.stage == "Casting"):
                     # Destination not reached, keep moving
                     # or
                     # Number of resting / concentrating turns not reached, continue it
@@ -310,8 +310,12 @@ class Fight:
                 if self.equip_action(character):
                     break
 
-            elif read == cfg.actions["spell"]["command"]:
+            elif read == cfg.actions["charge_spell"]["command"]:
                 if self.initiate_spell_object(character):
+                    break
+
+            elif read == cfg.actions["cast_spell"]["command"]:
+                if Fight.cast_charged_spell(character):
                     break
 
             elif read == cfg.actions["information"]["command"]:
@@ -406,7 +410,7 @@ class Fight:
         return True
     
     def initiate_spell_object(self, character):
-        choice = Spells.choose_spell()
+        choice = Spells.choose_spell(character)
         if not choice:
             return False
         else:
@@ -427,3 +431,12 @@ class Fight:
             return False
         character.last_action = action
         return True
+
+    @staticmethod
+    def cast_charged_spell(character):
+        if not character.charged_spell:
+            func.optional_print("You don't have a charged spell to cast!")
+            return False
+
+        character.last_action = character.charged_spell
+        return character.charged_spell.cast()

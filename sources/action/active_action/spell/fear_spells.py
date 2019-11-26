@@ -32,23 +32,34 @@ class FearSpells(Spells):
         else:
             return False
 
-    def throw(self):
-        super().throw()
+    def cast(self):
+        super().cast()
+        success = False
         if self.spell_code == "OWI":
-            return True
+            success = True
+            func.optional_print("You have decided to activate powerful winds around you.")
         elif self.spell_code == "GFI":
-            return self.choose_gigantic_fist_target()
-        else:
-            return False
+            success = self.choose_gigantic_fist_target()
+            if success:
+                func.optional_print("You have decided to throw a gigantic magic fist now.")
 
-    def occur(self):
-        super().occur()
+        if success:
+            self.end_update(cfg.actions["cast_spell"]["stamina"], cfg.actions["cast_spell"]["duration"])
+            func.optional_print("The spell is being cast!")
+            func.optional_sleep(3)
+        return success
+
+    def execute(self):
+        super().execute()
+        success = False
         if self.spell_code == "OWI":
-            return self.opposing_winds()
+            success = self.opposing_winds()
         elif self.spell_code == "GFI":
-            return self.gigantic_fist()
-        else:
-            return False
+            success = self.gigantic_fist()
+
+        if success:
+            self.initiator.charged_spell = None
+        return success
     
     def end(self, is_canceled=False):
         super().end(is_canceled)
@@ -61,7 +72,7 @@ class FearSpells(Spells):
         if not self.is_able_to_cast():
             return False
         
-        func.optional_print("You have decided to generate strong winds around you, making you harder to reach.")
+        func.optional_print("You have decided to generate powerful winds around you, making you harder to reach.")
         func.optional_print("The effect will start soon!")
         func.optional_sleep(3)
             
@@ -71,7 +82,7 @@ class FearSpells(Spells):
         return True
         
     def opposing_winds(self):
-        self.print_spell("has generating strong winds around themselves", "executing", True)
+        self.print_spell("has generating powerful winds around themselves", "executing", True)
         self.remove_identical_active_spell()
 
         self.magical_coef *= self.initiator.magic_power_ratio
@@ -86,7 +97,7 @@ class FearSpells(Spells):
     
     def end_opposing_winds(self, is_canceled):
         if not is_canceled:
-            self.print_spell("has no longer strong winds protecting them against attacks", "ending", True)
+            self.print_spell("has no longer powerful winds protecting them against attacks", "ending", True)
 
         self.initiator.equipments.remove_weapon(self.shield, definitive=True)
         
@@ -107,7 +118,7 @@ class FearSpells(Spells):
     def choose_gigantic_fist_target(self):
         self.print_spell("has a gigantic fist ready and needs to choose a target", "choosing", True)
         if not self.choose_target(True, False, False):
-            func.optional_print("Spell cancelled, the magic and stamina spent is lost")
+            func.optional_print("Casting cancelled, the spell remains charged")
             return False
         return True
 

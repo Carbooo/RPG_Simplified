@@ -35,23 +35,35 @@ class SadnessSpells(Spells):
         else:
             return False
 
-    def throw(self):
-        super().throw()
+    def cast(self):
+        super().cast()
+        success = False
         if self.spell_code == "IPK":
-            return self.choose_ice_pick_target()
+            success = self.choose_ice_pick_target()
+            if success:
+                func.optional_print("You have decided to throw an ice pick now.")
         elif self.spell_code == "DST":
-            return self.choose_despair_storm_target()
-        else:
-            return False
+            success = self.choose_despair_storm_target()
+            if success:
+                func.optional_print("You have decided to activate a despair ice storm now.")
 
-    def occur(self):
-        super().occur()
+        if success:
+            self.end_update(cfg.actions["cast_spell"]["stamina"], cfg.actions["cast_spell"]["duration"])
+            func.optional_print("The spell is being cast!")
+            func.optional_sleep(3)
+        return success
+
+    def execute(self):
+        super().execute()
+        success = False
         if self.spell_code == "IPK":
-            return self.ice_pick()
+            success = self.ice_pick()
         elif self.spell_code == "DST":
-            return self.despair_storm()
-        else:
-            return False
+            success = self.despair_storm()
+
+        if success:
+            self.initiator.charged_spell = None
+        return success
     
     def end(self, is_canceled=False):
         super().end(is_canceled)
@@ -74,6 +86,7 @@ class SadnessSpells(Spells):
     def choose_ice_pick_target(self):
         self.print_spell("has an ice pick ready and needs to choose a target", "choosing", True)
         if not self.choose_target(True, False, False):
+            func.optional_print("Casting cancelled, the spell remains charged")
             return False
         return True
 
@@ -108,7 +121,7 @@ class SadnessSpells(Spells):
     def choose_despair_storm_target(self):
         self.print_spell("has a despair storm ready and needs to choose a target", "choosing", True)
         if not self.choose_pos_target(is_obstacle_free=True):
-            func.optional_print("Spell cancelled, the magic and stamina spent is lost")
+            func.optional_print("Casting cancelled, the spell remains charged")
             return False
         return True
 
@@ -120,6 +133,7 @@ class SadnessSpells(Spells):
         self.target_ord = self.target["ordinate"]
         self.magical_coef *= self.initiator.magic_power_ratio
         self.nb_of_turns = int(round(self.spell_power["duration"] * self.magical_coef))
+        self.print_spell("'s despair storm is now activated", "executing", False)
         self.apply_despair_storm()
         self.fight.field.active_spells.append(self)
         self.add_lasting_spell("Despair storm", cfg.recurrent_spell_frequency, False)
@@ -132,7 +146,7 @@ class SadnessSpells(Spells):
                 self.target_abs, self.target_ord
         ):
             self.target = char
-            self.print_spell("'s despair storm diminishes", "executing", False)
+            self.print_spell("'s despair storm diminishes", "affecting", False)
             coef = math.sqrt(distance_ratio) * self.magical_coef
             char.update_morale(- self.spell_power["morale_dim_rate"] * coef)
             char.spend_stamina(self.spell_power["stamina_dim_rate"] * coef)
@@ -153,6 +167,7 @@ class SadnessSpells(Spells):
     def end_despair_storm(self):
         self.nb_of_turns -= 1
         if self.nb_of_turns == 0:
+            self.print_spell("'s despair storm is over", "ending", False)
             self.fight.field.active_spells.remove(self)
             self.end_lasting_spell(False)
             for char in self.affected_targets:
