@@ -23,6 +23,8 @@ class ModifyEquipments(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):
+        if not super().start():
+            return False
         if not self.initiator.check_stamina(cfg.actions["modify_equip"]["stamina"]):
             func.optional_print("You do not have enough stamina (",
                   round(self.initiator.body.stamina, 2), ") to modify your equipment")
@@ -191,7 +193,6 @@ class ModifyEquipments(ActiveActions):
             for weapon in self.next_unequipment:
                 if not self.initiator.equipments.remove_weapon(weapon):
                     return False
-                self.initiator.equipments.loose_reloaded_bow_ammo()
                     
         self.initiator.last_action = None  # To remove it from the scheduler
         return True

@@ -23,7 +23,9 @@ class WrathSpells(Spells):
         self.is_a_success = self.start()
         
     def start(self):
-        super().start()
+        if not super().start():
+            print("return False")
+            return False
         if self.spell_code == "STR":
             return self.start_improve_strength()
         elif self.spell_code == "FBL":

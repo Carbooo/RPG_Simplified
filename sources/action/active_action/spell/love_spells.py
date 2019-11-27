@@ -23,7 +23,8 @@ class LoveSpells(Spells):
         self.is_a_success = self.start()
         
     def start(self):
-        super().start()
+        if not super().start():
+            return False
         if self.spell_code == "SHD":
             return self.start_shield()
         elif self.spell_code == "HEA":

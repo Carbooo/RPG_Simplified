@@ -21,6 +21,8 @@ class Reload(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):
+        if not super().start():
+            return False
         if self.initiator.check_stamina(cfg.actions["reload"]["stamina"]) is False:
             func.optional_print("You do not have enough stamina (",
                   self.initiator.body.return_current_stamina(), ") to reload, action cancelled!")

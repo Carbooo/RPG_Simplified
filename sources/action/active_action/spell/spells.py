@@ -31,8 +31,11 @@ class Spells(ActiveActions):
 
 ######################### BASE FUNCTIONS #######################
     def start(self):
+        if not super().start():
+            return False
         self.stage = "Charging"
         self.initiator.charged_spell = self
+        return True
 
     def cast(self):
         self.stage = "Casting"

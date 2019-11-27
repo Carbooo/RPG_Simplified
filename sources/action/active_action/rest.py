@@ -21,6 +21,8 @@ class Rest(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):
+        if not super().start():
+            return False
         func.optional_print("How much time do you want to rest? (Resting longer make it more efficient)")
         txt = "--> Number of turns (0 = Cancel): "
         while 1:

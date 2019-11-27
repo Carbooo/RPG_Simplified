@@ -248,15 +248,20 @@ class CharEquipments:
                 break
         return True
 
-    def loose_reloaded_bow_ammo(self):
-        has_lost = False
+    def get_loaded_bow(self):
         for weapon in self.weapons_in_use:
             if isinstance(weapon, Bows) and weapon.is_reloaded():
-                has_lost = True
-                weapon.unload()
-                func.optional_print("Your bow has lost its loaded arrow!", level=2)
-                func.optional_sleep(2)
-        return has_lost
+                return weapon
+        return None
+
+    def loose_reloaded_bow_ammo(self):
+        bow = self.get_loaded_bow()
+        if bow:
+            bow.unload()
+            func.optional_print("Your bow has lost its loaded arrow!", level=2)
+            func.optional_sleep(2)
+            return True
+        return False
 
     ############################# TEST ON EQUIP ###########################
     def is_using_a_ranged_weapon(self):

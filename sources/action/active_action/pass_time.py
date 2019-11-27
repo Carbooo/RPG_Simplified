@@ -17,6 +17,8 @@ class PassTime(ActiveActions):
         self.is_a_success = self.start()
         
     def start(self):
+        if not super().start():
+            return False
         func.optional_print("How much time do you want to wait?")
         txt = "--> Number of 0.1 turn (0 = Cancel): "
         while 1:

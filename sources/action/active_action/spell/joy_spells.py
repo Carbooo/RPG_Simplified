@@ -23,7 +23,8 @@ class JoySpells(Spells):
         self.is_a_success = self.start()
         
     def start(self):
-        super().start()
+        if not super().start():
+            return False
         if self.spell_code == "EGY":
             return self.start_energize()
         elif self.spell_code == "LGT":

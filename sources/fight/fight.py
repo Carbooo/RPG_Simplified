@@ -428,6 +428,7 @@ class Fight:
             action = FearSpells(self, character, spell_code)
 
         if not action.is_a_success:
+            character.charged_spell = None
             return False
         character.last_action = action
         return True

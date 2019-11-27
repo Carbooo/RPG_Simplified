@@ -23,6 +23,8 @@ class Concentrate(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):
+        if not super().start():
+            return False
         func.optional_print("On which feeling do you want to concentrate?")
         for key in cfg.feelings_list:
             func.optional_print("-", cfg.feelings_list[key], "(" + key + ")")

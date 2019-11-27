@@ -23,6 +23,8 @@ class MeleeAttack(ActiveActions):
         self.is_a_success = self.start()
 
     def start(self):
+        if not super().start():
+            return False
         if not self.initiator.check_stamina(cfg.actions["melee_attack"]["stamina"]):
             func.optional_print("You do not have enough stamina (", round(self.initiator.body.stamina, 2), ") for a melee attack")
             return False

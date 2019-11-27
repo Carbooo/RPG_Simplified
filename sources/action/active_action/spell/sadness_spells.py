@@ -27,7 +27,8 @@ class SadnessSpells(Spells):
         self.is_a_success = self.start()
         
     def start(self):
-        super().start()
+        if not super().start():
+            return False
         if self.spell_code == "IPK":
             return self.start_ice_pick()
         elif self.spell_code == "DST":

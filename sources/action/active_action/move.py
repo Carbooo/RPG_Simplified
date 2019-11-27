@@ -25,6 +25,8 @@ class Move(ActiveActions):
 
     ####################### MOVE ACTIONS ########################
     def start(self):
+        if not super().start():
+            return False
         if not self.initial_move_check():
             return False
 
