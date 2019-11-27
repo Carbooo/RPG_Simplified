@@ -32,7 +32,7 @@ free_hand_life_rate = 1.0  # extra life damages of hits with free hands
 free_hand_ignoring_armor_rate = 0.1  # ignoring armor rate of hits with free hands
 free_hand_pen_rate = 0.05  # Penetration of hits with free hands
 free_hand_resis_dim_rate = 0.01  # Armor diminution of hits with free hands
-melee_attack_fighting_availability = 1.0  # impact coef on fighting availability
+melee_attack_fighting_availability = 0.95  # impact coef on fighting availability
 ranged_attack_fighting_availability = 0.33
 magic_attack_fighting_availability = 0.5
 
@@ -79,7 +79,7 @@ obstacle_types_list = [no_obstacle, melee_handicap, melee_obstacle, ranged_handi
 morale_bonus_over_time = 0.01  # Morale bonus pourcentage for every turn passed
 
 ######################## ACTION CONFIG ######################
-surprise_delay = 0.25
+surprise_delay = 0.1
 
 ######################## REST CONFIG ######################
 min_rest_turn = 1
@@ -163,17 +163,11 @@ actions = {
         "duration": 0.5,
         "stamina": 0.1
     },
-    "charge_spell": {
-        "description": "Charge a spell",
-        "command": "CHG",
+    "spell": {
+        "description": "Cast a spell",
+        "command": "SPL",
         "duration": 0.0,  # Not used, different for each spell
         "stamina": 0.0  # Not used, different for each spell
-    },
-    "cast_spell": {
-        "description": "Cast a spell",
-        "command": "CAS",
-        "duration": 0.25,
-        "stamina": 0.1
     },
     "information": {
         "description": "Information on a character state",
@@ -199,6 +193,7 @@ actions = {
 spells = []
 min_visibility = 0.25  # Min visibililty to magically reach a target
 recurrent_spell_frequency = 1.0  # Frequency (in turn) when effects occur
+throwing_time = 0.25  # Time to throw a spell when the spell is ready
 min_dist_ratio = 0.2  # Min distance ratio to be affected by a spread spell
 
 ##################### WRATH SPELLS CONFIG ###################
