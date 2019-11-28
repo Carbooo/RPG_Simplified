@@ -93,7 +93,7 @@ class LoveSpells(Spells):
 
         self.print_spell("has set up a magical shield on", "executing", False)
         self.remove_identical_active_spell()
-        self.magical_coef *= self.initiator.magic_power_ratio
+        self.magical_coef *= math.sqrt(self.initiator.magic_power_ratio)
         self.armor = self.target.equipments.set_magical_armor("Love shield", self.spell_power["resistance"] * self.magical_coef)
         self.add_lasting_spell("Magical love shield", cfg.recurrent_spell_frequency)
         return True
@@ -140,6 +140,6 @@ class LoveSpells(Spells):
             return False
 
         self.print_spell("is going to heal", "executing", False)
-        self.magical_coef *= self.initiator.magic_power_ratio
+        self.magical_coef *= math.sqrt(self.initiator.magic_power_ratio)
         self.target.body.update_life(self.spell_power["heal"] * self.magical_coef)
         return True

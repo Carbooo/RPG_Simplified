@@ -49,7 +49,7 @@ class Spells(ActiveActions):
         self.stage = "Ending"
 
     def set_magical_coef(self):
-        self.magical_coef = random.gauss(cfg.mean, cfg.high_variance) \
+        self.magical_coef = random.gauss(cfg.mean, cfg.variance) \
                             * self.initiator.feelings[self.feeling_type].use_energy(self.spell_energy)
 
     def get_stamina_with_coef(self):
@@ -329,7 +329,7 @@ class Spells(ActiveActions):
         func.optional_print("")
         func.optional_print("*********************************************************************")
         if state == "executing":
-            func.optional_print("************************* SPELL OCCURRING ****************************")
+            func.optional_print("************************* SPELL OCCURRING ***************************")
         elif state == "affecting":
             func.optional_print("********************** ACTIVE SPELL AFFECTING ***********************")
         elif state == "ending":

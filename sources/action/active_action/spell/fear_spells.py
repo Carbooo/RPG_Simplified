@@ -86,7 +86,7 @@ class FearSpells(Spells):
         self.print_spell("has generating powerful winds around themselves", "executing", True)
         self.remove_identical_active_spell()
 
-        self.magical_coef *= self.initiator.magic_power_ratio
+        self.magical_coef *= math.sqrt(self.initiator.magic_power_ratio)
         self.initiator.equipments.set_magical_shield("Opposing winds shield", 
                                                      self.spell_power["defense"], 0.0, 
                                                      self.spell_power["melee_def_ratio"], 

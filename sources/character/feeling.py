@@ -34,8 +34,8 @@ class Feeling:
     def use_energy(self, energy):
         if not self.check_energy(energy):
             func.optional_print("Error: Energy feeling below 0", level=3)
-        
-        coef = self.energy_ratio * self.mastering_ratio
+
+        coef = self.energy_ratio * math.sqrt(self.mastering_ratio)
         self.loose_energy(energy * self.energy_ratio)
         return coef
         

@@ -132,7 +132,7 @@ class SadnessSpells(Spells):
 
         self.target_abs = self.target["abscissa"]
         self.target_ord = self.target["ordinate"]
-        self.magical_coef *= self.initiator.magic_power_ratio
+        self.magical_coef *= math.sqrt(self.initiator.magic_power_ratio)
         self.nb_of_turns = int(round(self.spell_power["duration"] * self.magical_coef))
         self.print_spell("'s despair storm is now activated", "executing", False)
         self.apply_despair_storm()

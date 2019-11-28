@@ -86,7 +86,7 @@ class WrathSpells(Spells):
         self.print_spell("has greatly improve their strength", "executing", True)
 
         self.remove_identical_active_spell()
-        self.magical_coef *= self.initiator.magic_power_ratio
+        self.magical_coef *= math.sqrt(self.initiator.magic_power_ratio)
         
         self.target.update_force(
             (math.pow(self.spell_power["force"], self.magical_coef) - 1)

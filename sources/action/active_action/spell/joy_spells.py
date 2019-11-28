@@ -85,7 +85,7 @@ class JoySpells(Spells):
         self.print_spell("has improve all their attributes", "executing", True)
         self.remove_identical_active_spell()
 
-        self.magical_coef *= self.initiator.magic_power_ratio
+        self.magical_coef *= math.sqrt(self.initiator.magic_power_ratio)
         self.target.body.udpate(self.spell_power["stamina_restored"] * self.magical_coef)
         self.target.update_morale(
             (math.pow(self.spell_power["moral_increase"], self.magical_coef) - 1)
