@@ -133,7 +133,7 @@ class JoySpells(Spells):
             return False
 
         self.print_spell("is sending a burning light to", "executing", False)
-        attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
+        attack_value = self.spell_power["attack_value"] * self.magical_coef + self.initiator.magic_power
         result = self.magical_attack_received(
             attack_value,
             False,  # is_localized

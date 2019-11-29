@@ -169,18 +169,18 @@ def test_magic1():  # Wrath vs sadness
     func.log_level = 1
     func.automatic = True
     func.log_debug = True
-    func.action0 = ["PAS", 60]
-    """
+    func.action0 = ["PAS", 100]
+
     func.action1 = ["CON", "SAD", 3,
                     "CHG", "SAD", "DST",
                     "CAS", 5, 3,
                     "PAS", 1
                    ]
     """
-    func.action1 = ["CON", "SAD", 3,
-                    "CHG", "SAD", "IPK",
+    func.action1 = ["CHG", "SAD", "IPK",
                     "CAS", 7
                     ]
+    """
     func.actions = {"a6": func.action0, "b6": func.action1}
     Fight(cfg.field_list[0], cfg.team_list[16], cfg.team_list[17])
 
@@ -205,4 +205,4 @@ def test_melee_vs_magic2():  # Small shield vs sadness
     Fight(cfg.field_list[0], cfg.team_list[13], cfg.team_list[17])
 
 
-test_melee_vs_magic1()
+test_magic1()

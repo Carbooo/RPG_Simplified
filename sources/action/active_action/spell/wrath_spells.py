@@ -151,7 +151,7 @@ class WrathSpells(Spells):
             return False
 
         target = self.target
-        attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
+        attack_value = self.spell_power["attack_value"] * self.magical_coef + self.initiator.magic_power
         for char, distance_ratio in self.get_all_spread_targets(
                 self.spell_power["spread_distance"] * self.magical_coef,
                 target["abscissa"], target["ordinate"]
