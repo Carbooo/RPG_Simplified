@@ -49,8 +49,14 @@ class Spells(ActiveActions):
         self.stage = "Ending"
 
     def set_magical_coef(self):
-        self.magical_coef = random.gauss(cfg.mean, cfg.variance) \
-                            * self.initiator.feelings[self.feeling_type].use_energy(self.spell_energy)
+        coef = self.initiator.feelings[self.feeling_type].use_energy(self.spell_energy)
+        print("coef1", coef)
+        coef *= random.gauss(cfg.mean, cfg.variance)
+        print("coef1bis", coef)
+        coef = 1.0 + (coef - 1) / 4.0
+        print("coef2", coef)
+        print("coef3", math.pow(coef, 2.0))
+        self.magical_coef = math.pow(coef, 2.0)
 
     def get_stamina_with_coef(self):
         return self.spell_stamina / math.sqrt(self.magical_coef)
