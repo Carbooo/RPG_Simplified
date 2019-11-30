@@ -47,7 +47,7 @@ equip_bulk_mean = 2.5  # Bulk reference for equipped weapons
 ######################## FEELING CONFIG ######################
 concentrate_update_coef = 3  # Energy coef to update feeling with concentration
 max_alive_energy = 1000.0
-max_safe_energy = 300.0
+max_safe_energy = 500.0
 feelings_list = {
                     "WRA": "Wrath",
                     "JOY": "Joy",

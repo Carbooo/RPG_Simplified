@@ -36,6 +36,7 @@ class Feeling:
             func.optional_print("Error: Energy feeling below 0", level=3)
 
         coef = self.energy_ratio * math.sqrt(self.mastering_ratio)
+        print("coef", coef)
         self.loose_energy(energy * self.energy_ratio)
         return coef
         

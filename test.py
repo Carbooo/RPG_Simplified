@@ -169,7 +169,7 @@ def test_magic1():  # Wrath vs sadness
     func.log_level = 1
     func.automatic = True
     func.log_debug = True
-    func.action0 = ["PAS", 100]
+    func.action0 = ["PAS", 200]
 
     func.action1 = ["CON", "SAD", 3,
                     "CHG", "SAD", "DST",
