@@ -171,7 +171,7 @@ def test_magic1():  # Wrath vs sadness
     func.log_debug = True
     func.action0 = ["PAS", 200]
 
-    func.action1 = ["CON", "SAD", 10,
+    func.action1 = ["CON", "SAD", 3,
                     "CHG", "SAD", "DST",
                     "CAS", 5, 3
                    ]
@@ -190,7 +190,7 @@ def test_melee_vs_magic1():  # Big shield vs sadness
     func.automatic = True
     func.log_debug = True
     func.action0 = ["EQP", 27, 28, "PAS", 200]
-    func.action1 = ["CON", "SAD", 10, "CHG", "SAD", "IPK", "CAS", 2]
+    func.action1 = ["CON", "SAD", 3, "CHG", "SAD", "IPK", "CAS", 2]
     func.actions = {"a1": func.action0, "b6": func.action1}
     Fight(cfg.field_list[0], cfg.team_list[11], cfg.team_list[17])
 
@@ -200,9 +200,9 @@ def test_melee_vs_magic2():  # Small shield vs sadness
     func.automatic = True
     func.log_debug = True
     func.action0 = ["EQP", 24, 25, "PAS", 200]
-    func.action1 = ["CHG", "SAD", "IPK", "CAS", 1]
+    func.action1 = ["CON", "SAD", 3, "CHG", "SAD", "IPK", "CAS", 1]
     func.actions = {"a0": func.action0, "b6": func.action1}
     Fight(cfg.field_list[0], cfg.team_list[13], cfg.team_list[17])
 
 
-test_melee_vs_magic1()
+test_melee_vs_magic2()

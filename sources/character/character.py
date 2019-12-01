@@ -237,8 +237,10 @@ class Character:
             self.ranged_defense = self.get_global_ratio() * ranged_coef * weapons_defense["ranged_defense"]
         else:
             self.ranged_defense = self.get_global_ratio() * ranged_coef  # To have some def, even without a shield
+
         self.magic_defense = self.get_global_ratio() * magic_coef * 10.0
-        self.magic_defense_with_shields = self.get_global_ratio() * magic_coef * (10.0 + weapons_defense["magic_defense"])
+        self.magic_defense_with_shields = self.get_global_ratio() * magic_coef * (
+                10.0 + weapons_defense["magic_defense"] / 2.0)
         
     def calculate_dodging(self):
         # The bigger you are, the harder is to dodge
