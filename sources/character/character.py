@@ -227,7 +227,7 @@ class Character:
         ranged_coef = (self.reflex + self.agility/2) / (1 + 1.0/2)
         # Skills do not really matter for ranged defense, the bigger you are, the harder it is to defend
         ranged_coef = math.sqrt(ranged_coef/10) * 10 / self.constitution_ratio
-        magic_coef = (self.spirit + self.willpower/2 + self.constitution/3) / (1 + 1.0/2 + 1.0/3)
+        magic_coef = (self.spirit + self.willpower/2) / (1 + 1.0/2)
         for key in self.feelings:
             magic_coef += self.feelings[key].energy_ratio * self.feelings[key].mastering_ratio
         
@@ -238,7 +238,7 @@ class Character:
         else:
             self.ranged_defense = self.get_global_ratio() * ranged_coef  # To have some def, even without a shield
         self.magic_defense = self.get_global_ratio() * magic_coef * 10.0
-        self.magic_defense_with_shields = self.magic_defense + weapons_defense["magic_defense"]
+        self.magic_defense_with_shields = self.get_global_ratio() * magic_coef * (10.0 + weapons_defense["magic_defense"])
         
     def calculate_dodging(self):
         # The bigger you are, the harder is to dodge

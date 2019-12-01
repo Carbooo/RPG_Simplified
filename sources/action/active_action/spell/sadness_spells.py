@@ -96,7 +96,7 @@ class SadnessSpells(Spells):
             return False
 
         self.print_spell("is sending an ice pick to", "executing", False)
-        attack_value = self.spell_power["attack_value"] * self.magical_coef + self.initiator.magic_power
+        attack_value = (self.spell_power["attack_value"] + self.initiator.magic_power) * self.magical_coef
         self.magical_attack_received(
             attack_value,
             True,  # is_localized
