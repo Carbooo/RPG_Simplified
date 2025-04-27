@@ -26,12 +26,13 @@ min_speed = 1.0 / 6.0  # Minimum speed for char (necessary for hurt char)
 accuracy_mean = 100.0  # Accuracy reference for characters
 max_magic_distance = 150.0  # Around 300 meters
 free_hand_melee_defense = 0.75  # Melee defense for each free hand
-free_hand_melee_handiness = 7.5  # Melee handiness for each free hand
+free_hand_melee_handiness = 15.0  # Melee handiness for each free hand
 free_hand_melee_power = 0.75  # Melee power for each free hand
 free_hand_life_rate = 1.0  # extra life damages of hits with free hands
 free_hand_ignoring_armor_rate = 0.1  # ignoring armor rate of hits with free hands
 free_hand_pen_rate = 0.05  # Penetration of hits with free hands
 free_hand_resis_dim_rate = 0.01  # Armor diminution of hits with free hands
+second_hand_equip_ratio = 0.5  # Count only partially the bonus given by your second hand equipment
 melee_attack_fighting_availability = 1.0  # impact coef on fighting availability
 ranged_attack_fighting_availability = 0.33
 magic_attack_fighting_availability = 0.5
@@ -98,18 +99,18 @@ max_move_per_action = 15  # To prevent eternal stupid moving
 
 ################### RANGED ATTACK CONFIG ##################
 ranged_attack_stage = [25, 50]  # [Blocked", "Hit", "Hit & stopped"]
-moving_char_shooting_handicap = 0.5
+moving_char_shooting_handicap = 0.66
 melee_fighter_shooting_handicap = 0.5
 decrease_hit_chance_per_case = 0.01  # Every case, the distance hit chance diminishes by this ratio
-min_distance_ratio = 0.05  # The distance hit chance cannot go lower than that
+min_range_hit_chance = 0.05  # The range hit chance cannot go lower than that
+max_range_hit_chance = 0.95  # The range hit chance cannot go higher than that
 
 ################### MELEE ATTACK CONFIG ###################
 melee_attack_stage = [0, 30, 60, 90]  # ["Blocked" < "Delay" < "Hit" < "Strong hit" < "Huge hit"]
-def_type_ratio = 4.0  # Divided importance of the other type of def
+def_type_ratio = 3.0  # Divide importance of the other type of def
 random_defenser_move_probability = 0.25
 random_attacker_move_probability = 0.35
 no_armor_power_ratio = 6.0  # Divide the power of an attack if it is a no-armor attack
-
 
 ###################### ACTIONS CONFIG #####################
 # A turn is around 6 seconds

@@ -163,10 +163,6 @@ class Field:
                                     self.characters_array[min_abs + i, min_ord + j].last_action is None or
                                     self.characters_array[min_abs + i, min_ord + j].last_action.type == "Waiting"
                                 ))
-                                and
-                                # If path is at the border of the case, the character is not an obstacle
-                                attacker.calculate_point_to_enemy_path_distance(target_abs, target_ord,
-                                                                                min_abs + i, min_ord + j) < 0.25
                             )):
                         return 0
 

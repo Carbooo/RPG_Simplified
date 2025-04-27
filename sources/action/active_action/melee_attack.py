@@ -72,8 +72,8 @@ class MeleeAttack(ActiveActions):
                 self.target = char
                 if self.target.get_id() == read:
                     self.end_update(cfg.actions["melee_attack"]["stamina"], cfg.actions["melee_attack"]["duration"])
-                    self.timeline += cfg.actions["melee_attack"]["duration"] * 0.99  # To execute the attack before char get their turn
                     self.real_end_timeline = self.initiator.timeline
+                    self.timeline = self.real_end_timeline - 0.001  # To execute the attack before char get their turn                    
                     self.target.add_previous_attack(self.start_timeline, self.real_end_timeline, self)
                     self.initiator.add_previous_attack(self.start_timeline, self.real_end_timeline, self)
                     self.fight.scheduler.append(self)
@@ -204,6 +204,7 @@ class MeleeAttack(ActiveActions):
                 self.delay(attack_value)
             else:
                 func.optional_print("The attack is a small hit", level=3)
+                func.optional_sleep(2)
                 power_ratio = random.uniform(0.2, 0.66)
                 area_ratio = math.pow(1 - power_ratio, 2.0)
                 func.optional_print("power_ratio", power_ratio, level=3, debug=True)
@@ -216,6 +217,7 @@ class MeleeAttack(ActiveActions):
                 self.delay(attack_value)
             else:
                 func.optional_print("The attack is a normal hit", level=3)
+                func.optional_sleep(2)
                 power_ratio = random.uniform(0.66, 1.0)
                 area_ratio = math.pow(1.85 - power_ratio, 2.5)
                 func.optional_print("power_ratio", power_ratio, level=3, debug=True)

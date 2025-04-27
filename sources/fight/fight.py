@@ -230,7 +230,8 @@ class Fight:
 
                 previous_attacks = copy.copy(char.previous_attacks)
                 for attack in previous_attacks:
-                    if self.current_timeline > attack["end_time"]:
+                    # Remove previous attacks that will for sure not be taken in account anymore
+                    if self.current_timeline > attack["end_time"] + 3.0:
                         char.previous_attacks.remove(attack)
 
             self.field.remove_dead_char(char)

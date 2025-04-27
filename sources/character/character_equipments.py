@@ -258,7 +258,7 @@ class CharEquipments:
         bow = self.get_loaded_bow()
         if bow:
             bow.unload()
-            func.optional_print("Your bow has lost its loaded arrow!", level=2)
+            func.optional_print("The defender's bow has lost its loaded arrow!", level=2)
             func.optional_sleep(2)
             return True
         return False
@@ -353,25 +353,37 @@ class CharEquipments:
             "range_power": 0.0,
             "range_accuracy": 0.0,
         }
-        bulk = 0
 
+        # Find the main weapon for attack
+        most_powerful_weapon = None
+        max_melee_power = 0
         for weapon in self.weapons_in_use:
-            bulk += weapon.bulk
-            attack_powers["melee_power"] += weapon.melee_power * weapon.attack_ratio
-            attack_powers["melee_handiness"] += weapon.melee_handiness * weapon.attack_ratio
+            if weapon.melee_power * weapon.attack_ratio > max_melee_power:
+                most_powerful_weapon = weapon
+                max_melee_power = weapon.melee_power * weapon.attack_ratio
+
+        # Calculate the attack
+        for weapon in self.weapons_in_use:
+            if weapon == most_powerful_weapon:
+                attack_powers["melee_power"] += weapon.melee_power * weapon.attack_ratio
+                attack_powers["melee_handiness"] += weapon.melee_handiness * weapon.attack_ratio
+            else:
+                attack_powers["melee_power"] += weapon.melee_power * weapon.attack_ratio * cfg.second_hand_equip_ratio
+                attack_powers["melee_handiness"] += weapon.melee_handiness * weapon.attack_ratio * cfg.second_hand_equip_ratio
+
             if isinstance(weapon, RangedWeapons) and self.ranged_weapon_has_ammo(weapon):
                 attack_powers["range_power"] += weapon.range_power * weapon.attack_ratio
                 attack_powers["range_accuracy"] += weapon.accuracy * weapon.attack_ratio
 
         # Free hands melee attack
-        attack_powers["melee_power"] += self.free_hands * cfg.free_hand_melee_power
-        attack_powers["melee_handiness"] += self.free_hands * cfg.free_hand_melee_handiness
-        bulk += self.free_hands * 0.25
-
-        # Apply bulk ratio bonus / penalty
-        bulk_ratio = math.sqrt(cfg.equip_bulk_mean / bulk)
-        attack_powers["melee_power"] *= bulk_ratio
-        attack_powers["melee_handiness"] *= bulk_ratio
+        if most_powerful_weapon:
+            # Give a free hand bonus if only a one-hand weapon is equipped
+            attack_powers["melee_power"] += self.free_hands * cfg.free_hand_melee_power * cfg.second_hand_equip_ratio
+            attack_powers["melee_handiness"] += self.free_hands * cfg.free_hand_melee_handiness * cfg.second_hand_equip_ratio
+        else:
+            # If no equipment is used, a free hand becomes the main weapon
+            attack_powers["melee_power"] += cfg.free_hand_melee_power * (1.0 + cfg.second_hand_equip_ratio)
+            attack_powers["melee_handiness"] += cfg.free_hand_melee_handiness * (1.0 + cfg.second_hand_equip_ratio)
 
         return attack_powers
 
@@ -381,23 +393,33 @@ class CharEquipments:
             "ranged_defense": 0.0,
             "magic_defense": 0.0  # Where shield can be used against magic attacks
         }
-        bulk = 0
 
+        # Find the main weapon for defense
+        most_defensive_weapon = None
+        max_defense = 0
         for weapon in self.weapons_in_use:
-            bulk += weapon.bulk
-            defenses["melee_defense"] += weapon.defense * weapon.melee_defend_ratio
-            defenses["ranged_defense"] += weapon.defense * weapon.ranged_defend_ratio
-            defenses["magic_defense"] += weapon.defense * weapon.magic_defend_ratio
+            if weapon.defense * (weapon.magic_defend_ratio + weapon.ranged_defend_ratio + weapon.melee_defend_ratio) > max_defense:
+                most_defensive_weapon = weapon
+                max_defense = weapon.defense * (weapon.magic_defend_ratio + weapon.ranged_defend_ratio + weapon.melee_defend_ratio)
+
+        # Calculate the defense
+        for weapon in self.weapons_in_use:
+            if weapon == most_defensive_weapon:
+                defenses["melee_defense"] += weapon.defense * weapon.melee_defend_ratio
+                defenses["ranged_defense"] += weapon.defense * weapon.ranged_defend_ratio
+                defenses["magic_defense"] += weapon.defense * weapon.magic_defend_ratio
+            else:
+                defenses["melee_defense"] += weapon.defense * weapon.melee_defend_ratio * cfg.second_hand_equip_ratio
+                defenses["ranged_defense"] += weapon.defense * weapon.ranged_defend_ratio * cfg.second_hand_equip_ratio
+                defenses["magic_defense"] += weapon.defense * weapon.magic_defend_ratio * cfg.second_hand_equip_ratio
 
         # Free hands melee defense
-        defenses["melee_defense"] += self.free_hands * cfg.free_hand_melee_defense
-        bulk += self.free_hands * 0.25
-
-        # Apply bulk ratio bonus / penalty
-        bulk_ratio = math.sqrt(cfg.equip_bulk_mean / bulk)
-        defenses["melee_defense"] *= bulk_ratio
-        defenses["ranged_defense"] *= bulk_ratio
-        defenses["magic_defense"] *= bulk_ratio
+        if most_defensive_weapon:
+            # Give a free hand bonus if only a one-hand weapon is equipped
+            defenses["melee_defense"] += self.free_hands * cfg.free_hand_melee_defense * cfg.second_hand_equip_ratio
+        else:
+            # If no equipment is used, a free hand becomes the main defense
+            defenses["melee_defense"] += self.free_hands * cfg.free_hand_melee_defense
 
         return defenses
 

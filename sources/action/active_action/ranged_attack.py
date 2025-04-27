@@ -54,7 +54,7 @@ class RangedAttack(ActiveActions):
 
         func.optional_print("--------- TARGETS -----------")
         func.optional_print("Choose one of the reachable enemies:")
-        
+
         enemy_list = []
         hit_chance_list = []
         for char in team.characters_list:
@@ -96,7 +96,7 @@ class RangedAttack(ActiveActions):
                     self.target = enemy_list[i]
                     hit_chance = hit_chance_list[i]
                     self.shooting_time *= self.shoot_speed(hit_chance)
-                    
+
                     if self.initiator.equipments.is_using_a_crossbow():
                         stamina = cfg.actions["ranged_attack"]["stamina"] * self.shooting_time / 10
                     else:
@@ -145,7 +145,7 @@ class RangedAttack(ActiveActions):
         func.optional_print("*********************************************************************")
         func.optional_print("")
         func.optional_sleep(3)
-        
+
         target = self.fight.field.shoot_has_hit_another_target(self.initiator, self.target, hit_chance)
         if not target:
             func.optional_print("The shoot has missed its target!", level=3)
@@ -199,35 +199,52 @@ class RangedAttack(ActiveActions):
                                          self.ammo_used.pen_rate, self.ammo_used.resis_dim_rate)
 
     def shoot_hit_chance(self):
+        # Estimate the distance difficulty
         # Distance = -a*(x-1) + b --> distance min = 1.0, distance max = 0.0
-        h_dist = max(cfg.min_distance_ratio,
-                     1.0 -
-                     (self.initiator.calculate_point_distance(self.target.abscissa, self.target.ordinate) - 1.0)
-                     * cfg.decrease_hit_chance_per_case
-                     / self.get_ranged_action_ratio()
-                     / self.initiator.ranged_accuracy_ratio)
-        h_obs = self.fight.field.calculate_ranged_obstacle_ratio(self.initiator, self.target.abscissa, self.target.ordinate)
-        return h_dist * h_obs
+        h_dist = 1.0 - \
+                 (self.initiator.calculate_point_distance(self.target.abscissa, self.target.ordinate) - 1.0) \
+                 * cfg.decrease_hit_chance_per_case
+
+        # Estimate the obstacle handicap
+        h_obs = self.fight.field.calculate_ranged_obstacle_ratio(self.initiator, self.target.abscissa,
+                                                                 self.target.ordinate)
+
+        func.optional_print("h_dist: ", h_dist, level=3, debug=True)
+        func.optional_print("h_obs: ", h_obs, level=3, debug=True)
+        func.optional_print("self.get_ranged_action_ratio(): ", self.get_ranged_action_ratio(), level=3, debug=True)
+        func.optional_print("self.initiator.ranged_accuracy_ratio: ", self.initiator.ranged_accuracy_ratio, level=3, debug=True)
+        return min(cfg.max_range_hit_chance,
+                   max(cfg.min_range_hit_chance,
+                       h_dist * h_obs
+                       * self.get_ranged_action_ratio()  # Estimate the target action handicap
+                       * self.initiator.ranged_accuracy_ratio  # Take in account the skills of the attacker
+                       )
+                   )
 
     def get_ranged_action_ratio(self):
+        # Estimate the melee fight handicap
         total_time = 0
         for attack in self.target.previous_attacks:
             if attack["action"].type == "MeleeAttack":
-                real_start_time = max(attack["start_time"], self.start_timeline)
-                real_end_time = min(attack["end_time"], self.initiator.timeline)
-                time = (real_end_time - real_start_time) / (attack["end_time"] - attack["start_time"])
-                total_time += time
+                if self.fight.current_timeline == self.start_timeline:
+                    total_time += 1
+                else:
+                    real_start_time = max(attack["start_time"], self.start_timeline)
+                    real_end_time = min(attack["end_time"], self.initiator.timeline)
+                    time = (real_end_time - real_start_time) / (attack["end_time"] - attack["start_time"])
+                    total_time += time
+        coef = max(0.0, 1.0 - cfg.melee_fighter_shooting_handicap * math.sqrt(total_time))
 
-        if total_time > 0:
-            coef = math.pow(cfg.melee_fighter_shooting_handicap, total_time)
-        else:
-            coef = 1
-
-        if self.target.last_action and self.target.last_action.type == "Move":
-            coef *= cfg.moving_char_shooting_handicap
+        # Estimate movement handicap
+        action = self.target.last_action
+        if action and action.type == "Move":
+            # Handicap is at its maximum for square angles
+            angle = self.target.calculate_point_to_enemy_path_cos_angle(action.target_abs, action.target_ord,
+                                                                        self.initiator.abscissa, self.initiator.ordinate)
+            coef *= 1.0 - cfg.moving_char_shooting_handicap * abs(abs(angle) - 1)
 
         return coef
-    
+
     @staticmethod
     def range_hit_chance_ratio(hit_chance):
         return math.sqrt(0.5 + hit_chance)  # Between 0,7 and 1,2

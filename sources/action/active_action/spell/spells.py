@@ -222,7 +222,9 @@ class Spells(ActiveActions):
 
         if not reachable:
             func.optional_print("Your initial target is no longer reachable!")
-            func.optional_print("Spell cancelled, the magic and stamina spent is lost")
+            func.optional_sleep(3)
+            func.optional_print("You need to pick a new target.")
+            func.optional_sleep(3)
             return False
         return True
 

@@ -67,7 +67,7 @@ class ActiveActions(Actions):
         if cancelled:
             char.equipments.loose_reloaded_bow_ammo()
             if char.charged_spell:
-                func.optional_print("The attack makes you loose the spell you have previously charged!", level=3)
+                func.optional_print("The attack makes the defender loose the spell they have previously charged!", level=3)
                 func.optional_sleep(2)
                 char.charged_spell = None
 
@@ -77,7 +77,7 @@ class ActiveActions(Actions):
             pass
         elif char.last_action.type == "Waiting":
             # This action is always stopped and has no penalty
-            func.optional_print("You stop passing time because of the attack", level=2)
+            func.optional_print("The defender stopped passing time because of the attack", level=2)
             func.optional_sleep(2)
             char.last_action = None
             char.timeline = timeline
@@ -88,7 +88,7 @@ class ActiveActions(Actions):
         
             if char.last_action.type != "Move":
                 # Penalty for standard actions (excepting move)
-                func.optional_print("The attack surprises you and your defense is diminished!", level=2)
+                func.optional_print("The attack surprises the defender and their defense is diminished!", level=2)
                 func.optional_sleep(2)
                 
             if cancelled:
@@ -97,7 +97,7 @@ class ActiveActions(Actions):
                 func.optional_sleep(2)
                 
                 if char.last_action.type == "Reload":
-                        func.optional_print("Furthermore, you loose the ammo being used for reloading!", level=3)
+                        func.optional_print("Furthermore, the defender lost their ammo being used for reloading!", level=3)
                         func.optional_sleep(2)
                         char.equipments.ammo.remove(char.last_action.ammo_to_load)
                 

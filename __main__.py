@@ -20,5 +20,5 @@ ImportData("ObstaclesField", "data/maps/VeryLongTwoBridges.csv")
 ##################### FIGHT #####################
 func.log_level = 1
 
-# Fight(cfg.field_list[3], cfg.team_list[0], cfg.team_list[1])  # Melee vs Ranged (ranged field)
-Fight(cfg.field_list[4], cfg.team_list[0], cfg.team_list[1])
+Fight(cfg.field_list[3], cfg.team_list[0], cfg.team_list[1])  # Melee vs Ranged (ranged field)
+# Fight(cfg.field_list[4], cfg.team_list[0], cfg.team_list[1])
