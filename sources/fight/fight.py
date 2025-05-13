@@ -442,3 +442,52 @@ class Fight:
 
         character.last_action = character.charged_spell
         return character.charged_spell.cast()
+
+    #################### API INTEGRATION ########################
+    def get_game_state(self):
+        game_state = {
+            "field": self.field.get_field_state(),
+            "team1": self.team1.get_team_state(),
+            "team2": self.team2.get_team_state(),
+            "current_timeline": self.current_timeline,
+            "scheduler": [event.get_event_state() for event in self.scheduler],
+            "char_order": [char.get_character_state() for char in self.char_order]
+        }
+        return game_state
+
+    def execute_action(self, action):
+        action_type = action.get("action_type")
+        character = action.get("character")
+        if not character:
+            func.optional_print("Character not found in action data")
+            return
+        character = self.belong_to_team(character)
+        if not character:
+            func.optional_print("Character not found in team")
+            return
+        
+        if action_type == "move":
+            self.move_action(character)
+        elif action_type == "melee_attack":
+            self.melee_attack_action(character)  
+        elif action_type == "ranged_attack":
+            self.ranged_attack_action(character)
+        elif action_type == "reload":
+            self.reload_action(character)
+        elif action_type == "rest":
+            self.rest_action(character)
+        elif action_type == "concentrate":
+            self.concentrate_action(character)
+        elif action_type == "modify_equipments":
+            self.equip_action(character)
+        elif action_type == "pass_time":
+            self.pass_action(character)
+        elif action_type == "cast_spell":
+            Fight.cast_charged_spell(character)
+        elif action_type == "charge_spell":
+            self.initiate_spell_object(character)
+        else:
+            func.optional_print("Action type not recognized:", action_type)
+            return False
+
+        return True

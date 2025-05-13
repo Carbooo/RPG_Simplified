@@ -537,7 +537,7 @@ class Field:
 
         return current_paths[len(current_paths) - 1][3]
 
-################ PRINTING FUNCTIONS ########################
+    ################ PRINTING FUNCTIONS ########################
     def print_line(self):
         stri = "----|"
         for _ in range(1, self.abscissa_size + 1):
@@ -605,3 +605,16 @@ class Field:
 
         # Bottom abscissa scale
         self.print_abs_scale()
+
+    #################### API INTEGRATION ########################
+    def get_game_state(self):
+        game_state = {
+            "name": self.name,
+            "abscissa_size": self.abscissa_size,
+            "ordinate_size": self.ordinate_size,
+            "obstacles": self.obstacles_array.tolist(),
+            "characters": [[char.get_id() if char else None for char in row] for row in self.characters_array.tolist()],
+            "reliefs": self.reliefs_array.tolist(),
+            "active_spells": [{"target_abs": spell.target_abs, "target_ord": spell.target_ord, "spell_power": spell.spell_power} for spell in self.active_spells]
+        }
+        return game_state
